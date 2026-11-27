@@ -285,7 +285,7 @@
                             <div>
                                 <label for="discountAmountInput" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1">Discount (AED)</label>
                                 <input type="number" step="0.01" min="0" name="discount_amount" id="discountAmountInput"
-                                       x-model="manualDiscountAmount" @input="recalc()"
+                                       x-model="manualDiscountAmount" @input="discountManuallyEdited = true; recalc()"
                                        placeholder="0.00"
                                        class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-emerald-700 outline-hidden focus:border-primary">
                             </div>
@@ -414,6 +414,7 @@ function manualBookingCreator() {
         selectedAddons: @json($initialAddons),
         couponCode: @json($initialCouponCode),
         manualDiscountAmount: @json($initialDiscountAmount),
+        discountManuallyEdited: false,
         customTotal: @json($initialCustomTotal),
         status: @json($initialStatus),
         paymentMethod: @json($initialPaymentMethod),
@@ -508,29 +509,31 @@ function manualBookingCreator() {
         },
 
         onCouponChange() {
+            this.discountManuallyEdited = false;
             if (!this.couponCode) {
                 this.manualDiscountAmount = '';
                 this.recalc();
                 return;
             }
-            const c = this.coupons.find(item => item.code === this.couponCode);
-            if (c) {
-                const guests = Math.max(1, (Number(this.adults) || 1) + (Number(this.children) || 0));
-                let disc = 0;
-                if (c.discount_type === 'percentage') {
-                    disc = (this.originalTotal * Number(c.discount_value)) / 100;
-                } else if (c.discount_type === 'per_person') {
-                    disc = Number(c.discount_value) * guests;
-                } else {
-                    disc = Number(c.discount_value);
-                }
-                if (c.max_discount && disc > Number(c.max_discount)) {
-                    disc = Number(c.max_discount);
-                }
-                disc = Math.min(this.originalTotal, Math.round(disc * 100) / 100);
-                this.manualDiscountAmount = disc.toFixed(2);
-            }
             this.recalc();
+        },
+
+        computeCouponDiscount(baseTotal, guests) {
+            if (!this.couponCode) return null;
+            const c = this.coupons.find(item => item.code === this.couponCode);
+            if (!c) return null;
+            let disc = 0;
+            if (c.discount_type === 'percentage') {
+                disc = (baseTotal * Number(c.discount_value)) / 100;
+            } else if (c.discount_type === 'per_person') {
+                disc = Number(c.discount_value) * guests;
+            } else {
+                disc = Number(c.discount_value);
+            }
+            if (c.max_discount && disc > Number(c.max_discount)) {
+                disc = Number(c.max_discount);
+            }
+            return Math.min(baseTotal, Math.round(disc * 100) / 100);
         },
 
         recalc() {
@@ -564,6 +567,13 @@ function manualBookingCreator() {
             this.addonsTotal = Math.round(addonsSum * 100) / 100;
             this.subtotal = Math.round(this.subtotal * 100) / 100;
             this.originalTotal = Math.round((this.subtotal + this.addonsTotal) * 100) / 100;
+
+            if (this.couponCode && !this.discountManuallyEdited) {
+                const autoDisc = this.computeCouponDiscount(this.originalTotal, billableGuests);
+                if (autoDisc !== null) {
+                    this.manualDiscountAmount = autoDisc.toFixed(2);
+                }
+            }
 
             let disc = 0;
             if (this.manualDiscountAmount !== '' && this.manualDiscountAmount !== null && !isNaN(this.manualDiscountAmount)) {

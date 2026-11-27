@@ -112,6 +112,7 @@
     {{-- MULTIPLE / GALLERY SELECT MODE --}}
     <template x-if="isMultiple">
         <div class="space-y-3">
+            <input type="hidden" name="{{ $name }}_submitted" value="1" @if($form) form="{{ $form }}" @endif>
             <!-- Selected Gallery Grid -->
             <div x-show="items.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
                 <template x-for="(item, index) in items" :key="index">
@@ -257,9 +258,16 @@ if (typeof window.mediaPickerComponent !== 'function') {
                 if (!path) return '/images/media-placeholder.svg';
                 if (path.startsWith('http://') || path.startsWith('https://')) return path;
                 const clean = path.replace(/^\//, '');
-                // Check if starts with storage or images
-                if (clean.startsWith('storage/')) return '/' + clean;
-                return '/' + clean;
+                if (
+                    clean.startsWith('storage/') ||
+                    clean.startsWith('images/') ||
+                    clean.startsWith('videos/') ||
+                    clean.startsWith('assets/') ||
+                    clean.startsWith('media/')
+                ) {
+                    return '/' + clean;
+                }
+                return '/storage/' + clean;
             }
         };
     };

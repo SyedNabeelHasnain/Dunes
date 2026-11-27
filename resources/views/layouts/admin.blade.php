@@ -755,7 +755,7 @@
                                 <span class="flex items-center gap-2"><i class="bi bi-diagram-2-fill text-rose-500"></i> XML Sitemap Index</span>
                                 <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
                             </a>
-                            <a href="{{ url('/feeds/google-things-to-do.xml') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="google things to do feed products attractions xml live feed">
+                            <a href="{{ url('/feeds/google-things-to-do/feed.xml') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="google things to do feed products attractions xml live feed">
                                 <span class="flex items-center gap-2"><i class="bi bi-patch-check text-emerald-500"></i> Google Things To Do Feed</span>
                                 <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
                             </a>

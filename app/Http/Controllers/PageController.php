@@ -324,7 +324,10 @@ class PageController extends Controller
         $phone = strip_tags(trim($request->input('phone', 'N/A'))) ?: 'N/A';
         $email = strip_tags(trim($request->input('email', '')));
         $tourName = strip_tags(trim($request->input('tour_name', 'General Inquiry'))) ?: 'General Inquiry';
-        $pageUrl = strip_tags(trim($request->input('page_url', '')));
+        $rawPageUrl = strip_tags(trim((string) $request->input('page_url', '')));
+        $pageUrl = ($rawPageUrl !== '' && (str_starts_with($rawPageUrl, '/') || preg_match('#^https?://#i', $rawPageUrl)))
+            ? $rawPageUrl
+            : '';
         $messageText = strip_tags(trim($request->input('message_text', '')));
 
         // Collect comprehensive request context & telemetry
@@ -502,6 +505,7 @@ class PageController extends Controller
 
             // Save WhatsApp lead with direct telemetry columns (self-contained & resilient)
             $inquiry = WhatsappInquiry::create([
+                'ref_code' => $refCode,
                 'name' => $name,
                 'phone' => $phone,
                 'email' => $email ?: null,
@@ -656,8 +660,21 @@ class PageController extends Controller
         }
         $request->validate($rules);
 
-        $reviewerName = $booking ? $booking->name : trim($request->input('guest_name', 'Guest Traveler'));
+        $reviewerName = strip_tags($booking ? (string) $booking->name : trim((string) $request->input('guest_name', 'Guest Traveler')));
         $bookingId = $booking ? $booking->id : null;
+
+        // Prevent overwriting/defacing an already-submitted booking review via public reference
+        if ($booking && Review::where('source', 'direct_ugc')->where('booking_id', $booking->id)->exists()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A review for this reservation has already been submitted. Thank you!',
+                ], 409);
+            }
+
+            return redirect()->to(localized_route('review.rate', ['ref' => $ref]))
+                ->with('info', 'A review for this reservation has already been submitted. Thank you!');
+        }
 
         $rating = (float) $request->input('rating');
         $storedPhotos = [];
@@ -679,26 +696,23 @@ class PageController extends Controller
         }
 
         $sourceReviewId = $booking ? $booking->reference : ('GUEST-'.substr(md5($reviewerName.($storedPhotos[0] ?? microtime(true))), 0, 12));
-        $isVerifiedCompletedBooking = $booking && in_array($booking->status, ['confirmed', 'completed'], true);
+        $cleanTitle = strip_tags(trim((string) ($request->input('review_title') ?: 'Unforgettable Desert Safari Experience')));
+        $cleanText = strip_tags(trim((string) $request->input('review_text')));
 
-        $review = Review::updateOrCreate(
-            [
-                'source' => 'direct_ugc',
-                'source_review_id' => $sourceReviewId,
-            ],
-            [
-                'booking_id' => $bookingId,
-                'reviewer_name' => $reviewerName,
-                'rating' => $rating,
-                'review_title' => $request->input('review_title') ?: 'Unforgettable Desert Safari Experience',
-                'review_text' => $request->input('review_text'),
-                'photos' => $storedPhotos,
-                'status' => ($isVerifiedCompletedBooking && $rating >= 4) ? 'approved' : 'pending',
-                'is_featured' => ($isVerifiedCompletedBooking && $rating >= 4.5 && count($storedPhotos) > 0),
-                'published_date' => now()->toDateString(),
-                'imported_at' => now(),
-            ]
-        );
+        $review = Review::create([
+            'source' => 'direct_ugc',
+            'source_review_id' => $sourceReviewId,
+            'booking_id' => $bookingId,
+            'reviewer_name' => $reviewerName,
+            'rating' => $rating,
+            'review_title' => $cleanTitle,
+            'review_text' => $cleanText,
+            'photos' => $storedPhotos,
+            'status' => 'pending',
+            'is_featured' => false,
+            'published_date' => now()->toDateString(),
+            'imported_at' => now(),
+        ]);
 
         flush_review_and_social_proof_caches();
 
@@ -748,14 +762,14 @@ class PageController extends Controller
             }
 
             try {
+                $feedbackRating = max(1.0, min(5.0, (float) $request->input('rating', 1.0)));
                 $feedbackReview = new Review([
                     'reviewer_name' => $booking->name ?: 'Valued Guest',
-                    'rating' => 5.0,
+                    'rating' => $feedbackRating,
                     'review_title' => 'Guest Service Recovery Feedback (Ref: #'.$booking->reference.')',
                     'review_text' => $feedback,
                     'status' => 'pending',
                 ]);
-                $feedbackReview->id = $booking->id;
                 app(\App\Services\NotificationManagementService::class)->notifyCustomerReview($feedbackReview, $booking, 'feedback');
             } catch (\Throwable $e) {
                 Log::error('Failed to send guest feedback notification: '.$e->getMessage());

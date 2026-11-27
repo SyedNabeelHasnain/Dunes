@@ -43,8 +43,14 @@
         this.pickupTime = time;
     },
     toggleSelectAll(event, bookingIds) {
-        this.allSelected = event.target.checked;
-        this.selectedBookings = this.allSelected ? [...bookingIds] : [];
+        const checked = event.target.checked;
+        const zoneIds = bookingIds.map(String);
+        if (checked) {
+            const merged = new Set([...this.selectedBookings.map(String), ...zoneIds]);
+            this.selectedBookings = Array.from(merged);
+        } else {
+            this.selectedBookings = this.selectedBookings.map(String).filter(id => !zoneIds.includes(id));
+        }
     },
     toggleBooking(id) {
         const strId = String(id);
@@ -183,7 +189,7 @@
                     $cap = $driver->defaultVehicle?->passenger_capacity ?: 6;
                     $pct = $cap > 0 ? round(($guestLoad / $cap) * 100) : 0;
                     $cleanPhone = preg_replace('/[^0-9]/', '', $driver->phone);
-                    $runSheetUrl = route('driver.run-sheet', $driver->access_token);
+                    $runSheetUrl = route('driver.run-sheet', ['token' => $driver->access_token, 'date' => $selectedDate]);
                     $waRunSheetMsg = "Hi Captain {$driver->name}! Here is your Dunes Discovery safari run sheet for {$targetDate->format('M j, Y')}: {$runSheetUrl} - Safe driving!";
                 @endphp
                 <div class="p-3.5 rounded-xl border {{ $guestLoad > 0 ? 'border-primary/20 bg-orange-50/20' : 'border-slate-200 bg-slate-50/40' }} flex flex-col justify-between">
@@ -214,7 +220,7 @@
                     </div>
 
                     <div class="pt-2 border-t border-slate-200 flex items-center justify-between gap-1 text-[11px]">
-                        <a href="{{ route('admin.drivers.run-sheet', $driver->id) }}" class="font-bold text-primary hover:underline flex items-center gap-1">
+                        <a href="{{ route('admin.drivers.run-sheet', ['id' => $driver->id, 'date' => $selectedDate]) }}" class="font-bold text-primary hover:underline flex items-center gap-1">
                             <i class="bi bi-card-checklist"></i> Run Sheet
                         </a>
                         @if($cleanPhone)

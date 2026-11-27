@@ -25,12 +25,24 @@ class SyndicationController extends Controller
         $slug = trim((string) $request->input('tour', $request->input('slug', '')));
         $partnerId = trim((string) $request->input('partner_id', $request->input('partner', '')));
 
-        // Cache key based on query parameters
-        $cacheKey = 'syndication_tours_' . md5("{$category}_{$slug}_{$partnerId}");
+        // Exclude partner_id from cache key so arbitrary partner strings cannot flood cache storage
+        $cacheKey = 'syndication_tours_' . md5("{$category}_{$slug}");
 
-        $data = Cache::remember($cacheKey, $this->cacheTtl, function () use ($category, $slug, $partnerId) {
-            return $this->buildSyndicationPayload($category, $slug, $partnerId);
+        $data = Cache::remember($cacheKey, $this->cacheTtl, function () use ($category, $slug) {
+            return $this->buildSyndicationPayload($category, $slug);
         });
+
+        if ($partnerId !== '' && ! empty($data['tours']) && is_array($data['tours'])) {
+            foreach ($data['tours'] as &$item) {
+                $baseTourUrl = $item['url'] ?? url('/' . ($item['slug'] ?? ''));
+                $item['booking_url'] = $baseTourUrl . '?' . http_build_query([
+                    'utm_source' => $partnerId,
+                    'utm_medium' => 'syndication_api',
+                    'utm_campaign' => 'partner_' . ($item['slug'] ?? 'tour'),
+                ]);
+            }
+            unset($item);
+        }
 
         return response()->json($data, 200, [
             'Access-Control-Allow-Origin' => '*',
@@ -43,7 +55,7 @@ class SyndicationController extends Controller
     /**
      * Build the syndication dataset.
      */
-    protected function buildSyndicationPayload(string $categoryFilter, string $slugFilter, string $partnerId): array
+    protected function buildSyndicationPayload(string $categoryFilter, string $slugFilter, string $partnerId = ''): array
     {
         try {
             $settings = Setting::pluck('setting_value', 'setting_key')->all();
@@ -62,9 +74,10 @@ class SyndicationController extends Controller
         }
 
         if ($categoryFilter !== '') {
-            $query->whereHas('category', function ($q) use ($categoryFilter) {
+            $escapedCategory = addcslashes($categoryFilter, '%_!');
+            $query->whereHas('category', function ($q) use ($categoryFilter, $escapedCategory) {
                 $q->where('slug', $categoryFilter)
-                    ->orWhere('name', 'like', "%{$categoryFilter}%");
+                    ->orWhereRaw("name LIKE ? ESCAPE '!'", ["%{$escapedCategory}%"]);
             });
         }
 
@@ -131,7 +144,6 @@ class SyndicationController extends Controller
                     'dropoff_window' => $timings['dropoff'],
                     'summary' => $timings['summary'],
                 ],
-                'duration' => $tour->duration ?: '6 Hours',
                 'rating' => (float) ($tour->rating ?: 4.9),
                 'review_count' => (int) ($tour->review_count ?: 2847),
                 'starting_price_aed' => $startingPrice > 0 ? $startingPrice : 79.00,
@@ -193,36 +205,50 @@ class SyndicationController extends Controller
     {
         $slug = strtolower($tour->slug);
         $name = strtolower($tour->name);
+        $dbPickup = trim((string) ($tour->pickup_time ?? ''));
+        $dbDropoff = trim((string) ($tour->dropoff_time ?? ''));
 
         if (str_contains($slug, 'morning') || str_contains($name, 'morning')) {
+            $pickup = $dbPickup !== '' ? $dbPickup : '07:00 AM – 07:30 AM';
+            $dropoff = $dbDropoff !== '' ? $dbDropoff : '10:30 AM – 11:00 AM';
+
             return [
-                'pickup' => '07:00 AM – 07:30 AM',
-                'dropoff' => '10:30 AM – 11:00 AM',
-                'summary' => 'Morning Red Dunes Safari: 07:00 AM Pickup · 10:30 AM – 11:00 AM Return (Back before midday)',
+                'pickup' => $pickup,
+                'dropoff' => $dropoff,
+                'summary' => "Morning Red Dunes Safari: {$pickup} Pickup · {$dropoff} Return (Back before midday)",
             ];
         }
 
         if (str_contains($slug, 'overnight') || str_contains($name, 'overnight')) {
+            $pickup = $dbPickup !== '' ? $dbPickup : '02:45 PM – 03:15 PM';
+            $dropoff = $dbDropoff !== '' ? $dbDropoff : '06:30 AM – 07:00 AM (Next Day)';
+
             return [
-                'pickup' => '02:45 PM – 03:15 PM',
-                'dropoff' => '06:30 AM – 07:00 AM (Next Day)',
-                'summary' => 'Overnight Bedouin Safari: 02:45 PM Pickup · 06:30 AM – 07:00 AM Next Day Return',
+                'pickup' => $pickup,
+                'dropoff' => $dropoff,
+                'summary' => "Overnight Bedouin Safari: {$pickup} Pickup · {$dropoff} Return",
             ];
         }
 
         if (str_contains($slug, 'quad') || str_contains($slug, 'buggy') || str_contains($name, 'quad') || str_contains($name, 'buggy')) {
+            $pickup = $dbPickup !== '' ? $dbPickup : '02:00 PM – 02:30 PM';
+            $dropoff = $dbDropoff !== '' ? $dbDropoff : '09:00 PM – 09:30 PM';
+
             return [
-                'pickup' => '02:00 PM – 02:30 PM',
-                'dropoff' => '09:00 PM – 09:30 PM',
-                'summary' => 'Self-Drive Quad & Buggy Safari: 02:00 PM Pickup · 09:00 PM – 09:30 PM Return',
+                'pickup' => $pickup,
+                'dropoff' => $dropoff,
+                'summary' => "Self-Drive Quad & Buggy Safari: {$pickup} Pickup · {$dropoff} Return",
             ];
         }
 
         // Standard Evening Safari
+        $pickup = $dbPickup !== '' ? $dbPickup : '02:30 PM – 03:00 PM';
+        $dropoff = $dbDropoff !== '' ? $dbDropoff : '09:00 PM – 09:30 PM';
+
         return [
-            'pickup' => $tour->pickup_time ?: '02:30 PM – 03:00 PM',
-            'dropoff' => $tour->dropoff_time ?: '09:00 PM – 09:30 PM',
-            'summary' => 'Evening Red Dunes Safari & BBQ: 02:30 PM Pickup · 09:00 PM – 09:30 PM Return',
+            'pickup' => $pickup,
+            'dropoff' => $dropoff,
+            'summary' => "Evening Red Dunes Safari & BBQ: {$pickup} Pickup · {$dropoff} Return",
         ];
     }
 }

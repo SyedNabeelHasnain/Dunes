@@ -48,7 +48,7 @@ class GoogleReviewSyncService
     {
         $lock = Cache::lock(self::SYNC_LOCK_KEY, 30);
 
-        if (! $force && ! $lock->get()) {
+        if (! $lock->get()) {
             return [
                 'success' => false,
                 'rate_limited' => true,
@@ -80,6 +80,17 @@ class GoogleReviewSyncService
             $isFallback = false;
             if (! empty($fetchResult['error'])) {
                 $errorMsg = $fetchResult['error'];
+                if (app()->environment('production')) {
+                    Log::error('Google Places API live fetch failed in production (fallback disabled): '.$errorMsg);
+
+                    return [
+                        'success' => false,
+                        'rate_limited' => false,
+                        'fallback' => false,
+                        'message' => 'Google Places API sync failed: '.$errorMsg,
+                        'last_synced_at' => $this->getLastSyncedAt(),
+                    ];
+                }
                 Log::warning('Google Places API live fetch returned notice, utilizing verified fallback reviews: '.$errorMsg);
                 $fetchResult = $this->getFallbackGoogleReviews();
                 $isFallback = true;
@@ -103,12 +114,28 @@ class GoogleReviewSyncService
                     continue;
                 }
 
-                $reviewRecord = Review::updateOrCreate(
-                    [
+                $existing = Review::where('source', 'google')
+                    ->where('source_review_id', $normalized['source_review_id'])
+                    ->first();
+
+                if ($existing) {
+                    $existing->update([
+                        'reviewer_name' => $normalized['reviewer_name'],
+                        'reviewer_avatar_url' => $normalized['reviewer_avatar_url'] ?: $existing->reviewer_avatar_url,
+                        'reviewer_profile_url' => $normalized['reviewer_profile_url'] ?: $existing->reviewer_profile_url,
+                        'review_url' => $normalized['review_url'] ?: $existing->review_url,
+                        'rating' => $normalized['rating'],
+                        'review_title' => ! empty($existing->review_title) ? $existing->review_title : $normalized['review_title'],
+                        'review_text' => $normalized['review_text'] ?: $existing->review_text,
+                        'photos' => ! empty($existing->photos) ? $existing->photos : $normalized['photos'],
+                        'published_date' => $normalized['published_date'] ?: $existing->published_date,
+                        'imported_at' => now(),
+                    ]);
+                    $updated++;
+                } else {
+                    Review::create([
                         'source' => 'google',
                         'source_review_id' => $normalized['source_review_id'],
-                    ],
-                    [
                         'reviewer_name' => $normalized['reviewer_name'],
                         'reviewer_avatar_url' => $normalized['reviewer_avatar_url'],
                         'reviewer_profile_url' => $normalized['reviewer_profile_url'],
@@ -121,13 +148,8 @@ class GoogleReviewSyncService
                         'status' => $normalized['status'],
                         'is_featured' => $normalized['is_featured'],
                         'imported_at' => now(),
-                    ]
-                );
-
-                if ($reviewRecord->wasRecentlyCreated) {
+                    ]);
                     $added++;
-                } else {
-                    $updated++;
                 }
             }
 
@@ -209,7 +231,7 @@ class GoogleReviewSyncService
                     'X-Goog-Api-Key' => $apiKey,
                     'X-Goog-FieldMask' => 'id,displayName,rating,userRatingCount,reviews,googleMapsUri',
                 ])
-                ->get("https://places.googleapis.com/v1/places/{$placeId}");
+                ->get('https://places.googleapis.com/v1/places/'.urlencode($placeId));
 
             if ($response->successful()) {
                 $data = $response->json();

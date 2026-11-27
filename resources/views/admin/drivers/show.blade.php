@@ -91,8 +91,8 @@
         </div>
     </div>
 
-    <!-- 4 Stats Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- 5 Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80">
             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Today's Pickups</span>
             <h3 class="text-2xl font-black text-primary">{{ $todayBookings->count() }}</h3>
@@ -112,6 +112,12 @@
         </div>
 
         <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Settled Revenue</span>
+            <h3 class="text-xl font-black text-slate-900">AED {{ number_format((float) ($lifetimeStats['cash_collected'] ?? 0), 0) }}</h3>
+            <span class="text-[11px] text-slate-400">Paid bookings handled</span>
+        </div>
+
+        <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 col-span-2 lg:col-span-1">
             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Assigned Vehicle</span>
             <h3 class="text-base font-black text-slate-900 truncate">
                 {{ $driver->defaultVehicle?->short_plate ?: 'None' }}
@@ -196,5 +202,42 @@
             </table>
         </div>
     </div>
+
+    <!-- Upcoming Assigned Schedule -->
+    @if(isset($upcomingBookings) && $upcomingBookings->isNotEmpty())
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                <i class="bi bi-calendar2-week text-sky-600"></i> Upcoming Assigned Departures ({{ $upcomingBookings->count() }})
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
+                        <th class="py-3 px-4">Tour Date</th>
+                        <th class="py-3 px-4">Ref</th>
+                        <th class="py-3 px-4">Guest</th>
+                        <th class="py-3 px-4">Tour &amp; Tier</th>
+                        <th class="py-3 px-4 text-center">Guests</th>
+                        <th class="py-3 px-4">Pickup Location</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach($upcomingBookings as $ub)
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3 px-4 font-bold text-slate-800 whitespace-nowrap">{{ $ub->tour_date ? $ub->tour_date->format('M j, Y') : 'N/A' }}</td>
+                        <td class="py-3 px-4"><a href="{{ route('admin.bookings.show', $ub->id) }}" class="font-mono font-black text-primary hover:underline">#{{ $ub->reference }}</a></td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">{{ $ub->name }}</td>
+                        <td class="py-3 px-4">{{ $ub->tour_name }} <span class="text-[10px] text-slate-400">({{ $ub->tier_name }})</span></td>
+                        <td class="py-3 px-4 text-center font-bold">{{ (int) $ub->adults + (int) $ub->children }}</td>
+                        <td class="py-3 px-4 text-slate-600">{{ $ub->pickup_location ?: 'TBD' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
 </div>
 @endsection

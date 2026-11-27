@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() ?: 'en' }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -169,14 +169,28 @@
             });
 
             const result = await res.json();
+            feedback.textContent = '';
+            const wrap = document.createElement('div');
+            wrap.className = 'flex items-start gap-2.5';
+            const icon = document.createElement('i');
+            const body = document.createElement('div');
             if (result.success) {
                 form.classList.add('hidden');
                 feedback.className = 'p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-200 text-xs shadow-md leading-relaxed';
-                feedback.innerHTML = '<div class="flex items-start gap-2.5"><i class="bi bi-check-circle-fill text-emerald-400 text-base shrink-0 mt-0.5"></i><div><strong class="font-bold text-white text-sm block mb-1">Review Request Submitted Successfully!</strong>' + result.message + '</div></div>';
+                icon.className = 'bi bi-check-circle-fill text-emerald-400 text-base shrink-0 mt-0.5';
+                const strong = document.createElement('strong');
+                strong.className = 'font-bold text-white text-sm block mb-1';
+                strong.textContent = 'Review Request Submitted Successfully!';
+                body.appendChild(strong);
+                body.appendChild(document.createTextNode(String(result.message || '')));
             } else {
                 feedback.className = 'p-3.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-200 text-xs shadow-md';
-                feedback.innerHTML = '<div class="flex items-start gap-2"><i class="bi bi-exclamation-triangle-fill text-rose-400 shrink-0 mt-0.5"></i><div>' + (result.message || 'Failed to submit unblock request.') + '</div></div>';
+                icon.className = 'bi bi-exclamation-triangle-fill text-rose-400 shrink-0 mt-0.5';
+                body.textContent = String(result.message || 'Failed to submit unblock request.');
             }
+            wrap.appendChild(icon);
+            wrap.appendChild(body);
+            feedback.appendChild(wrap);
             feedback.classList.remove('hidden');
         } catch (err) {
             feedback.className = 'p-3.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-200 text-xs shadow-md';

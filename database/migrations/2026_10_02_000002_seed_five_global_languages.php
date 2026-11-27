@@ -105,8 +105,10 @@ return new class extends Migration
                 ]));
             }
 
-            // Build complete locale directories and files
-            $localeManager->buildLocale($langData['code']);
+            // Build complete locale directories and files (skip disk writes during automated tests)
+            if (! app()->runningUnitTests()) {
+                $localeManager->buildLocale($langData['code']);
+            }
         }
 
         Language::clearLanguageCache();

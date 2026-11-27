@@ -4,6 +4,13 @@
 $heroPoster = !empty($settings['site_hero_poster']) 
     ? (str_starts_with($settings['site_hero_poster'], 'http') ? $settings['site_hero_poster'] : asset(ltrim($settings['site_hero_poster'], '/'))) 
     : asset('images/desert-safari-poster.avif');
+$heroPosterExt = strtolower(pathinfo((string) parse_url((string) $heroPoster, PHP_URL_PATH), PATHINFO_EXTENSION));
+$heroPosterMime = match ($heroPosterExt) {
+    'jpg', 'jpeg' => 'image/jpeg',
+    'png' => 'image/png',
+    'webp' => 'image/webp',
+    default => 'image/avif',
+};
 
 $heroVideo = !empty($settings['site_hero_video']) 
     ? (str_starts_with($settings['site_hero_video'], 'http') ? $settings['site_hero_video'] : asset(ltrim($settings['site_hero_video'], '/'))) 
@@ -13,7 +20,7 @@ $cmsSvc = app(\App\Services\CmsContentService::class);
 @endphp
 
 @push('preloads')
-<link rel="preload" as="image" href="{{ $heroPoster }}" type="image/avif" fetchpriority="high">
+<link rel="preload" as="image" href="{{ $heroPoster }}" type="{{ $heroPosterMime }}" fetchpriority="high">
 @endpush
 
 @section('content')
@@ -60,7 +67,10 @@ if (!function_exists('renderReviewCardMarkup')) {
             $sourceLinkText = 'View Review';
         }
 
-        $url = !empty($r->review_url) ? $r->review_url : localized_route('review.rate', ['ref' => 'guest']);
+        $rawReviewUrl = trim((string) ($r->review_url ?? ''));
+        $url = ($rawReviewUrl !== '' && (preg_match('#^https?://#i', $rawReviewUrl) || str_starts_with($rawReviewUrl, '/')))
+            ? $rawReviewUrl
+            : localized_route('review.rate', ['ref' => 'guest']);
         $rawName = trim((string)($r->reviewer_name ?? ''));
         $reviewerName = htmlspecialchars(!empty($rawName) ? $rawName : 'Verified Guest');
 
@@ -134,7 +144,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                         <div class="flex gap-0.5 text-xs">
                             ' . $stars . '
                         </div>
-                        <span class="text-[11px] font-bold text-slate-700 bg-amber-50 border border-amber-200/60 rounded-md px-1.5 py-0.5 leading-none">5.0</span>
+                        <span class="text-[11px] font-bold text-slate-700 bg-amber-50 border border-amber-200/60 rounded-md px-1.5 py-0.5 leading-none">{{ number_format($rating, 1) }}</span>
                     </div>
 
                     ' . ($reviewTitle ? '<h3 class="text-sm font-bold text-slate-900 mb-1.5 line-clamp-1 leading-snug group-hover:text-slate-950">' . $reviewTitle . '</h3>' : '') . '
@@ -297,9 +307,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 
 <!-- Modern Hero Section -->
 <section class="hero-modern relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-28 sm:pt-36 pb-16 sm:pb-20">
-    <video class="hero-video absolute inset-0 w-full h-full object-cover -z-10" autoplay loop muted playsinline id="heroVideo" poster="{{ $heroPoster }}" fetchpriority="high" aria-hidden="true">
-        <track kind="captions" src="" label="English" srclang="en">
-    </video>
+    <video class="hero-video absolute inset-0 w-full h-full object-cover -z-10" autoplay loop muted playsinline id="heroVideo" poster="{{ $heroPoster }}" fetchpriority="high" aria-hidden="true"></video>
     <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-slate-950/75 via-slate-950/65 to-slate-950/90 -z-10"></div>
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center text-white py-6 sm:py-10">

@@ -32,35 +32,46 @@ class BlogPostObserver
     protected function syncCachesAndIndexNow(BlogPost $post): void
     {
         try {
-            Cache::forget('sitemap_blogs_xml');
-            Cache::forget('sitemap_xml');
-            Cache::forget('site_llms_txt');
-            Cache::forget('site_llms_full_txt');
+            \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
+            Cache::forget('blog_sidebar_categories_counts');
 
             if ($post->status !== 'published') {
                 return;
             }
 
-            // Collect URLs for IndexNow streaming (only the modified blog post and its language alternates)
-            $urls = [
-                url('/blog/' . $post->slug),
-            ];
-
-            try {
-                $languages = Language::where('is_active', true)->where('is_default', false)->get();
-                foreach ($languages as $lang) {
-                    $urls[] = url('/' . $lang->code . '/blog/' . $post->slug);
+            if (app()->runningUnitTests()) {
+                if (! app()->bound(IndexNowService::class)) {
+                    return;
                 }
-            } catch (\Throwable $e) {
-                foreach (['ar', 'ru', 'es', 'it'] as $code) {
-                    $urls[] = url('/' . $code . '/blog/' . $post->slug);
-                }
+            } elseif (app()->runningInConsole()) {
+                return;
             }
 
-            if (app()->bound(IndexNowService::class)) {
-                $service = app(IndexNowService::class);
-                if ($service->isEnabled()) {
+            $urls = [url('/blog/' . $post->slug)];
+            $activeCodes = ['ar', 'ru', 'es', 'it'];
+            try {
+                $dbCodes = Language::where('is_active', true)->where('is_default', false)->pluck('code')->all();
+                if (! empty($dbCodes)) {
+                    $activeCodes = $dbCodes;
+                }
+            } catch (\Throwable) {
+            }
+            foreach ($activeCodes as $code) {
+                $urls[] = url('/' . $code . '/blog/' . $post->slug);
+            }
+
+            $service = app(IndexNowService::class);
+            if ($service->isEnabled()) {
+                if (app()->runningUnitTests()) {
                     $service->submit($urls);
+                } else {
+                    dispatch(static function () use ($urls) {
+                        try {
+                            app(IndexNowService::class)->submit($urls);
+                        } catch (\Throwable $ex) {
+                            Log::warning('BlogPostObserver async IndexNow failed: ' . $ex->getMessage());
+                        }
+                    })->afterResponse();
                 }
             }
         } catch (\Throwable $e) {

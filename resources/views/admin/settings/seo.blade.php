@@ -756,11 +756,11 @@
                                     </div>
                                     <div>
                                         <label for="gsc_oauth_access_token" class="block text-[11px] font-bold text-slate-700 mb-1">Google Search Console OAuth Token</label>
-                                        <input type="password" name="gsc_oauth_access_token" id="gsc_oauth_access_token" value="{{ $settings['gsc_oauth_access_token'] ?? '' }}" autocomplete="new-password" placeholder="Optional Bearer token" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                                        <input type="password" name="gsc_oauth_access_token" id="gsc_oauth_access_token" value="" autocomplete="new-password" placeholder="{{ !empty($settings['gsc_oauth_access_token']) ? '•••••••• (Configured — leave blank to keep)' : 'Optional Bearer token' }}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
                                     </div>
                                     <div>
                                         <label for="bing_webmaster_api_key" class="block text-[11px] font-bold text-slate-700 mb-1">Bing Webmaster API Key</label>
-                                        <input type="password" name="bing_webmaster_api_key" id="bing_webmaster_api_key" value="{{ $settings['bing_webmaster_api_key'] ?? '' }}" autocomplete="new-password" placeholder="Optional Bing API key" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                                        <input type="password" name="bing_webmaster_api_key" id="bing_webmaster_api_key" value="" autocomplete="new-password" placeholder="{{ !empty($settings['bing_webmaster_api_key']) ? '•••••••• (Configured — leave blank to keep)' : 'Optional Bing API key' }}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
                                     </div>
                                 </div>
                             </div>

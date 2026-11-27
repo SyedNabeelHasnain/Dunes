@@ -189,6 +189,11 @@
                                 <a href="{{ route('admin.campaigns.show', $campaign->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="View Analytics & Recipients">
                                     <i class="bi bi-graph-up text-xs"></i>
                                 </a>
+                                @if(in_array($campaign->status, ['draft', 'scheduled']))
+                                <a href="{{ route('admin.campaigns.edit', $campaign->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-sky-400 hover:text-sky-600 flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="Edit Campaign">
+                                    <i class="bi bi-pencil-square text-xs"></i>
+                                </a>
+                                @endif
                                 @if($campaign->status === 'draft')
                                 <form action="{{ route('admin.campaigns.send', $campaign->id) }}" method="POST" class="inline send-campaign-form">
                                     @csrf

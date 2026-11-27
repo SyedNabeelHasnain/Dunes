@@ -114,6 +114,7 @@
         @php
             $phoneVal = $settings['site_phone'] ?? '+971 50 245 6056';
             $emailVal = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
+            $supportEmailVal = trim((string) ($settings['site_support_email'] ?? ''));
             $whatsappVal = $settings['site_whatsapp'] ?? '971502456056';
         @endphp
         
@@ -133,6 +134,9 @@
                 </div>
                 <div class="font-bold text-slate-900 text-base mb-1">{{ __('ui.contact_page.email_title') }}</div>
                 <div class="text-slate-600 text-sm">{{ $emailVal }}</div>
+                @if($supportEmailVal !== '' && strtolower($supportEmailVal) !== strtolower($emailVal))
+                <div class="text-slate-500 text-xs mt-1">Support: {{ $supportEmailVal }}</div>
+                @endif
             </a>
             
             <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$whatsappVal) }}" target="_blank" rel="noopener" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group cursor-pointer btn-whatsapp" data-action="whatsapp">
@@ -191,7 +195,7 @@
                                 </div>
                                 <div class="relative flex items-center rounded-xl bg-white border border-slate-300 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="contactEmailContainer">
                                     <input type="email"
-                                           class="w-full pl-3.5 pr-24 py-3 rounded-xl bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400"
+                                           class="w-full ps-3.5 pe-24 py-3 rounded-xl bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400"
                                            id="email"
                                            name="email"
                                            placeholder="{{ __('ui.contact_page.email_address') }}"
@@ -199,7 +203,7 @@
                                            required
                                            data-form="contact"
                                            data-field="email">
-                                    <div class="absolute right-1.5 inset-y-1.5 flex items-center" id="contactEmailActionSlot">
+                                    <div class="absolute end-1.5 inset-y-1.5 flex items-center" id="contactEmailActionSlot">
                                         <span id="contactEmailCheckSpinner" class="hidden px-2.5 text-primary items-center">
                                             <span class="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
                                         </span>
@@ -384,7 +388,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="bi bi-clock-fill text-slate-400 shrink-0"></i>
-                            <span>{{ __('ui.contact_page.business_hours') }}</span>
+                            <span>{{ (app()->getLocale() === 'en' && !empty($settings['google_business_hours'])) ? $settings['google_business_hours'] : __('ui.contact_page.business_hours') }}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="bi bi-shield-check text-emerald-600 shrink-0"></i>
@@ -412,7 +416,7 @@
 
                 <!-- Google Maps Interactive Embed -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 flex-grow aspect-video sm:aspect-auto sm:h-96 min-h-[260px]">
-                    <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[260px]" allowfullscreen loading="lazy"></iframe>
+                    <iframe title="{{ __('ui.contact_page.get_directions') }} - Dunes Discovery Tourism Dubai" src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[260px]" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>
             @endif

@@ -6,6 +6,7 @@ use App\Models\RedirectRule;
 use App\Models\RequestLog;
 use App\Models\Tour;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
@@ -48,7 +49,8 @@ class UxChecker implements AuditCheckerInterface
                     }
                 }
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('UxChecker 404 spike check failed: '.$e->getMessage());
         }
 
         // 2. Probed Live Pages: Viewport Meta, Broken Status, Broken Internal Links & Primary Booking CTA Check
@@ -68,7 +70,8 @@ class UxChecker implements AuditCheckerInterface
             foreach (RedirectRule::where('is_active', true)->pluck('source_path') as $rp) {
                 $knownCatchAllSlugs[ltrim((string) $rp, '/')] = true;
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('UxChecker slug preload failed: '.$e->getMessage());
         }
 
         $checkedLinks = [];
@@ -137,8 +140,12 @@ class UxChecker implements AuditCheckerInterface
                     $linkPath = null;
                     if (str_starts_with($href, '/') && ! str_starts_with($href, '//')) {
                         $linkPath = (string) parse_url($href, PHP_URL_PATH);
-                    } elseif (str_starts_with($href, rtrim(url('/'), '/'))) {
-                        $linkPath = (string) parse_url($href, PHP_URL_PATH);
+                    } elseif (preg_match('#^https?://#i', $href)) {
+                        $appHost = strtolower((string) parse_url(url('/'), PHP_URL_HOST));
+                        $hrefHost = strtolower((string) parse_url($href, PHP_URL_HOST));
+                        if ($appHost !== '' && $hrefHost === $appHost) {
+                            $linkPath = (string) parse_url($href, PHP_URL_PATH);
+                        }
                     }
                     if (! $linkPath || $linkPath === '/' || preg_match('#^/(images|videos|assets|storage|build|admin|api|booking|checkout|driver|email|locale|currency|sitemap|feed\.xml|robots\.txt|llms)#i', $linkPath)) {
                         continue;

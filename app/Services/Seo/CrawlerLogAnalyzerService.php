@@ -3,7 +3,7 @@
 namespace App\Services\Seo;
 
 use App\Models\RequestLog;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -59,26 +59,17 @@ class CrawlerLogAnalyzerService
 
             $allTokens = [];
             foreach (self::CRAWLER_CATEGORIES as $catKey => $catMeta) {
-                $catTotal = 0;
                 $bots = [];
                 foreach ($catMeta['tokens'] as $token) {
                     $allTokens[] = $token;
-                    $hits = RequestLog::where('user_agent', 'like', "%{$token}%")
-                        ->where('request_timestamp', '>=', $since)
-                        ->count();
-                    $bots[$token] = $hits;
-                    $catTotal += $hits;
+                    $bots[$token] = 0;
                 }
                 $report['by_category'][$catKey] = [
                     'label' => $catMeta['label'],
-                    'total' => $catTotal,
+                    'total' => 0,
                     'bots' => $bots,
                 ];
             }
-
-            $report['search_engine_hits'] = $report['by_category']['search_engines']['total'] ?? 0;
-            $report['ai_bot_hits'] = $report['by_category']['ai_search']['total'] ?? 0;
-            $report['scraper_hits'] = $report['by_category']['scrapers_seo']['total'] ?? 0;
 
             $botScope = function ($query) use ($allTokens) {
                 $query->where('bot_indicator', '!=', 'Likely Human')
@@ -89,54 +80,89 @@ class CrawlerLogAnalyzerService
                     });
             };
 
-            $totalBotHits = RequestLog::where('request_timestamp', '>=', $since)
-                ->where($botScope)
-                ->count();
+            $totalBotHits = 0;
+            $wasted404 = 0;
+            $wastedQuery = 0;
+            $wastedUnique = 0;
+            $urlStats = [];
+            $url404Stats = [];
 
-            $wasted404 = RequestLog::where('request_timestamp', '>=', $since)
-                ->where('entity_type', 'error_404')
+            RequestLog::where('request_timestamp', '>=', $since)
                 ->where($botScope)
-                ->count();
+                ->select(['id', 'user_agent', 'entity_type', 'query_string', 'request_uri', 'request_timestamp'])
+                ->chunkById(1000, function ($rows) use (
+                    &$report,
+                    &$totalBotHits,
+                    &$wasted404,
+                    &$wastedQuery,
+                    &$wastedUnique,
+                    &$urlStats,
+                    &$url404Stats
+                ) {
+                    foreach ($rows as $row) {
+                        $totalBotHits++;
+                        $ua = (string) ($row->user_agent ?? '');
 
-            $wastedQuery = RequestLog::where('request_timestamp', '>=', $since)
-                ->whereNotNull('query_string')
-                ->where('query_string', '!=', '')
-                ->where($botScope)
-                ->count();
+                        if ($ua !== '') {
+                            foreach (self::CRAWLER_CATEGORIES as $catKey => $catMeta) {
+                                foreach ($catMeta['tokens'] as $token) {
+                                    if (stripos($ua, $token) !== false) {
+                                        $report['by_category'][$catKey]['bots'][$token]++;
+                                        $report['by_category'][$catKey]['total']++;
+                                    }
+                                }
+                            }
+                        }
 
-            $topCrawled = RequestLog::where('request_timestamp', '>=', $since)
-                ->whereNotNull('request_uri')
-                ->where($botScope)
-                ->select('request_uri', DB::raw('COUNT(*) as hits'), DB::raw('MAX(request_timestamp) as last_hit'))
-                ->groupBy('request_uri')
-                ->orderByDesc('hits')
-                ->limit(15)
-                ->get()
-                ->map(fn ($r) => [
-                    'uri' => (string) $r->request_uri,
-                    'hits' => (int) $r->hits,
-                    'last_hit' => (string) $r->last_hit,
-                ])
-                ->all();
+                        $is404 = $row->entity_type === 'error_404';
+                        $hasQuery = $row->query_string !== null && $row->query_string !== '';
 
-            $top404Bot = RequestLog::where('request_timestamp', '>=', $since)
-                ->where('entity_type', 'error_404')
-                ->whereNotNull('request_uri')
-                ->where($botScope)
-                ->select('request_uri', DB::raw('COUNT(*) as hits'), DB::raw('MAX(request_timestamp) as last_hit'))
-                ->groupBy('request_uri')
-                ->orderByDesc('hits')
-                ->limit(10)
-                ->get()
-                ->map(fn ($r) => [
-                    'uri' => (string) $r->request_uri,
-                    'hits' => (int) $r->hits,
-                    'last_hit' => (string) $r->last_hit,
-                ])
-                ->all();
+                        if ($is404) {
+                            $wasted404++;
+                        }
+                        if ($hasQuery) {
+                            $wastedQuery++;
+                        }
+                        if ($is404 || $hasQuery) {
+                            $wastedUnique++;
+                        }
 
-            $wasteNumerator = $wasted404 + $wastedQuery;
-            $wastePct = $totalBotHits > 0 ? round(min(100.0, ($wasteNumerator / $totalBotHits) * 100), 1) : 0.0;
+                        if ($row->request_uri !== null && $row->request_uri !== '') {
+                            $uri = (string) $row->request_uri;
+                            $ts = (string) $row->request_timestamp;
+
+                            if (! isset($urlStats[$uri])) {
+                                $urlStats[$uri] = ['uri' => $uri, 'hits' => 0, 'last_hit' => $ts];
+                            }
+                            $urlStats[$uri]['hits']++;
+                            if ($ts > $urlStats[$uri]['last_hit']) {
+                                $urlStats[$uri]['last_hit'] = $ts;
+                            }
+
+                            if ($is404) {
+                                if (! isset($url404Stats[$uri])) {
+                                    $url404Stats[$uri] = ['uri' => $uri, 'hits' => 0, 'last_hit' => $ts];
+                                }
+                                $url404Stats[$uri]['hits']++;
+                                if ($ts > $url404Stats[$uri]['last_hit']) {
+                                    $url404Stats[$uri]['last_hit'] = $ts;
+                                }
+                            }
+                        }
+                    }
+                });
+
+            $report['search_engine_hits'] = $report['by_category']['search_engines']['total'] ?? 0;
+            $report['ai_bot_hits'] = $report['by_category']['ai_search']['total'] ?? 0;
+            $report['scraper_hits'] = $report['by_category']['scrapers_seo']['total'] ?? 0;
+
+            usort($urlStats, fn ($a, $b) => $b['hits'] <=> $a['hits']);
+            $topCrawled = array_slice($urlStats, 0, 15);
+
+            usort($url404Stats, fn ($a, $b) => $b['hits'] <=> $a['hits']);
+            $top404Bot = array_slice($url404Stats, 0, 10);
+
+            $wastePct = $totalBotHits > 0 ? round(min(100.0, ($wastedUnique / $totalBotHits) * 100), 1) : 0.0;
 
             $anomalies = [];
             if ($totalBotHits >= 20 && $wasted404 > 0 && ($wasted404 / $totalBotHits) >= 0.15) {
@@ -166,8 +192,8 @@ class CrawlerLogAnalyzerService
             $report['top_crawled_urls'] = $topCrawled;
             $report['top_404_bot_urls'] = $top404Bot;
             $report['anomalies'] = $anomalies;
-        } catch (\Throwable) {
-            // Fail safely with empty observed metrics
+        } catch (\Throwable $e) {
+            Log::warning('CrawlerLogAnalyzerService analysis failed: '.$e->getMessage());
         }
 
         return $report;
@@ -183,7 +209,7 @@ class CrawlerLogAnalyzerService
             return [
                 'available' => false,
                 'source' => 'application_request_logs',
-                'note' => 'Analyzing Laravel request_logs table. Set SEO_SERVER_ACCESS_LOG_PATH in .env if raw LiteSpeed/Nginx access logs are readable on this host.',
+                'note' => 'Analyzing Laravel request_logs table. Set SERVER_ACCESS_LOG_PATH in .env if raw LiteSpeed/Nginx access logs are readable on this host.',
             ];
         }
 

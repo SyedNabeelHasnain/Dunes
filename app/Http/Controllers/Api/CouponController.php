@@ -25,8 +25,9 @@ class CouponController extends Controller
             'tour_id' => 'nullable|integer',
             'tier_id' => 'nullable|integer',
             'email' => 'nullable|email|max:255',
-            'adults' => 'nullable|integer|min:1',
-            'children' => 'nullable|integer|min:0',
+            'adults' => 'nullable|integer|min:1|max:500',
+            'children' => 'nullable|integer|min:0|max:500',
+            'guests' => 'nullable|integer|min:1|max:500',
             'date' => 'nullable|date',
         ]);
 
@@ -37,7 +38,6 @@ class CouponController extends Controller
         $email = $request->input('email');
         $adults = (int) $request->input('adults', 1);
         $children = (int) $request->input('children', 0);
-        $infants = (int) $request->input('infants', 0);
         $totalGuests = (int) $request->input('guests', max(1, $adults + $children));
         $tourDate = $request->input('date');
 
@@ -149,6 +149,10 @@ class CouponController extends Controller
     {
         $featured = Coupon::featured()
             ->valid()
+            ->where(function ($q) {
+                $q->whereNull('usage_limit')
+                    ->orWhereColumn('used_count', '<', 'usage_limit');
+            })
             ->select('id', 'code', 'name', 'description', 'discount_type', 'discount_value', 'min_spend')
             ->limit(3)
             ->get();

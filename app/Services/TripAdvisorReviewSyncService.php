@@ -49,7 +49,7 @@ class TripAdvisorReviewSyncService
     {
         $lock = Cache::lock(self::SYNC_LOCK_KEY, 30);
 
-        if (! $force && ! $lock->get()) {
+        if (! $lock->get()) {
             return [
                 'success' => false,
                 'rate_limited' => true,
@@ -81,6 +81,17 @@ class TripAdvisorReviewSyncService
             $isFallback = false;
             if (! empty($fetchResult['error'])) {
                 $errorMsg = $fetchResult['error'];
+                if (app()->environment('production')) {
+                    Log::error('TripAdvisor API live fetch failed in production (fallback disabled): '.$errorMsg);
+
+                    return [
+                        'success' => false,
+                        'rate_limited' => false,
+                        'fallback' => false,
+                        'message' => 'TripAdvisor API sync failed: '.$errorMsg,
+                        'last_synced_at' => $this->getLastSyncedAt(),
+                    ];
+                }
                 Log::warning('TripAdvisor API live fetch returned notice, utilizing verified fallback reviews: '.$errorMsg);
                 $fetchResult = $this->getFallbackTripAdvisorReviews();
                 $isFallback = true;
@@ -104,12 +115,30 @@ class TripAdvisorReviewSyncService
                     continue;
                 }
 
-                $reviewRecord = Review::updateOrCreate(
-                    [
+                $existing = Review::where('source', 'tripadvisor')
+                    ->where('source_review_id', $normalized['source_review_id'])
+                    ->first();
+
+                if ($existing) {
+                    $existing->update([
+                        'reviewer_name' => $normalized['reviewer_name'],
+                        'reviewer_avatar_url' => $normalized['reviewer_avatar_url'] ?: $existing->reviewer_avatar_url,
+                        'reviewer_profile_url' => $normalized['reviewer_profile_url'] ?: $existing->reviewer_profile_url,
+                        'review_url' => $normalized['review_url'] ?: $existing->review_url,
+                        'rating' => $normalized['rating'],
+                        'review_title' => ! empty($existing->review_title) ? $existing->review_title : $normalized['review_title'],
+                        'review_text' => $normalized['review_text'] ?: $existing->review_text,
+                        'photos' => ! empty($existing->photos) ? $existing->photos : $normalized['photos'],
+                        'published_date' => $normalized['published_date'] ?: $existing->published_date,
+                        'owner_response_text' => $normalized['owner_response_text'] ?? $existing->owner_response_text,
+                        'owner_response_date' => $normalized['owner_response_date'] ?? $existing->owner_response_date,
+                        'imported_at' => now(),
+                    ]);
+                    $updated++;
+                } else {
+                    Review::create([
                         'source' => 'tripadvisor',
                         'source_review_id' => $normalized['source_review_id'],
-                    ],
-                    [
                         'reviewer_name' => $normalized['reviewer_name'],
                         'reviewer_avatar_url' => $normalized['reviewer_avatar_url'],
                         'reviewer_profile_url' => $normalized['reviewer_profile_url'],
@@ -124,13 +153,8 @@ class TripAdvisorReviewSyncService
                         'owner_response_text' => $normalized['owner_response_text'] ?? null,
                         'owner_response_date' => $normalized['owner_response_date'] ?? null,
                         'imported_at' => now(),
-                    ]
-                );
-
-                if ($reviewRecord->wasRecentlyCreated) {
+                    ]);
                     $added++;
-                } else {
-                    $updated++;
                 }
             }
 
@@ -259,10 +283,11 @@ class TripAdvisorReviewSyncService
                 ];
             }
         } catch (\Throwable $e) {
-            Log::warning('TripAdvisor API fetch exception: '.$e->getMessage());
+            $safeMsg = (string) preg_replace('/(key=)[^&\s]+/i', '$1[REDACTED]', $e->getMessage());
+            Log::warning('TripAdvisor API fetch exception: '.$safeMsg);
 
             return [
-                'error' => 'TripAdvisor API connection failure: '.$e->getMessage(),
+                'error' => 'TripAdvisor API connection failure: '.$safeMsg,
             ];
         }
 

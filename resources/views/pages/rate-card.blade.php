@@ -196,10 +196,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-12">
                         <!-- Left: Image & Badge (3 cols) -->
                         <div class="md:col-span-3 relative min-h-[180px] bg-slate-900">
-                            @php
-                                $imgFile = !empty($t->hero_image) ? preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->hero_image) : 'desert-safari-poster.avif';
-                            @endphp
-                            <img src="{{ asset('images/' . $imgFile) }}" width="400" height="250" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy" class="w-full h-full object-cover">
+                            <img src="{{ resolve_tour_image($t->hero_image ?: $t->thumb_image) }}" width="400" height="250" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy" class="w-full h-full object-cover">
                             <div class="absolute top-2.5 start-2.5 flex flex-col gap-1.5">
                                 @if($t->is_bestseller)
                                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2.5 py-0.5 text-[10px] uppercase shadow-xs">
@@ -241,7 +238,7 @@
                                 <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-200">
                                     <i class="bi bi-check-circle-fill text-primary"></i> {{ __('ui.rate_card.refreshments') }}
                                 </span>
-                                @if(str_contains(strtolower($t->name), 'evening') || str_contains(strtolower($t->name), 'cruise'))
+                                @if(str_contains(strtolower((string) $t->slug), 'evening') || str_contains(strtolower((string) $t->slug), 'cruise') || str_contains(strtolower((string) $t->slug), 'overnight'))
                                 <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-200">
                                     <i class="bi bi-check-circle-fill text-primary"></i> {{ __('ui.rate_card.buffet_dinner') }}
                                 </span>
@@ -326,8 +323,8 @@
                             <span class="text-slate-500 text-[10px] block line-clamp-1">{{ Str::limit($addon->description, 45) }}</span>
                             @endif
                         </div>
-                        <div class="font-black text-primary text-sm whitespace-nowrap text-end" data-aed="{{ $addon->default_price ?: $addon->price ?: 0 }}">
-                            AED {{ number_format($addon->default_price ?: $addon->price ?: 0) }}
+                        <div class="font-black text-primary text-sm whitespace-nowrap text-end">
+                            <span data-aed="{{ $addon->default_price ?: $addon->price ?: 0 }}">AED {{ number_format($addon->default_price ?: $addon->price ?: 0) }}</span>
                             <span class="text-[9px] text-slate-400 block font-normal">{{ ($addon->price_type ?? 'per_person') === 'per_group' ? '/ booking' : '/ guest' }}</span>
                         </div>
                     </div>

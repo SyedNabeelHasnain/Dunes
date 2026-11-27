@@ -260,7 +260,7 @@
                                 </div>
                                 <div>
                                     <label for="tripadvisor_api_key" class="block text-xs font-bold text-slate-700 mb-1.5">TripAdvisor Content API Key</label>
-                                    <input type="password" name="tripadvisor_api_key" id="tripadvisor_api_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['tripadvisor_api_key'] ?? '' }}" placeholder="Paste your TripAdvisor API Key here">
+                                    <input type="password" name="tripadvisor_api_key" id="tripadvisor_api_key" autocomplete="new-password" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="" placeholder="{{ !empty($settings['tripadvisor_api_key']) ? '•••••••• (Configured — leave blank to keep current)' : 'Paste your TripAdvisor API Key here' }}">
                                     <div class="mt-1 text-[11px] text-slate-500">TripAdvisor Content API v1 key from TripAdvisor Developer Portal.</div>
                                 </div>
                             </div>
@@ -278,16 +278,21 @@
                             <span class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-700">Checkout & Payments</span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <label for="admin_email" class="block text-xs font-bold text-slate-700 mb-1.5">Primary Admin Booking Alert Email</label>
+                                <label for="admin_email" class="block text-xs font-bold text-slate-700 mb-1.5">Primary Admin Alert Email</label>
                                 <input type="email" name="admin_email" id="admin_email" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['admin_email'] ?? ($settings['site_email'] ?? 'info@dunesdiscoverytourism.com') }}" placeholder="info@dunesdiscoverytourism.com">
                                 <div class="mt-1 text-[11px] text-slate-500">Receives instant new booking, inquiry, and WhatsApp lead notifications.</div>
                             </div>
                             <div>
-                                <label for="admin_email_cc" class="block text-xs font-bold text-slate-700 mb-1.5">Admin Alert CC Email (Optional)</label>
+                                <label for="admin_email_cc" class="block text-xs font-bold text-slate-700 mb-1.5">Admin Alert CC Email</label>
                                 <input type="email" name="admin_email_cc" id="admin_email_cc" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['admin_email_cc'] ?? '' }}" placeholder="operations@dunesdiscoverytourism.com">
                                 <div class="mt-1 text-[11px] text-slate-500">Secondary recipient copied on all admin booking notifications.</div>
+                            </div>
+                            <div>
+                                <label for="admin_email_bcc" class="block text-xs font-bold text-slate-700 mb-1.5">Admin Alert BCC Email</label>
+                                <input type="email" name="admin_email_bcc" id="admin_email_bcc" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['admin_email_bcc'] ?? '' }}" placeholder="audit@dunesdiscoverytourism.com">
+                                <div class="mt-1 text-[11px] text-slate-500">Silent blind-carbon-copy archive recipient for booking alerts.</div>
                             </div>
                             <div>
                                 <label for="email_verification_required" class="block text-xs font-bold text-slate-700 mb-1.5">Checkout Email OTP Verification</label>
@@ -327,11 +332,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label for="ziina_access_token" class="block text-xs font-bold text-slate-700 mb-1.5">Ziina API Access Token</label>
-                                    <input type="password" name="ziina_access_token" id="ziina_access_token" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary" value="{{ $settings['ziina_access_token'] ?? '' }}" placeholder="Bearer token from Ziina Business Portal">
+                                    <input type="password" name="ziina_access_token" id="ziina_access_token" autocomplete="new-password" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary" value="" placeholder="{{ !empty($settings['ziina_access_token']) ? '•••••••• (Configured — leave blank to keep current)' : 'Bearer token from Ziina Business Portal' }}">
                                 </div>
                                 <div>
                                     <label for="ziina_webhook_secret" class="block text-xs font-bold text-slate-700 mb-1.5">Ziina Webhook Secret</label>
-                                    <input type="password" name="ziina_webhook_secret" id="ziina_webhook_secret" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary" value="{{ $settings['ziina_webhook_secret'] ?? '' }}" placeholder="HMAC secret for verifying payment webhooks">
+                                    <input type="password" name="ziina_webhook_secret" id="ziina_webhook_secret" autocomplete="new-password" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary" value="" placeholder="{{ !empty($settings['ziina_webhook_secret']) ? '•••••••• (Configured — leave blank to keep current)' : 'HMAC secret for verifying payment webhooks' }}">
                                 </div>
                             </div>
                         </div>

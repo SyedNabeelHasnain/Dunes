@@ -151,14 +151,13 @@ return new class extends Migration
                     $nameVal = is_array($cat['name']) ? json_encode($cat['name'], JSON_UNESCAPED_UNICODE) : $cat['name'];
                     $descVal = isset($cat['description']) ? (is_array($cat['description']) ? json_encode($cat['description'], JSON_UNESCAPED_UNICODE) : $cat['description']) : null;
 
-                    if (Schema::hasTable('categories')) {
+                    if (Schema::hasTable('categories') && ! empty($nameVal)) {
                         DB::table('categories')
                             ->where('id', $cat['id'])
                             ->orWhere('slug', $cat['slug'])
-                            ->update(array_filter([
+                            ->update([
                                 'name' => $nameVal,
-                                'description' => $descVal,
-                            ]));
+                            ]);
                     }
 
                     if (Schema::hasTable('blog_categories')) {

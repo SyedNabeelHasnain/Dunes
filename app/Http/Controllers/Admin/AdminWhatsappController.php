@@ -52,7 +52,7 @@ class AdminWhatsappController extends Controller
             $query->where('whatsapp_inquiries.tour_name', $tourName);
         }
         if ($deviceType) {
-            $query->where('request_logs.device_type', $deviceType);
+            $query->whereRaw("LOWER(COALESCE(NULLIF(whatsapp_inquiries.device_type, ''), NULLIF(request_logs.device_type, ''), 'Desktop')) = ?", [strtolower((string) $deviceType)]);
         }
         if ($status === 'new' || $status === 'unread') {
             $query->where(function ($q) {
@@ -86,7 +86,7 @@ class AdminWhatsappController extends Controller
 
         $mobileCount = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
-            ->where('request_logs.device_type', 'mobile')
+            ->whereRaw("LOWER(COALESCE(NULLIF(whatsapp_inquiries.device_type, ''), NULLIF(request_logs.device_type, ''), 'Desktop')) = 'mobile'")
             ->count();
         $mobilePct = $totalLeads > 0 ? round(($mobileCount / $totalLeads) * 100) : 0;
 
@@ -125,7 +125,7 @@ class AdminWhatsappController extends Controller
         // 4. Device Breakdown Chart Data
         $deviceBreakdown = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
-            ->select(DB::raw("COALESCE(NULLIF(request_logs.device_type, ''), 'Desktop') as device_label"), DB::raw('count(*) as count'))
+            ->select(DB::raw("COALESCE(NULLIF(whatsapp_inquiries.device_type, ''), NULLIF(request_logs.device_type, ''), 'Desktop') as device_label"), DB::raw('count(*) as count'))
             ->groupBy('device_label')
             ->get();
 
@@ -209,12 +209,16 @@ class AdminWhatsappController extends Controller
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
             ->select(
                 'whatsapp_inquiries.*',
-                'request_logs.client_ip',
-                'request_logs.country',
-                'request_logs.city',
-                'request_logs.device_type',
-                'request_logs.browser_name',
-                'request_logs.os_name'
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.client_ip, ''), NULLIF(request_logs.client_ip, ''), 'Not Available') as client_ip"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.country, ''), NULLIF(request_logs.country, ''), 'Unknown') as country"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.city, ''), NULLIF(request_logs.city, ''), 'Unknown') as city"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.region, ''), NULLIF(request_logs.region, ''), '') as region"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.device_type, ''), NULLIF(request_logs.device_type, ''), 'Desktop') as device_type"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.browser_name, ''), NULLIF(request_logs.browser_name, ''), 'Unknown') as browser_name"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.os_name, ''), NULLIF(request_logs.os_name, ''), 'Unknown') as os_name"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.isp, ''), NULLIF(request_logs.isp, ''), 'Not Available') as isp"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.organization, ''), NULLIF(request_logs.organization, ''), 'Not Available') as organization"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.utm_source, ''), NULLIF(request_logs.utm_source, ''), 'Direct') as utm_source")
             );
 
         if ($request->filled('from_date')) {
@@ -227,7 +231,17 @@ class AdminWhatsappController extends Controller
             $query->where('whatsapp_inquiries.tour_name', $request->input('tour_name'));
         }
         if ($request->filled('device_type')) {
-            $query->where('request_logs.device_type', $request->input('device_type'));
+            $query->whereRaw("LOWER(COALESCE(NULLIF(whatsapp_inquiries.device_type, ''), NULLIF(request_logs.device_type, ''), 'Desktop')) = ?", [strtolower((string) $request->input('device_type'))]);
+        }
+        $status = $request->input('status');
+        if ($status === 'new' || $status === 'unread') {
+            $query->where(function ($q) {
+                $q->where('whatsapp_inquiries.is_read', false)
+                    ->orWhereNull('whatsapp_inquiries.is_read')
+                    ->orWhere('whatsapp_inquiries.status', 'new');
+            });
+        } elseif ($status === 'read') {
+            $query->where('whatsapp_inquiries.is_read', true);
         }
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -354,6 +368,8 @@ class AdminWhatsappController extends Controller
             // 3. Delete WhatsApp inquiry record
             DB::table('whatsapp_inquiries')->where('id', $id)->delete();
         });
+        Cache::forget('admin_dashboard_kpis');
+        Cache::forget('admin_sidebar_counts');
     }
 
     /**

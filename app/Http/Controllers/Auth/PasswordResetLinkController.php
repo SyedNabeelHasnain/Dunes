@@ -36,11 +36,12 @@ class PasswordResetLinkController extends Controller
 
         $email = trim(strtolower($request->input('email')));
         $user = User::where('email', $email)->first();
-        if (! $user) {
+        if (! $user || (isset($user->is_active) && ! $user->is_active)) {
             return back()->with('status', __('passwords.sent'));
         }
 
         try {
+            app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
             $token = Password::createToken($user);
             $resetUrl = url(route('password.reset', [
                 'token' => $token,

@@ -312,10 +312,30 @@
                                 </h3>
                                 <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
                                     @forelse($contentByType->get($typeKey, collect()) as $ci)
-                                    <label class="flex items-center gap-2 cursor-pointer p-1.5 hover:bg-white rounded-lg transition-colors">
-                                        <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox" name="{{ $typeKey }}[]" value="{{ $ci->id }}" id="ci_{{ $typeKey }}_{{ $ci->id }}" {{ in_array($ci->id, $assignedContentIds) ? 'checked' : '' }}>
-                                        <span class="text-xs text-slate-800">{{ $ci->title }}</span>
-                                    </label>
+                                    @php
+                                        $ciPayload = [
+                                            'id' => $ci->id,
+                                            'type' => $ci->type,
+                                            'title' => (string) $ci->getTranslation('title', 'en'),
+                                            'description' => (string) ($ci->getTranslation('description', 'en') ?? ''),
+                                            'icon' => (string) ($ci->icon ?? ''),
+                                            'priority' => (int) ($ci->priority ?? 99),
+                                        ];
+                                    @endphp
+                                    <div class="flex items-center justify-between gap-2 p-1.5 hover:bg-white rounded-lg transition-colors group">
+                                        <label class="flex items-center gap-2 cursor-pointer min-w-0 flex-1">
+                                            <input class="rounded border-slate-300 text-primary focus:ring-primary shrink-0" type="checkbox" name="{{ $typeKey }}[]" value="{{ $ci->id }}" id="ci_{{ $typeKey }}_{{ $ci->id }}" {{ in_array($ci->id, $assignedContentIds) ? 'checked' : '' }}>
+                                            <span class="text-xs text-slate-800 truncate">{{ $ci->title }}</span>
+                                        </label>
+                                        <div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 shrink-0">
+                                            <button type="button" data-ci="{{ json_encode($ciPayload) }}" onclick="openEditContentItemModal(JSON.parse(this.dataset.ci))" class="p-1 rounded text-slate-400 hover:text-primary hover:bg-slate-100 text-[11px] cursor-pointer" title="Edit Global Item">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" onclick="deleteContentItem({{ $ci->id }})" class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 text-[11px] cursor-pointer" title="Delete Global Item">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                     @empty
                                     <div class="text-xs text-slate-400 italic py-2">No items. Create one globally.</div>
                                     @endforelse
@@ -341,6 +361,11 @@
                     <i class="bi bi-sliders text-base"></i> Display & Visibility Options
                 </h3>
                 
+                <div>
+                    <label for="tour_slug" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">URL Slug</label>
+                    <input type="text" name="slug" form="editTourForm" id="tour_slug" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-mono text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('slug', $tour->slug) }}" placeholder="evening-desert-safari-dubai">
+                </div>
+
                 <div>
                     <label for="tour_duration" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Duration Info</label>
                     <input type="text" name="duration" form="editTourForm" id="tour_duration" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('duration', $tour->duration) }}" placeholder="e.g. 6 Hours">
@@ -370,6 +395,22 @@
                 <div>
                     <label for="tour_languages" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Languages</label>
                     <input type="text" name="languages" form="editTourForm" id="tour_languages" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('languages', $tour->languages) }}">
+                </div>
+
+                <div>
+                    <label for="tour_video_url" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Promo Video URL (Optional)</label>
+                    <input type="text" name="video_url" form="editTourForm" id="tour_video_url" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-mono text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('video_url', $tour->video_url) }}" placeholder="https://... or /videos/...">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="tour_rating" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Rating (1–5)</label>
+                        <input type="number" step="0.1" min="1" max="5" name="rating" form="editTourForm" id="tour_rating" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('rating', $tour->rating) }}">
+                    </div>
+                    <div>
+                        <label for="tour_review_count" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Review Count</label>
+                        <input type="number" min="0" name="review_count" form="editTourForm" id="tour_review_count" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('review_count', $tour->review_count) }}">
+                    </div>
                 </div>
 
                 <div>
@@ -495,9 +536,22 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Existing Categories</label>
-                    <div id="catList" class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap gap-1.5">
+                    <div id="catList" class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 max-h-56 overflow-y-auto">
                         @foreach($categories as $cat)
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-slate-800 border border-slate-200 shadow-2xs">{{ $cat->name }}</span>
+                            <div class="flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs text-xs">
+                                <div class="min-w-0">
+                                    <span class="font-bold text-slate-800">{{ $cat->name }}</span>
+                                    <span class="text-[10px] font-mono text-slate-400 ms-1.5">/{{ $cat->slug }}</span>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <button type="button" data-cat-id="{{ $cat->id }}" data-cat-name="{{ $cat->name }}" onclick="editCategoryPrompt(this.dataset.catId, this.dataset.catName)" class="p-1 rounded text-slate-500 hover:text-primary hover:bg-slate-100 cursor-pointer" title="Edit Category">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" data-cat-id="{{ $cat->id }}" data-cat-name="{{ $cat->name }}" onclick="deleteCategoryById(this.dataset.catId, this.dataset.catName)" class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer" title="Delete Category">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -576,6 +630,53 @@
     </div>
 </div>
 
+<!-- Edit Global Content Item Modal -->
+<div x-data="{ open: false }" @open-edit-content-modal.window="open = true" @close-edit-content-modal.window="open = false" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-black text-slate-900">Edit Global Content Item</h3>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form id="editContentItemForm" class="space-y-4">
+                <input type="hidden" id="editCiId">
+                <div>
+                    <label for="editCiType" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Type</label>
+                    <select id="editCiType" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white" required>
+                        <option value="inclusion">Inclusion</option>
+                        <option value="exclusion">Exclusion</option>
+                        <option value="highlight">Highlight</option>
+                        <option value="not_allowed">Not Allowed</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="editCiTitle" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Title</label>
+                    <input type="text" id="editCiTitle" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden" required>
+                </div>
+                <div>
+                    <label for="editCiDesc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Description (Optional)</label>
+                    <input type="text" id="editCiDesc" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="editCiIcon" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Icon Class</label>
+                        <input type="text" id="editCiIcon" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-hidden">
+                    </div>
+                    <div>
+                        <label for="editCiPriority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Sort Priority</label>
+                        <input type="number" id="editCiPriority" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-hidden" value="99">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @include('admin.partials.seo-editorial-panel', ['entity' => $tour, 'entityType' => 'tour'])
 
 @push('scripts')
@@ -630,14 +731,127 @@ function renameCategory() {
         },
         error: function(xhr) {
             hideLoader();
-            Swal.fire('Error', 'Failed to rename category.', 'error');
+            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to rename category.', 'error');
         }
+    });
+}
+function editCategoryPrompt(id, currentName) {
+    Swal.fire({
+        title: 'Edit Category',
+        input: 'text',
+        inputValue: currentName,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        inputValidator: (value) => !value || !value.trim() ? 'Category name is required.' : null
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+        showLoader();
+        $.ajax({
+            url: `/admin/categories/${id}`,
+            type: 'POST',
+            data: { _token: "{{ csrf_token() }}", _method: 'PUT', name: result.value.trim() },
+            success: function(res) {
+                hideLoader();
+                if (res.success) location.reload();
+            },
+            error: function(xhr) {
+                hideLoader();
+                Swal.fire('Error', xhr.responseJSON?.message || 'Failed to update category.', 'error');
+            }
+        });
+    });
+}
+function deleteCategoryById(id, name) {
+    Swal.fire({
+        title: 'Delete Category?',
+        text: `Remove category "${name}"? Categories with assigned tours cannot be deleted.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: 'Yes, delete'
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+        showLoader();
+        $.ajax({
+            url: `/admin/categories/${id}`,
+            type: 'POST',
+            data: { _token: "{{ csrf_token() }}", _method: 'DELETE' },
+            success: function(res) {
+                hideLoader();
+                if (res.success) location.reload();
+            },
+            error: function(xhr) {
+                hideLoader();
+                Swal.fire('Cannot Delete', xhr.responseJSON?.message || 'Failed to delete category.', 'error');
+            }
+        });
     });
 }
 
 // Global Content Items
 function openAddContentItemModal() {
     window.dispatchEvent(new CustomEvent('open-content-modal'));
+}
+function openEditContentItemModal(item) {
+    $('#editCiId').val(item.id);
+    $('#editCiType').val(item.type || 'inclusion');
+    $('#editCiTitle').val(item.title || '');
+    $('#editCiDesc').val(item.description || '');
+    $('#editCiIcon').val(item.icon || '');
+    $('#editCiPriority').val(item.priority ?? 99);
+    window.dispatchEvent(new CustomEvent('open-edit-content-modal'));
+}
+$('#editContentItemForm').on('submit', function(e) {
+    e.preventDefault();
+    const id = $('#editCiId').val();
+    showLoader();
+    $.ajax({
+        url: `/admin/content-items/${id}`,
+        type: 'POST',
+        data: {
+            _token: "{{ csrf_token() }}",
+            _method: 'PUT',
+            type: $('#editCiType').val(),
+            title: $('#editCiTitle').val(),
+            description: $('#editCiDesc').val(),
+            icon: $('#editCiIcon').val(),
+            priority: $('#editCiPriority').val()
+        },
+        success: function(res) {
+            hideLoader();
+            if (res.success) location.reload();
+        },
+        error: function(xhr) {
+            hideLoader();
+            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to update content item.', 'error');
+        }
+    });
+});
+function deleteContentItem(id) {
+    Swal.fire({
+        title: 'Delete Global Content Item?',
+        text: 'This removes the item globally and detaches it from all tours.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: 'Yes, delete'
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+        showLoader();
+        $.ajax({
+            url: `/admin/content-items/${id}`,
+            type: 'POST',
+            data: { _token: "{{ csrf_token() }}", _method: 'DELETE' },
+            success: function(res) {
+                hideLoader();
+                if (res.success) location.reload();
+            },
+            error: function(xhr) {
+                hideLoader();
+                Swal.fire('Error', xhr.responseJSON?.message || 'Failed to delete content item.', 'error');
+            }
+        });
+    });
 }
 $('#newContentItemForm').on('submit', function(e) {
     e.preventDefault();

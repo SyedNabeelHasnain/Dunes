@@ -2,10 +2,17 @@
 
 @php
     $featImgPath = $post->featured_image_url;
+    $featExt = strtolower(pathinfo((string) parse_url((string) $featImgPath, PHP_URL_PATH), PATHINFO_EXTENSION));
+    $featMime = match ($featExt) {
+        'jpg', 'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        default => 'image/avif',
+    };
 @endphp
 
 @push('preloads')
-    <link rel="preload" as="image" href="{{ $featImgPath }}" type="image/avif">
+    <link rel="preload" as="image" href="{{ $featImgPath }}" type="{{ $featMime }}">
 @endpush
 
 @section('content')
@@ -25,7 +32,9 @@
     $pageDesc = $pageDesc ?? ($post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155)));
     $pageKeys = $pageKeys ?? ($post->meta_keywords ?: 'dubai, desert safari, travel');
     
-    $siteLogoUrl = !empty($settings['site_logo']) ? (str_starts_with($settings['site_logo'], 'http') || str_starts_with($settings['site_logo'], '/') ? $settings['site_logo'] : asset($settings['site_logo'])) : asset('images/logo.png');
+    $siteLogoUrl = !empty($settings['site_logo'])
+        ? (str_starts_with($settings['site_logo'], 'http') ? $settings['site_logo'] : url(ltrim($settings['site_logo'], '/')))
+        : asset('images/logo.png');
 
     // Breadcrumb Schema
     $breadcrumbItems = [
@@ -54,9 +63,9 @@
         ],
         'publisher' => [
             '@type' => 'TravelAgency',
-            '@id' => route('home') . '#organization',
+            '@id' => url('/') . '#organization',
             'name' => 'Dunes Discovery Tourism',
-            'url' => route('home'),
+            'url' => url('/'),
             'logo' => ['@type' => 'ImageObject', 'url' => $siteLogoUrl, 'width' => 160, 'height' => 46]
         ],
         'datePublished' => $publishedAt ? $publishedAt->toIso8601String() : now()->toIso8601String(),
@@ -267,7 +276,7 @@
                 @if ($authorBio)
                 <div class="mt-10 p-6 rounded-2xl bg-slate-50 border border-slate-200 flex gap-4 items-start">
                     <div class="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-black text-xl shrink-0">
-                        {{ strtoupper(substr($authorName, 0, 1)) }}
+                        {{ mb_strtoupper(mb_substr((string) $authorName, 0, 1, 'UTF-8'), 'UTF-8') }}
                     </div>
                     <div>
                         <div class="font-bold text-slate-900 text-base">{{ $authorName }}</div>
@@ -309,7 +318,7 @@
                         <div class="rounded-2xl p-6 bg-gradient-to-br from-primary to-orange-600 text-white shadow-lg">
                             <h3 class="font-extrabold text-lg text-white mb-1.5">{{ __('ui.blog_journal.book_now_btn') }}</h3>
                             <p class="text-xs text-white/90 mb-4 leading-relaxed">{{ __('ui.common.from') }} <span data-aed="99" class="font-bold">{{ __('ui.common.aed') }} 99</span> {{ __('ui.common.per_person') }}.</p>
-                            <button data-action="open-booking" class="w-full bg-white hover:bg-slate-50 text-slate-950 font-bold rounded-full py-2.5 text-xs transition-colors cursor-pointer shadow-xs mb-2" @click="$store.modal.open('booking')">
+                            <button type="button" data-action="open-booking" class="w-full bg-white hover:bg-slate-50 text-slate-950 font-bold rounded-full py-2.5 text-xs transition-colors cursor-pointer shadow-xs mb-2" @click="$store.modal.open('booking')">
                                 <i class="bi bi-calendar-check me-1.5"></i>{{ __('ui.common.book_now') }}
                             </button>
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="btn-whatsapp w-full border border-white/40 hover:border-white text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer" target="_blank" rel="noopener noreferrer" data-action="whatsapp" data-tour-name="{{ $post->title }}">
@@ -319,7 +328,14 @@
                     @endif
 
                     <!-- Categories Sidebar -->
-                    @php $cats = \App\Models\BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get(); @endphp
+                    @php
+                        $cats = \Illuminate\Support\Facades\Cache::remember('blog_sidebar_categories_counts', 3600, function () {
+                            return \App\Models\BlogCategory::where('status', 'active')
+                                ->withCount(['posts' => fn ($q) => $q->where('status', 'published')])
+                                ->orderBy('priority', 'asc')
+                                ->get();
+                        });
+                    @endphp
                     @if ($cats->count() > 0)
                     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                         <div class="p-4 border-b border-slate-200">
@@ -329,10 +345,9 @@
                         </div>
                         <div class="divide-y divide-slate-200">
                             @foreach ($cats as $catItem)
-                            @php $cc = \App\Models\BlogPost::where('category_id', $catItem->id)->where('status', 'published')->count(); @endphp
                             <a href="{{ localized_route('blog.index', ['category' => $catItem->slug]) }}" rel="nofollow" class="flex justify-between items-center px-4 py-3 text-xs text-slate-700 hover:text-primary hover:bg-slate-50 transition-colors">
                                 <span>{{ $catItem->name }}</span>
-                                <span class="bg-slate-100 text-slate-600 rounded-full px-2 py-0.5 font-semibold text-[10px]">{{ $cc }}</span>
+                                <span class="bg-slate-100 text-slate-600 rounded-full px-2 py-0.5 font-semibold text-[10px]">{{ (int) ($catItem->posts_count ?? 0) }}</span>
                             </a>
                             @endforeach
                         </div>
@@ -415,7 +430,7 @@
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">{{ __('ui.blog_journal.ready_adventure') }}</h2>
         <p class="text-slate-300 text-sm sm:text-base mb-6">{{ __('ui.blog_journal.satisfied_guests') }}</p>
         <div class="flex gap-3 justify-center flex-wrap">
-            <button data-action="open-booking" 
+            <button type="button" data-action="open-booking" 
                     class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" 
                     data-tour="{{ $matchedTour->id ?? '' }}"
                     @click="$store.modal.open('booking'{{ isset($matchedTour) && $matchedTour ? ', { tourId: ' . $matchedTour->id . ' }' : '' }})">
@@ -425,23 +440,25 @@
         </div>
     </div>
 </section>
+@endsection
 
+@push('styles')
 <style>
 .blog-content { font-size: 1.05rem; line-height: 1.85; color: #334155; }
 .blog-content h2 { font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.5rem; color: #0f172a; scroll-margin-top: 6rem; }
 .blog-content h3 { font-weight: 700; margin-top: 1.75rem; margin-bottom: .75rem; font-size: 1.25rem; color: #0f172a; scroll-margin-top: 6rem; }
 .blog-content h4 { font-weight: 700; margin-top: 1.5rem; margin-bottom: .5rem; color: #0f172a; scroll-margin-top: 6rem; }
 .blog-content p  { margin-bottom: 1.25rem; }
-.blog-content ul, .blog-content ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+.blog-content ul, .blog-content ol { padding-inline-start: 1.5rem; margin-bottom: 1.25rem; }
 .blog-content li { margin-bottom: .4rem; }
-.blog-content blockquote { border-left: 4px solid #F69044; padding: .75rem 1.25rem; margin: 1.5rem 0; background: #fff8f0; border-radius: 0 12px 12px 0; color: #475569; font-style: italic; }
+.blog-content blockquote { border-inline-start: 4px solid #F69044; padding: .75rem 1.25rem; margin: 1.5rem 0; background: #fff8f0; border-radius: 0 12px 12px 0; color: #475569; font-style: italic; }
 .blog-content img { max-width: 100%; border-radius: 16px; height: auto; margin: 1.5rem 0; }
 .blog-content a { color: #F69044; text-decoration: none; font-weight: 600; }
 .blog-content a:hover { text-decoration: underline; }
 .blog-content table { width: 100% !important; border-collapse: collapse !important; margin: 1.5rem 0 !important; font-size: .95rem !important; box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important; border-radius: 12px !important; overflow: hidden !important; }
-.blog-content table th, .blog-content table td { padding: .75rem 1rem !important; border: 1px solid #e2e8f0 !important; text-align: left !important; }
+.blog-content table th, .blog-content table td { padding: .75rem 1rem !important; border: 1px solid #e2e8f0 !important; text-align: start !important; }
 .blog-content table th, .blog-content table thead th, .blog-content table .table-dark th, .blog-content table tr th { background-color: #0f172a !important; color: #ffffff !important; font-weight: 700 !important; }
 .blog-content table td { background-color: #ffffff !important; color: #1e293b !important; }
 .blog-content table tr:nth-child(even) td { background-color: #f8fafc !important; }
 </style>
-@endsection
+@endpush

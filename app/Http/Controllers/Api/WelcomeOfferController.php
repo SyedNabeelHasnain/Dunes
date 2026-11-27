@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Mail\WelcomeOfferMail;
 use App\Models\Contact;
 use App\Models\Coupon;
+use App\Models\WhatsappInquiry;
 use App\Services\MetaCapiService;
 use App\Services\SettingsService;
 use App\Services\VisitorTrackerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -83,8 +83,9 @@ class WelcomeOfferController extends Controller
         $discountInt = (int) round($discountPercent);
 
         // Check if there is already an active welcome coupon generated for this specific email today
+        $escapedEmail = addcslashes($email, '%_!');
         $existing = Coupon::where('code', 'like', 'FIRST25-%')
-            ->where('name', 'like', "%({$email})%")
+            ->whereRaw("name LIKE ? ESCAPE '!'", ["%({$escapedEmail})%"])
             ->where('status', 'active')
             ->where(function ($q) {
                 $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
@@ -153,14 +154,13 @@ class WelcomeOfferController extends Controller
 
         // Record Lead in WhatsApp Inquiries Hub for 1-Click Retargeting
         try {
-            DB::table('whatsapp_inquiries')->insert([
+            WhatsappInquiry::create([
                 'name' => $name,
                 'phone' => $phone,
                 'tour_name' => '25% Welcome Offer ('.$coupon->code.')',
                 'page_url' => $request->header('referer') ?: url('/'),
                 'message_text' => "Customer claimed 25% discount voucher {$coupon->code}. Phone: {$phone}, Email: {$email}.",
                 'request_log_id' => $logId,
-                'created_at' => now(),
             ]);
         } catch (\Throwable $e) {
             Log::error('Failed to log welcome offer lead to whatsapp_inquiries: '.$e->getMessage());

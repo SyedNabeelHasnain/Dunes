@@ -9,6 +9,7 @@ use App\Models\VerifiedEmail;
 use App\Services\SettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -70,10 +71,10 @@ class EmailVerificationController extends Controller
             ], 429);
         }
 
-        // Session rate limiting check (60 seconds cooldown)
+        // Cooldown check (60 seconds) backed by Cache (works across stateless API & session requests)
         $rateKey = 'otp_sent_'.md5($email);
-        if (session()->has($rateKey)) {
-            $lastSent = (int) session($rateKey);
+        $lastSent = (int) (Cache::get($rateKey) ?: ($request->hasSession() ? session($rateKey, 0) : 0));
+        if ($lastSent > 0) {
             $elapsed = time() - $lastSent;
             if ($elapsed < 60) {
                 $wait = 60 - $elapsed;
@@ -90,15 +91,19 @@ class EmailVerificationController extends Controller
         // Generate 6-digit OTP
         $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        session([
-            $rateKey => time(),
-            'otp_email' => $email,
-            'otp_code' => $otp,
-            'otp_expiry' => time() + 300, // 5 minutes
-        ]);
+        Cache::put($rateKey, time(), 60);
+        if ($request->hasSession()) {
+            session([
+                $rateKey => time(),
+                'otp_email' => $email,
+                'otp_code' => $otp,
+                'otp_expiry' => time() + 300, // 5 minutes
+            ]);
+        }
 
-        // Hashed OTP audit log entry
+        // Invalidate any prior unused OTPs for this email before issuing the new hashed code
         try {
+            EmailOtp::where('email', $email)->delete();
             EmailOtp::create([
                 'email' => $email,
                 'otp' => hash('sha256', $otp),

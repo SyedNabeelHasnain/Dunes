@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() ?: 'en' }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="{{ $pageRobots ?? 'noindex, nofollow' }}">
     <title>Driver Run Sheet - {{ $driver->name }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-    <link rel="stylesheet" href="https://dunesdiscoverytourism.com/assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased pb-20">
@@ -69,11 +70,12 @@
         <div class="space-y-3">
             @forelse($bookings as $idx => $b)
             @php
-                $cleanGuestPhone = preg_replace('/[^0-9]/', '', $b->phone);
-                $mapsUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode($b->pickup_location);
+                $cleanGuestPhone = preg_replace('/[^0-9]/', '', (string) $b->phone);
+                $mapsUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode((string) $b->pickup_location);
                 $isPaid = ($b->payment_status === 'paid');
+                $status = $b->pickup_status ?: 'scheduled';
             @endphp
-            <div class="p-4 rounded-2xl bg-slate-800 border {{ $b->pickup_status === 'completed' ? 'border-emerald-500/40 opacity-75' : ($b->pickup_status === 'picked_up' ? 'border-sky-500/50' : 'border-slate-700') }} shadow-md space-y-3 transition">
+            <div class="p-4 rounded-2xl bg-slate-800 border {{ $status === 'completed' ? 'border-emerald-500/40 opacity-75' : ($status === 'picked_up' ? 'border-sky-500/50' : 'border-slate-700') }} shadow-md space-y-3 transition">
                 <!-- Top Row: Sequence #, Time, Status -->
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
@@ -88,10 +90,10 @@
                             <i class="bi bi-clock"></i> {{ $b->pickup_time ?: '3:00 PM' }}
                         </span>
                         <span class="px-2 py-0.5 rounded-md text-[10px] font-bold capitalize
-                            {{ $b->pickup_status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                              ($b->pickup_status === 'picked_up' ? 'bg-sky-500/20 text-sky-400' :
-                              ($b->pickup_status === 'en_route' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700 text-slate-300')) }}">
-                            {{ str_replace('_', ' ', $b->pickup_status ?: 'scheduled') }}
+                            {{ $status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
+                              ($status === 'picked_up' ? 'bg-sky-500/20 text-sky-400' :
+                              ($status === 'en_route' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700 text-slate-300')) }}">
+                            {{ str_replace('_', ' ', $status) }}
                         </span>
                     </div>
                 </div>
@@ -132,20 +134,20 @@
                         </span>
                     @else
                         <span class="inline-flex items-center gap-1 font-black text-rose-400 font-mono">
-                            <i class="bi bi-cash"></i> Collect Cash: AED {{ number_format($b->balance_due, 2) }}
+                            <i class="bi bi-cash"></i> Collect Cash: AED {{ number_format((float) ($b->balance_due ?? 0), 2) }}
                         </span>
                     @endif
                 </div>
 
                 <!-- Action Buttons: Map, Call, WhatsApp -->
                 <div class="grid grid-cols-3 gap-2 pt-1">
-                    <a href="{{ $mapsUrl }}" target="_blank" class="py-2.5 px-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                    <a href="{{ $mapsUrl }}" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="bi bi-map-fill text-primary"></i> Map
                     </a>
                     <a href="tel:{{ $b->phone }}" class="py-2.5 px-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="bi bi-telephone-fill text-sky-400"></i> Call
                     </a>
-                    <a href="https://wa.me/{{ $cleanGuestPhone }}" target="_blank" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                    <a href="https://wa.me/{{ $cleanGuestPhone }}" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="bi bi-whatsapp"></i> Chat
                     </a>
                 </div>
@@ -154,22 +156,22 @@
                 <div class="pt-2 border-t border-slate-700/60 flex items-center gap-2">
                     <form method="POST" action="{{ route('driver.update-status', [$token, $b->id]) }}" class="flex-1">
                         @csrf
-                        @if($b->pickup_status === 'scheduled')
+                        @if($status === 'scheduled')
                             <input type="hidden" name="status" value="en_route">
                             <button type="submit" class="w-full py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 font-bold text-xs flex items-center justify-center gap-1.5 transition">
                                 <i class="bi bi-car-front"></i> Mark En Route
                             </button>
-                        @elseif($b->pickup_status === 'en_route')
+                        @elseif($status === 'en_route')
                             <input type="hidden" name="status" value="arrived">
                             <button type="submit" class="w-full py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 border border-sky-500/30 font-bold text-xs flex items-center justify-center gap-1.5 transition">
                                 <i class="bi bi-geo-alt-fill"></i> Mark Arrived at Hotel
                             </button>
-                        @elseif($b->pickup_status === 'arrived')
+                        @elseif($status === 'arrived')
                             <input type="hidden" name="status" value="picked_up">
                             <button type="submit" class="w-full py-2 px-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs">
                                 <i class="bi bi-check-circle-fill"></i> Mark Guests Onboard
                             </button>
-                        @elseif($b->pickup_status === 'picked_up')
+                        @elseif($status === 'picked_up')
                             <input type="hidden" name="status" value="completed">
                             <button type="submit" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs">
                                 <i class="bi bi-flag-fill"></i> Mark Completed

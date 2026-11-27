@@ -38,12 +38,12 @@
                 </div>
 
                 <!-- Step 1: Category -->
-                <div x-show="step === 1">
+                <div x-show="step === 1" x-cloak>
                     <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">{{ __('ui.safari_quiz.step1_title') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div @click="selectChoice(1, 'desert')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-compass text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h4 class="font-bold text-slate-900 text-sm mb-1">{{ __('ui.safari_quiz.time_morning_title') }}</h4>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">{{ __('ui.home_categories.evening_title') }}</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">{{ __('ui.safari_quiz.package_includes') }}</p>
                         </div>
                         <div @click="selectChoice(1, 'city')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
@@ -65,7 +65,7 @@
                 </div>
 
                 <!-- Step 2: Timing -->
-                <div x-show="step === 2">
+                <div x-show="step === 2" x-cloak>
                     <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">{{ __('ui.safari_quiz.step2_title') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <div @click="selectChoice(2, 'morning')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
@@ -87,7 +87,7 @@
                 </div>
 
                 <!-- Step 3: Style -->
-                <div x-show="step === 3">
+                <div x-show="step === 3" x-cloak>
                     <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">{{ __('ui.safari_quiz.step3_title') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <div @click="selectChoice(3, 'family')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
@@ -109,7 +109,7 @@
                 </div>
 
                 <!-- Step 4: Result -->
-                <div x-show="step === 4">
+                <div x-show="step === 4" x-cloak>
                     <div class="text-center mb-6">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-2">
                             <i class="bi bi-patch-check-fill text-emerald-500"></i> {{ __('ui.safari_quiz.recommendation_badge') }}
@@ -139,7 +139,7 @@
                             <div class="sm:col-span-7 space-y-2 text-xs text-slate-600">
                                 <div class="flex items-center gap-2 text-slate-900 font-bold">
                                     <i class="bi bi-shield-check text-emerald-500 text-base"></i>
-                                    <span>Official DTCM-Licensed Operator & 100% Guaranteed Spot</span>
+                                    <span>Official DET-Licensed Operator &amp; 100% Guaranteed Spot</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <i class="bi bi-check2 text-emerald-500 font-bold"></i>

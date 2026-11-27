@@ -240,7 +240,8 @@ class SmtpDiagnosticService
                     }
                 }
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::debug('SmtpDiagnosticService::getHealthStatus lookup failed: '.$e->getMessage());
         }
 
         return [
@@ -254,14 +255,22 @@ class SmtpDiagnosticService
     protected function persistSnapshot(array $snapshot): void
     {
         try {
+            $previous = Cache::get(self::CACHE_KEY);
             Cache::put(self::CACHE_KEY, $snapshot, now()->addDays(7));
-            if (Schema::hasTable('settings')) {
+
+            $statusChanged = ! is_array($previous) || (($previous['status'] ?? null) !== ($snapshot['status'] ?? null));
+            $throttleKey = 'smtp_health_db_persisted_lock';
+
+            if (($statusChanged || ! Cache::has($throttleKey)) && Schema::hasTable('settings')) {
                 Setting::updateOrCreate(
                     ['setting_key' => self::SETTING_KEY],
                     ['setting_value' => (string) json_encode($snapshot)]
                 );
+                Cache::put($throttleKey, true, now()->addMinutes(5));
+                Cache::forget('site_settings_cache');
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::debug('SmtpDiagnosticService::persistSnapshot failed: '.$e->getMessage());
         }
     }
 }

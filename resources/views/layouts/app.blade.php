@@ -1,28 +1,38 @@
 @php
     if (!isset($settings) || (!is_array($settings) && !($settings instanceof \ArrayAccess))) {
         try {
-            $settings = app(\App\Services\SettingsService::class)->all();
+            $settings = app(\App\Services\SettingsService::class)->publicAll();
         } catch (\Throwable $e) {
             $settings = [];
         }
     } elseif (is_countable($settings) && count($settings) === 0) {
         try {
-            $settings = app(\App\Services\SettingsService::class)->all();
+            $settings = app(\App\Services\SettingsService::class)->publicAll();
         } catch (\Throwable $e) {
             $settings = [];
         }
     }
 
     try {
-        $allTours = \Illuminate\Support\Facades\Cache::remember('site_tours_header_cache', 3600, function() {
-            return \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+        $cachedToursRaw = \Illuminate\Support\Facades\Cache::remember('site_tours_header_cache', 3600, function() {
+            return \App\Models\Tour::where('status', 'active')
+                ->orderBy('priority', 'asc')
+                ->get()
+                ->map(fn ($t) => $t->getAttributes())
+                ->all();
         });
+        if (is_array($cachedToursRaw)) {
+            $allTours = collect($cachedToursRaw)
+                ->filter(fn ($attrs) => is_array($attrs))
+                ->map(fn (array $attrs) => (new \App\Models\Tour)->newFromBuilder($attrs))
+                ->values();
+        } else {
+            \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
+            $allTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+        }
     } catch (\Throwable $e) {
-        $allTours = null;
-    }
-    if (!is_iterable($allTours) || $allTours instanceof \__PHP_Incomplete_Class) {
-        try { \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache'); } catch (\Throwable $e) {}
-        try { $allTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get(); } catch (\Throwable $e) { $allTours = collect(); }
+        try { \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache'); } catch (\Throwable $ex) {}
+        try { $allTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get(); } catch (\Throwable $ex) { $allTours = collect(); }
     }
     
     $googleActive = isset($settings['google_active']) && $settings['google_active'] === '1';
@@ -40,18 +50,18 @@
     $primaryGtagId = !empty($adsId) ? $adsId : ($googleActive && !empty($ga4Id) ? $ga4Id : '');
     $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
     $conversionSendTo = (!empty($adsId) && !empty($conversionLabel)) ? "{$adsId}/{$conversionLabel}" : '';
-    $gVerify = ($settings['google_site_verification'] ?? null) ?: (config('services.google.site_verification') ?: env('GOOGLE_SITE_VERIFICATION', ''));
-    $bingVerify = ($settings['bing_site_verification'] ?? null) ?: (config('services.bing.site_verification') ?: env('BING_SITE_VERIFICATION', ''));
-    $yandexVerify = ($settings['yandex_site_verification'] ?? null) ?: (config('services.yandex.site_verification') ?: env('YANDEX_SITE_VERIFICATION', ''));
-    $baiduVerify = ($settings['baidu_site_verification'] ?? null) ?: (config('services.baidu.site_verification') ?: env('BAIDU_SITE_VERIFICATION', ''));
-    $clarityId = ($settings['clarity_id'] ?? null) ?: (config('services.clarity.id') ?: env('CLARITY_ID', 'z79y89wha9'));
+    $gVerify = ($settings['google_site_verification'] ?? null) ?: (config('services.google.site_verification') ?: '');
+    $bingVerify = ($settings['bing_site_verification'] ?? null) ?: (config('services.bing.site_verification') ?: '');
+    $yandexVerify = ($settings['yandex_site_verification'] ?? null) ?: (config('services.yandex.site_verification') ?: '');
+    $baiduVerify = ($settings['baidu_site_verification'] ?? null) ?: (config('services.baidu.site_verification') ?: '');
+    $clarityId = ($settings['clarity_id'] ?? null) ?: (config('services.clarity.id') ?: 'z79y89wha9');
     $clarityActive = ($settings['clarity_active'] ?? '1') !== '0';
     
     $metaActive = isset($settings['meta_active']) && $settings['meta_active'] === '1';
     $metaCapi = isset($settings['meta_capi_enabled']) && $settings['meta_capi_enabled'] === '1';
     $metaPixelId = $settings['meta_pixel_id'] ?? '';
     
-    $rcSiteKey = $settings['recaptcha_site_key'] ?? '6LdOpWEsAAAAAOhnKd4WFFtJMrShRtMV33HdZBP6';
+    $rcSiteKey = $settings['recaptcha_site_key'] ?? '';
     $waPhone = $settings['site_whatsapp'] ?? '971502456056';
     $phone = $settings['site_phone'] ?? '+971 50 245 6056';
     $email = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
@@ -71,7 +81,11 @@
 
     $currentYear = date('Y');
     $currentLocale = $currentLocale ?? app()->getLocale() ?? 'en';
-    $activeLanguages = $activeLanguages ?? \App\Models\Language::getActive();
+    try {
+        $activeLanguages = $activeLanguages ?? \App\Models\Language::getActive();
+    } catch (\Throwable $langEx) {
+        $activeLanguages = \App\Models\Language::fallbackCollection();
+    }
     $yieldTitle = trim($__env->yieldContent('title') ?: $__env->yieldContent('page_title'));
     $yieldDesc = trim($__env->yieldContent('meta_description'));
     if (! isset($pageTitle) && $yieldTitle !== '') {
@@ -126,6 +140,8 @@
         window.CSRF_TOKEN = "{{ csrf_token() }}";
         window.WHATSAPP_FORM_ENABLED = "{{ (string)($settings['whatsapp_form_enabled'] ?? '1') }}";
         window.WHATSAPP_NUMBER = "{{ (string)($settings['site_whatsapp'] ?? '971502456056') }}";
+        window.WHATSAPP_PREFILL_MESSAGE = @json((string) ($settings['whatsapp_prefill_message'] ?? ''));
+        window.RECAPTCHA_SITE_KEY = @json(app()->environment('testing') ? '' : (string) ($rcSiteKey ?? ''));
 
         window.DunesConsent = (function() {
             var strictGating = {{ $privacyStrictGating ? 'true' : 'false' }};
@@ -440,7 +456,12 @@
     <meta name="twitter:description" content="{{ $ogDesc ?? $pageDesc }}">
     <meta name="twitter:image" content="{{ $ogImage }}">
     @if(!empty($seoCustomSchemaJson))
-    <script type="application/ld+json">{!! $seoCustomSchemaJson !!}</script>
+    @php
+        $decodedCustomSchema = json_decode((string) $seoCustomSchemaJson, true);
+    @endphp
+    @if(json_last_error() === JSON_ERROR_NONE && is_array($decodedCustomSchema))
+    <script type="application/ld+json">{!! json_encode($decodedCustomSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
+    @endif
     @endif
     
     <meta name="geo.region" content="AE-DU">
@@ -540,41 +561,65 @@
               "url": "https://www.dubaitourism.gov.ae"
             }
           },
-          "knowsAbout": [
-            "https://en.wikipedia.org/wiki/Dubai",
-            "https://en.wikipedia.org/wiki/Desert_safari",
-            "https://en.wikipedia.org/wiki/Dune_bashing",
-            "Dubai Desert Safari",
-            "Dune Buggy Rental Dubai",
-            "Quad Biking Dubai",
-            "Lahbab Red Dunes",
-            "Dubai Tourism"
-          ],
-          "areaServed": [
-            {
-              "@@type": "AdministrativeArea",
-              "name": "Dubai",
-              "sameAs": "https://www.wikidata.org/wiki/Q612"
-            },
-            {
-              "@@type": "Country",
-              "name": "United Arab Emirates",
-              "sameAs": "https://www.wikidata.org/wiki/Q878"
-            }
-          ],
+          @php
+              $knowsAboutList = [
+                  'https://en.wikipedia.org/wiki/Dubai',
+                  'https://en.wikipedia.org/wiki/Desert_safari',
+                  'https://en.wikipedia.org/wiki/Dune_bashing',
+                  'Dubai Desert Safari',
+                  'Dune Buggy Rental Dubai',
+                  'Quad Biking Dubai',
+                  'Lahbab Red Dunes',
+                  'Dubai Tourism',
+              ];
+              if (!empty($settings['google_primary_category'])) {
+                  $knowsAboutList[] = trim((string) $settings['google_primary_category']);
+              }
+              $knowsAboutList = array_values(array_unique($knowsAboutList));
+
+              $areaServedList = [
+                  [
+                      '@type' => 'AdministrativeArea',
+                      'name' => 'Dubai',
+                      'sameAs' => 'https://www.wikidata.org/wiki/Q612',
+                  ],
+                  [
+                      '@type' => 'Country',
+                      'name' => 'United Arab Emirates',
+                      'sameAs' => 'https://www.wikidata.org/wiki/Q878',
+                  ],
+              ];
+              if (!empty($settings['google_service_area'])) {
+                  $existingAreas = ['dubai', 'united arab emirates', 'uae'];
+                  foreach (preg_split('/[\r\n,;]+/', (string) $settings['google_service_area']) as $customArea) {
+                      $customArea = trim((string) $customArea);
+                      if ($customArea !== '' && !in_array(strtolower($customArea), $existingAreas, true)) {
+                          $existingAreas[] = strtolower($customArea);
+                          $areaServedList[] = [
+                              '@type' => 'AdministrativeArea',
+                              'name' => $customArea,
+                          ];
+                      }
+                  }
+              }
+          @endphp
+          "knowsAbout": {!! json_encode($knowsAboutList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_PRETTY_PRINT) !!},
+          "areaServed": {!! json_encode($areaServedList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_PRETTY_PRINT) !!},
           @if(request()->is('/') || request()->routeIs('home') || request()->routeIs('locale.home'))
           @php
               $useVerifiedSchemaReviews = ($settings['schema_use_verified_review_count'] ?? '0') === '1';
               $schemaRatingValue = $settings['schema_homepage_rating'] ?? '4.9';
               $schemaReviewCount = $settings['schema_homepage_review_count'] ?? '2847';
               if ($useVerifiedSchemaReviews) {
-                  $realCount = \App\Models\Review::where('status', 'approved')->count();
-                  if ($realCount > 0) {
-                      $schemaReviewCount = (string) $realCount;
-                      $schemaRatingValue = (string) round((float) (\App\Models\Review::where('status', 'approved')->avg('rating') ?? 5.0), 1);
-                  } else {
-                      $schemaReviewCount = '0';
-                  }
+                  try {
+                      $realCount = \App\Models\Review::where('status', 'approved')->count();
+                      if ($realCount > 0) {
+                          $schemaReviewCount = (string) $realCount;
+                          $schemaRatingValue = (string) round((float) (\App\Models\Review::where('status', 'approved')->avg('rating') ?? 5.0), 1);
+                      } else {
+                          $schemaReviewCount = '0';
+                      }
+                  } catch (\Throwable $revEx) {}
               }
           @endphp
           @if((int) $schemaReviewCount > 0)
@@ -617,6 +662,9 @@
               "availableLanguage": ["en", "ar", "ru", "es", "it", "English", "Arabic", "Russian", "Spanish", "Italian"]
             }
           ],
+          @if(!empty($settings['google_business_hours']))
+          "openingHours": {!! json_encode(trim((string) $settings['google_business_hours']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          @endif
           "openingHoursSpecification": {
             "@@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
@@ -1153,16 +1201,16 @@
                 <div class="sm:col-span-2 lg:col-span-4">
                     <img src="{{ $siteLogoWhite }}" alt="{{ $settings['site_name'] ?? 'Dunes Discovery Tourism' }}" width="160" height="46" loading="lazy" decoding="async" class="h-9 w-auto object-contain mb-4">
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-sm mb-4">
-                        {{ __('ui.footer.about_text') }}
+                        {{ ($currentLocale === 'en' && !empty($settings['footer_about'])) ? $settings['footer_about'] : __('ui.footer.about_text') }}
                     </p>
                     <div class="flex items-center gap-3">
-                        <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Instagram">
+                        <a href="{{ !empty($settings['social_instagram']) ? $settings['social_instagram'] : 'https://instagram.com/dunesdiscoverytourism' }}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Instagram">
                             <i class="bi bi-instagram"></i>
                         </a>
-                        <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Facebook">
+                        <a href="{{ !empty($settings['social_facebook']) ? $settings['social_facebook'] : 'https://facebook.com/dunesdiscoverytourism' }}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Facebook">
                             <i class="bi bi-facebook"></i>
                         </a>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-emerald-600 hover:border-emerald-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="{{ __('ui.common.whatsapp') }}">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-emerald-600 hover:border-emerald-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="{{ __('ui.common.whatsapp') }}">
                             <i class="bi bi-whatsapp"></i>
                         </a>
                     </div>
@@ -1249,6 +1297,9 @@
                     <ul class="space-y-2 text-xs sm:text-sm">
                         <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-telephone text-primary"></i><span>{{ $phone }}</span></a></li>
                         <li><a href="mailto:{{ $email }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-envelope text-primary"></i><span class="break-all">{{ $email }}</span></a></li>
+                        @if(!empty($settings['site_support_email']) && strtolower(trim($settings['site_support_email'])) !== strtolower(trim($email)))
+                        <li><a href="mailto:{{ trim($settings['site_support_email']) }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-headset text-primary"></i><span class="break-all">{{ trim($settings['site_support_email']) }}</span></a></li>
+                        @endif
                         <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2 btn-whatsapp cursor-pointer" data-action="whatsapp"><i class="bi bi-whatsapp text-emerald-400"></i><span>24/7 WhatsApp</span></a></li>
                         <li class="text-slate-300 inline-flex items-start gap-2"><i class="bi bi-geo-alt text-primary shrink-0 mt-0.5"></i><span>{{ $settings['site_address'] ?? 'Dubai, United Arab Emirates' }}</span></li>
                     </ul>
@@ -1299,6 +1350,9 @@
             <div class="border-t border-slate-800/80 pt-6">
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-start">
                     <div>
+                        @if(!empty($settings['site_copyright']))
+                        <p class="text-slate-300 text-xs mb-1 font-medium">{{ str_replace('{year}', date('Y'), (string) $settings['site_copyright']) }}</p>
+                        @endif
                         <p class="text-slate-400 text-xs mb-1">{!! __('ui.footer.license_line', [
                             'year' => date('Y'),
                             'name' => e($settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.'),
@@ -1369,6 +1423,10 @@
             contact_email_otp_required: {{ ($settings['contact_email_otp_required'] ?? '1') === '1' ? 'true' : 'false' }},
             turnstile_enabled: {{ ($settings['turnstile_enabled'] ?? '0') === '1' && !empty($settings['turnstile_site_key'] ?? '') ? 'true' : 'false' }},
             turnstile_site_key: @json($settings['turnstile_site_key'] ?? ''),
+            recaptcha_site_key: @json($rcSiteKey),
+            recordings_enabled: {{ ($settings['recordings_enabled'] ?? '1') === '1' ? 'true' : 'false' }},
+            heatmaps_enabled: {{ ($settings['heatmaps_enabled'] ?? '1') === '1' ? 'true' : 'false' }},
+            whatsapp_prefill_message: @json($settings['whatsapp_prefill_message'] ?? ''),
             site_phone: @json($settings['site_phone'] ?? '+971 50 245 6056'),
             site_whatsapp: @json($settings['site_whatsapp'] ?? '971502456056')
         };
@@ -1382,7 +1440,7 @@
     <script defer src="{{ asset('assets/js/dunes-rum.js') }}"></script>
 
     <!-- Persistent Floating WhatsApp Action Button -->
-    <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hi Dunes Discovery! I would like to inquire about booking a Dubai Desert Safari.') }}"
+    <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode(($settings['whatsapp_prefill_message'] ?? '') !== '' ? $settings['whatsapp_prefill_message'] : 'Hi Dunes Discovery! I would like to inquire about booking a Dubai Desert Safari.') }}"
        target="_blank"
        rel="noopener"
        id="globalWhatsappFloat"

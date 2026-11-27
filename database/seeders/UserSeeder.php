@@ -14,7 +14,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $defaultPassword = env('ADMIN_PASSWORD', 'admin123');
+        $envPassword = (string) env('ADMIN_PASSWORD', '');
+        if (strlen($envPassword) >= 12) {
+            $defaultPassword = $envPassword;
+        } elseif (app()->environment(['local', 'testing'])) {
+            $defaultPassword = $envPassword !== '' ? $envPassword : 'admin123';
+        } else {
+            // Never seed a weak default password in production when ADMIN_PASSWORD is not securely configured
+            $defaultPassword = \Illuminate\Support\Str::password(24);
+        }
 
         $path = database_path('seeders/data/users.json');
         if (File::exists($path)) {
@@ -31,15 +39,16 @@ class UserSeeder extends Seeder
                         $pass = $defaultPassword;
                     }
 
-                    User::updateOrCreate(
-                        ['id' => $u['id']],
-                        [
-                            'name' => ucfirst($u['username']),
-                            'email' => $u['email'],
-                            'password' => $pass,
-                            'email_verified_at' => now(),
-                        ]
-                    );
+                    $user = User::firstOrNew(['id' => $u['id']]);
+                    $user->forceFill([
+                        'id' => $u['id'],
+                        'name' => ucfirst($u['username']),
+                        'email' => $u['email'],
+                        'password' => $pass,
+                        'email_verified_at' => $user->email_verified_at ?? now(),
+                        'role' => $user->role ?: 'super_admin',
+                        'is_active' => $user->is_active ?? true,
+                    ])->save();
                 }
             }
         }
@@ -52,14 +61,18 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($adminAccounts as $acc) {
-            User::firstOrCreate(
-                ['email' => $acc['email']],
-                [
+            $existing = User::where('email', $acc['email'])->first();
+            if (! $existing) {
+                $created = new User();
+                $created->forceFill([
                     'name' => $acc['name'],
+                    'email' => $acc['email'],
                     'password' => $defaultPassword,
                     'email_verified_at' => now(),
-                ]
-            );
+                    'role' => 'super_admin',
+                    'is_active' => true,
+                ])->save();
+            }
         }
     }
 }

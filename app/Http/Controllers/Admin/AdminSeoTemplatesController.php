@@ -92,7 +92,7 @@ class AdminSeoTemplatesController extends Controller
         return redirect()->route('admin.settings.seo-templates.index')->with('success', "SEO template '{$template->label}' updated.");
     }
 
-    public function reset(string $contentType): RedirectResponse
+    public function reset(Request $request, string $contentType): RedirectResponse
     {
         $template = SeoTemplate::where('content_type', $contentType)->firstOrFail();
         $defaults = SeoTemplate::defaultDefinitions();
@@ -102,7 +102,24 @@ class AdminSeoTemplatesController extends Controller
         }
 
         $old = $template->toArray();
-        $template->update(array_merge($defaults[$contentType], ['is_active' => true, 'updated_by' => auth()->id()]));
+        $newValues = array_merge($defaults[$contentType], ['is_active' => true, 'updated_by' => auth()->id()]);
+
+        $user = $request->user();
+        if ($user && method_exists($user, 'hasAnyPermission') && ! $user->hasAnyPermission(['governance.approve', '*'])) {
+            $approval = $this->approvals->propose(
+                section: 'seo_template',
+                targetKey: "seo_template:{$contentType}",
+                summary: "Proposed reset of SEO template '{$template->label}' to baseline defaults",
+                payload: array_merge(['content_type' => $contentType], $newValues),
+                previousPayload: $old,
+                requester: $user,
+            );
+
+            return redirect()->route('admin.settings.seo-templates.index')
+                ->with('success', "SEO template reset for '{$template->label}' submitted for approval (#{$approval->id}).");
+        }
+
+        $template->update($newValues);
         SitemapController::flushAllSitemapCaches();
 
         $this->audit->log(

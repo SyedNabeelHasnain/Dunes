@@ -110,6 +110,15 @@ class IndexNowService
      */
     public function submit(array $urls): array
     {
+        if (app()->environment('local')) {
+            return [
+                'success' => false,
+                'status' => 200,
+                'message' => 'IndexNow submission skipped in local development environment.',
+                'count' => 0,
+            ];
+        }
+
         $this->ensureKeyFileExists();
 
         $urls = array_values(array_unique(array_filter($urls)));
@@ -132,10 +141,11 @@ class IndexNowService
             $parsedHost = parse_url($url, PHP_URL_HOST);
             $parsedPath = parse_url($url, PHP_URL_PATH) ?? '/';
             $parsedQuery = parse_url($url, PHP_URL_QUERY);
+            $normalizedPath = '/'.ltrim((string) $parsedPath, '/');
 
             // Re-normalize URL to canonical https://{host}{path}
             if ($parsedHost === $host || $parsedHost === 'dunesdiscoverytourism.com' || $parsedHost === 'localhost' || $parsedHost === '127.0.0.1' || empty($parsedHost)) {
-                $fullUrl = 'https://' . $host . ($parsedPath === '/' && empty($parsedQuery) ? '/' : $parsedPath);
+                $fullUrl = 'https://' . $host . $normalizedPath;
                 if (!empty($parsedQuery)) {
                     $fullUrl .= '?' . $parsedQuery;
                 }
@@ -333,7 +343,9 @@ class IndexNowService
         }
 
         try {
-            $recentTours = Tour::where('updated_at', '>=', $since)->pluck('slug');
+            $recentTours = Tour::where('status', 'active')
+                ->where('updated_at', '>=', $since)
+                ->pluck('slug');
             foreach ($recentTours as $slug) {
                 $urls[] = $scheme . $host . '/' . $slug;
                 foreach ($languages as $lang) {
@@ -343,6 +355,7 @@ class IndexNowService
                 }
             }
         } catch (\Throwable $e) {
+            Log::warning('IndexNow::submitRecent tour query failed: ' . $e->getMessage());
         }
 
         try {
@@ -356,6 +369,29 @@ class IndexNowService
                 }
             }
         } catch (\Throwable $e) {
+            Log::warning('IndexNow::submitRecent blog query failed: ' . $e->getMessage());
+        }
+
+        try {
+            $recentWikis = \App\Models\WikiArticle::where('status', 'published')
+                ->where('updated_at', '>=', $since)
+                ->whereHas('pillar', fn ($q) => $q->where('status', 'active'))
+                ->with('pillar:id,slug')
+                ->get(['id', 'pillar_id', 'slug']);
+            foreach ($recentWikis as $article) {
+                if (! $article->pillar) {
+                    continue;
+                }
+                $wikiPath = '/wiki/' . $article->pillar->slug . '/' . $article->slug;
+                $urls[] = $scheme . $host . $wikiPath;
+                foreach ($languages as $lang) {
+                    if (! $lang->is_default) {
+                        $urls[] = $scheme . $host . '/' . $lang->code . $wikiPath;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('IndexNow::submitRecent wiki query failed: ' . $e->getMessage());
         }
 
         if (empty($urls)) {

@@ -44,9 +44,11 @@
             <button type="button" @click="showMethodology = !showMethodology" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition">
                 <i class="bi bi-calculator"></i> Methodology
             </button>
+            @if($latestRun)
             <a href="{{ route('admin.audit.export', ['id' => $latestRun->id, 'format' => 'csv']) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-2xs">
                 <i class="bi bi-download"></i> Export CSV
             </a>
+            @endif
             <form action="{{ route('admin.audit.run') }}" method="POST" class="inline">
                 @csrf
                 <input type="hidden" name="scan_type" value="incremental">
@@ -121,6 +123,21 @@
         </div>
     @endif
 
+    @if(!$latestRun)
+    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-5">
+            <div class="w-20 h-20 rounded-full border-4 border-slate-100 flex flex-col items-center justify-center shrink-0">
+                <span class="text-xl font-black text-slate-400 leading-none">--</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase mt-0.5">/ 100</span>
+            </div>
+            <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Overall Health</span>
+                <h3 class="text-base font-extrabold text-slate-900 mt-0.5">No Audit Runs Recorded Yet</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-md">Click <strong>Incremental Scan</strong> or <strong>Run Full Audit Now</strong> above to execute your first live evidence-based site health audit.</p>
+            </div>
+        </div>
+    </div>
+    @else
     <!-- Health Score & Primary Metric Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-5">
@@ -233,6 +250,9 @@
                 <p class="text-xs text-slate-500 mt-0.5">Filter by discipline, verification level, assignee, or status.</p>
             </div>
             <form action="{{ route('admin.audit.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
                 <select name="severity" class="rounded-xl border border-slate-200 text-xs px-3 py-1.5 bg-white text-slate-700 font-medium">
                     <option value="">All Severities</option>
                     @foreach(['critical', 'high', 'medium', 'low', 'info'] as $sev)
@@ -374,6 +394,7 @@
             </table>
         </div>
     </div>
+    @endif
 
     <!-- Assign / Remediation Modal -->
     <div x-show="remediateModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">

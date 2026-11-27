@@ -44,11 +44,9 @@ class SessionTelemetryController extends Controller
             $parsedBody = is_string($rawContent) && $rawContent !== '' ? json_decode($rawContent, true) : null;
             $bodyData = is_array($parsedBody) ? $parsedBody : [];
 
-            $payloadForIp = array_merge($bodyData, $request->all());
-            $ipInfo = $this->tracker->resolveClientIp($payloadForIp);
-            $clientIp = $ipInfo['client_ip'];
+            $clientIp = $request->ip() ?: '0.0.0.0';
 
-            // Strict Exclusion: Firewall and Ignored IPs
+            // Strict Exclusion: Firewall and Ignored IPs (always use server-trusted request IP)
             if ($this->ipSecurity->isIpBlocked($clientIp) || $this->ipSecurity->isIpIgnoredFromAnalytics($clientIp)) {
                 return response()->json(['skipped' => 'ip_excluded'], 200);
             }
@@ -61,13 +59,13 @@ class SessionTelemetryController extends Controller
                 return response()->json(['skipped' => 'bot_excluded'], 200);
             }
 
-            // Decode incoming events payload (supports gzip+base64 payload, JSON array/string, or raw beacon body)
+            // Decode incoming events payload (bounded gzip+base64 to prevent zip-bomb DoS)
             $events = [];
             $gzB64 = $request->input('events_gz_b64', $bodyData['events_gz_b64'] ?? null);
-            if (is_string($gzB64) && $gzB64 !== '' && strlen($gzB64) <= 4194304) {
+            if (is_string($gzB64) && $gzB64 !== '' && strlen($gzB64) <= 2097152) {
                 $compressed = base64_decode($gzB64, true);
-                if ($compressed !== false) {
-                    $inflated = @gzdecode($compressed);
+                if ($compressed !== false && strlen($compressed) <= 1572864) {
+                    $inflated = @gzdecode($compressed, 8388608);
                     if ($inflated !== false) {
                         $decodedGz = json_decode($inflated, true);
                         if (is_array($decodedGz)) {
@@ -79,25 +77,26 @@ class SessionTelemetryController extends Controller
 
             if (empty($events)) {
                 $rawEvents = $request->input('events', $bodyData['events'] ?? null);
-                if (is_string($rawEvents)) {
+                if (is_string($rawEvents) && strlen($rawEvents) <= 4194304) {
                     $events = json_decode($rawEvents, true) ?: [];
                 } elseif (is_array($rawEvents)) {
                     $events = $rawEvents;
                 }
             }
 
-            $events = array_values(array_filter(
+            $events = array_slice(array_values(array_filter(
                 is_array($events) ? $events : [],
                 static fn ($evt) => is_array($evt) && isset($evt['type'], $evt['timestamp'])
-            ));
+            )), 0, 1000);
 
             if (empty($events)) {
                 return response()->json(['error' => 'empty_events'], 422);
             }
 
-            $sessionId = (string) ($request->input('session_id')
+            $rawSessionId = (string) ($request->input('session_id')
                 ?: ($bodyData['session_id'] ?? '')
                 ?: ($request->cookie('dunes_session') ?: session()->getId()));
+            $sessionId = substr((string) preg_replace('/[^a-zA-Z0-9_\-]/', '', $rawSessionId), 0, 100);
             $geo = $this->tracker->ipLookup($clientIp);
 
             $currentPage = $request->input('current_page', $bodyData['current_page'] ?? $request->header('referer'));
@@ -110,7 +109,7 @@ class SessionTelemetryController extends Controller
                 'device_type' => $uaData['device_type'] ?? ($bodyData['device_type'] ?? 'desktop'),
                 'browser_name' => $uaData['browser_name'] ?? null,
                 'os_name' => $uaData['os_name'] ?? null,
-                'current_page' => $currentPage,
+                'current_page' => is_string($currentPage) ? mb_substr($currentPage, 0, 500) : null,
                 'is_final' => $isFinal,
                 'is_bot' => false,
             ];
@@ -127,7 +126,7 @@ class SessionTelemetryController extends Controller
             \Illuminate\Support\Facades\Log::error('Recording batch ingestion error: ' . $e->getMessage(), [
                 'exception' => $e
             ]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 200);
+            return response()->json(['success' => false, 'error' => 'telemetry_ingestion_failed'], 200);
         }
     }
 
@@ -141,8 +140,7 @@ class SessionTelemetryController extends Controller
                 return response()->json(['skipped' => 'heatmaps_disabled'], 200);
             }
 
-            $ipInfo = $this->tracker->resolveClientIp($request->all());
-            $clientIp = $ipInfo['client_ip'];
+            $clientIp = $request->ip() ?: '0.0.0.0';
 
             if ($this->ipSecurity->isIpBlocked($clientIp) || $this->ipSecurity->isIpIgnoredFromAnalytics($clientIp)) {
                 return response()->json(['skipped' => 'ip_excluded'], 200);
@@ -174,7 +172,7 @@ class SessionTelemetryController extends Controller
             \Illuminate\Support\Facades\Log::error('Heatmap click ingestion error: ' . $e->getMessage(), [
                 'exception' => $e
             ]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 200);
+            return response()->json(['success' => false, 'error' => 'heatmap_click_failed'], 200);
         }
     }
 
@@ -188,8 +186,7 @@ class SessionTelemetryController extends Controller
                 return response()->json(['skipped' => 'heatmaps_disabled'], 200);
             }
 
-            $ipInfo = $this->tracker->resolveClientIp($request->all());
-            $clientIp = $ipInfo['client_ip'];
+            $clientIp = $request->ip() ?: '0.0.0.0';
 
             if ($this->ipSecurity->isIpBlocked($clientIp) || $this->ipSecurity->isIpIgnoredFromAnalytics($clientIp)) {
                 return response()->json(['skipped' => 'ip_excluded'], 200);
@@ -216,7 +213,7 @@ class SessionTelemetryController extends Controller
             \Illuminate\Support\Facades\Log::error('Heatmap scroll ingestion error: ' . $e->getMessage(), [
                 'exception' => $e
             ]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 200);
+            return response()->json(['success' => false, 'error' => 'heatmap_scroll_failed'], 200);
         }
     }
 }

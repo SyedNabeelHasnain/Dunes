@@ -111,7 +111,7 @@
                     <div class="text-xs text-slate-600 space-y-2">
                         <p class="font-bold text-slate-800">Supported Query Parameters:</p>
                         <ul class="list-disc list-inside space-y-1 text-slate-600 text-[11px]">
-                            <li><code class="text-primary font-bold">?tour=evening-desert-safari</code> — Returns a specific tour only.</li>
+                            <li><code class="text-primary font-bold">?tour=evening-desert-safari-dubai</code> — Returns a specific tour only.</li>
                             <li><code class="text-primary font-bold">?limit=10</code> — Limit number of returned tours.</li>
                         </ul>
                     </div>
@@ -137,7 +137,7 @@
 
                 <!-- Preview Container -->
                 <div class="bg-slate-100/70 p-4 rounded-xl flex items-center justify-center">
-                    <div class="dunes-safari-widget" :data-tour="selectedTour" :data-partner="partnerSlug" style="width: 100%; max-width: 360px;"></div>
+                    <div x-ref="widgetPreview" class="dunes-safari-widget" :data-tour="selectedTour" :data-partner="partnerSlug" style="width: 100%; max-width: 360px;"></div>
                 </div>
             </div>
 
@@ -204,6 +204,19 @@ function syndicationHub() {
         selectedTour: '{{ $tours->first()?->slug ?? 'evening-desert-safari-dubai' }}',
         partnerSlug: 'partner_embed',
         copied: false,
+        init() {
+            const refreshPreview = () => {
+                this.$nextTick(() => {
+                    const el = this.$refs.widgetPreview;
+                    if (!el || !window.DunesWidget || typeof window.DunesWidget.init !== 'function') return;
+                    el.removeAttribute('data-dunes-initialized');
+                    window.DunesWidget.init();
+                });
+            };
+            refreshPreview();
+            this.$watch('selectedTour', refreshPreview);
+            this.$watch('partnerSlug', refreshPreview);
+        },
         get embedSnippet() {
             const partnerAttr = this.partnerSlug ? ` data-partner="${this.partnerSlug}"` : '';
             return `<!-- Dunes Discovery Tourism Safari Card Widget -->\n<div class="dunes-safari-widget" data-tour="${this.selectedTour}"${partnerAttr}></div>\n<script src="{{ $widgetScriptUrl }}" async><\/script>`;

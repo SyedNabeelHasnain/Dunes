@@ -458,6 +458,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin User',
             'email' => 'admin@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         $coupon = Coupon::create([
@@ -571,6 +572,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin User',
             'email' => 'admin_bulk@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         $b1 = Booking::create([
@@ -626,6 +628,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin WhatsApp',
             'email' => 'admin_wa@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         // 1. Single Lead Deletion Test
@@ -712,6 +715,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin Inquiries',
             'email' => 'admin_inq@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         // 1. Single Inquiry Deletion Test
@@ -805,6 +809,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin Realtime',
             'email' => 'admin_realtime@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         $b1 = Booking::create([
@@ -862,6 +867,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin Drafts',
             'email' => 'admin_drafts@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         // Create 1 real confirmed booking
@@ -914,6 +920,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin Revenue',
             'email' => 'admin_rev@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         // Booking 1: Confirmed and fully paid (total 600, payment_amount 600)
@@ -988,6 +995,7 @@ class BookingEngineTest extends TestCase
             'name' => 'Admin Operations',
             'email' => 'admin_ops@dunesdiscovery.com',
             'password' => bcrypt('password123'),
+            'role' => 'super_admin',
         ]);
 
         $emptyDate = now()->addDays(30)->format('Y-m-d');

@@ -459,6 +459,9 @@
                             <option value="manual">Manual</option>
                             <option value="google">Google Reviews</option>
                             <option value="tripadvisor">TripAdvisor</option>
+                            <option value="website">Website</option>
+                            <option value="direct">Direct</option>
+                            <option value="direct_ugc">Direct UGC</option>
                         </select>
                     </div>
                     <div>
@@ -560,8 +563,8 @@ $(document).ready(function() {
         });
     }
 
-    // Edit Review Modal handler
-    $('.edit-review-btn').on('click', function() {
+    // Edit Review Modal handler (delegated for DataTables pagination)
+    $(document).on('click', '.edit-review-btn', function() {
         const id = $(this).data('id');
         const name = $(this).data('name');
         const title = $(this).data('title');

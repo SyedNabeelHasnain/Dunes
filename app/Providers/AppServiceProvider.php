@@ -18,10 +18,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (file_exists(app_path('Helpers/helpers.php'))) {
-            require_once app_path('Helpers/helpers.php');
-        }
-
         if (file_exists(base_path('../public_html'))) {
             $this->app->usePublicPath(base_path('../public_html'));
         }
@@ -29,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(SettingsService::class, fn () => new SettingsService);
         $this->app->singleton(\App\Services\CmsContentService::class);
         $this->app->singleton(\App\Services\Localization\LocaleManager::class);
+        $this->app->singleton(\App\Services\IndexNowService::class);
 
         $this->app->singleton('url', function ($app) {
             $routes = $app['router']->getRoutes();
@@ -85,30 +82,15 @@ class AppServiceProvider extends ServiceProvider
             @mkdir($fontDir, 0775, true);
         }
 
-        $secretSettingKeys = [
-            'smtp_password',
-            'smtp_fallback_password',
-            'ziina_access_token',
-            'ziina_webhook_secret',
-            'meta_access_token',
-            'meta_capi_token',
-            'recaptcha_secret_key',
-            'turnstile_secret_key',
-            'tripadvisor_api_key',
-            'deepl_auth_key',
-            'google_translate_api_key',
-            'google_places_api_key',
-        ];
-
-        View::composer('*', function ($view) use ($secretSettingKeys) {
+        View::composer('*', function ($view) {
             $viewData = $view->getData();
             $viewName = (string) $view->getName();
             $isAdminView = str_starts_with($viewName, 'admin.') || str_starts_with($viewName, 'layouts.admin');
 
             if (! array_key_exists('settings', $viewData)) {
                 try {
-                    $allSettings = app(SettingsService::class)->all();
-                    $view->with('settings', $isAdminView ? $allSettings : $allSettings->except($secretSettingKeys));
+                    $settingsService = app(SettingsService::class);
+                    $view->with('settings', $isAdminView ? $settingsService->all() : $settingsService->publicAll());
                 } catch (\Throwable $e) {
                     $view->with('settings', collect());
                 }
@@ -144,12 +126,18 @@ class AppServiceProvider extends ServiceProvider
                         $pendingReviews = \App\Models\Review::where('status', 'pending')->count();
                     } catch (\Throwable $ex) {}
 
+                    $pendingAppeals = 0;
+                    try {
+                        $pendingAppeals = \App\Models\UnblockRequest::where('status', 'pending')->count();
+                    } catch (\Throwable $ex) {}
+
                     return [
                         'pending_bookings' => $pendingBookings,
                         'draft_bookings' => $draftBookings,
                         'new_inquiries' => $newInquiries,
                         'unread_whatsapp' => $unreadWhatsapp,
                         'pending_reviews' => $pendingReviews,
+                        'pending_appeals' => $pendingAppeals,
                     ];
                 });
                 $view->with('sidebarCounts', $sidebarCounts);
@@ -160,6 +148,7 @@ class AppServiceProvider extends ServiceProvider
                     'new_inquiries' => 0,
                     'unread_whatsapp' => 0,
                     'pending_reviews' => 0,
+                    'pending_appeals' => 0,
                 ]);
             }
         });

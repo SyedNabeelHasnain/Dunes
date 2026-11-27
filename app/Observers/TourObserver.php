@@ -32,37 +32,60 @@ class TourObserver
     protected function syncCachesAndIndexNow(Tour $tour): void
     {
         try {
-            // Flush related caches
+            // Flush related caches (all sitemaps, feeds, search catalogs, header tours)
             Cache::forget('site_tours_header_cache');
-            Cache::forget('sitemap_tours_xml');
-            Cache::forget('sitemap_xml');
-            Cache::forget('site_llms_txt');
-            Cache::forget('site_llms_full_txt');
             Cache::forget('feeds_tours_rss_xml');
             Cache::forget('site_home_cache');
+            \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
+            \App\Http\Controllers\GoogleThingsToDoFeedController::flushCache();
 
-            // Collect URLs for IndexNow streaming (only the modified tour and its language alternates)
-            $urls = [
-                url('/' . $tour->slug),
-            ];
-
+            $activeCodes = ['en', 'ar', 'ru', 'es', 'it'];
             try {
-                $languages = Language::where('is_active', true)->where('is_default', false)->get();
-                foreach ($languages as $lang) {
-                    $urls[] = url('/' . $lang->code . '/' . $tour->slug);
+                $dbCodes = Language::where('is_active', true)->pluck('code')->all();
+                if (! empty($dbCodes)) {
+                    $activeCodes = array_values(array_unique(array_merge($activeCodes, $dbCodes)));
                 }
-            } catch (\Throwable $e) {
-                // Fallback standard locales
-                foreach (['ar', 'ru', 'es', 'it'] as $code) {
+            } catch (\Throwable) {
+            }
+
+            foreach ($activeCodes as $code) {
+                Cache::forget('site_active_tours_search_' . $code);
+                Cache::forget('site_search_modal_catalog_v4_' . $code);
+            }
+
+            // Never submit unpublished/draft tours; during tests only submit if IndexNowService is explicitly bound/mocked
+            if ($tour->status !== 'active') {
+                return;
+            }
+
+            if (app()->runningUnitTests()) {
+                if (! app()->bound(IndexNowService::class)) {
+                    return;
+                }
+            } elseif (app()->runningInConsole()) {
+                return;
+            }
+
+            $urls = [url('/' . $tour->slug)];
+            foreach ($activeCodes as $code) {
+                if ($code !== 'en') {
                     $urls[] = url('/' . $code . '/' . $tour->slug);
                 }
             }
 
-            // Submit to IndexNow safely
-            if (app()->bound(IndexNowService::class)) {
-                $service = app(IndexNowService::class);
-                if ($service->isEnabled()) {
+            $service = app(IndexNowService::class);
+            if ($service->isEnabled()) {
+                if (app()->runningUnitTests()) {
                     $service->submit($urls);
+                } else {
+                    // Submit asynchronously after HTTP response so admin saves never stall
+                    dispatch(static function () use ($urls) {
+                        try {
+                            app(IndexNowService::class)->submit($urls);
+                        } catch (\Throwable $ex) {
+                            Log::warning('TourObserver async IndexNow failed: ' . $ex->getMessage());
+                        }
+                    })->afterResponse();
                 }
             }
         } catch (\Throwable $e) {

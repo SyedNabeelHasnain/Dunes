@@ -6,8 +6,9 @@ use App\Models\Tour;
 use App\Models\WikiArticle;
 use App\Models\WikiGlossaryTerm;
 use App\Models\WikiPillar;
-use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class WikiController extends Controller
@@ -75,7 +76,6 @@ class WikiController extends Controller
     public function pillar(Request $request, ...$params)
     {
         $pillarSlug = (string) end($params);
-        $currentLocale = app()->getLocale();
         $pillar = WikiPillar::where('slug', $pillarSlug)->active()->firstOrFail();
 
         $articles = WikiArticle::where('pillar_id', $pillar->id)
@@ -126,10 +126,15 @@ class WikiController extends Controller
             ->with(['pillar', 'tours.tiers', 'glossaryTerms'])
             ->firstOrFail();
 
-        // Increment view count quietly
+        // Increment view count quietly (throttled per visitor to prevent write amplification on GET)
         try {
-            $article->increment('view_count');
-        } catch (\Throwable $e) {}
+            $viewKey = 'wiki_view_'.$article->id.'_'.md5((string) $request->ip());
+            if (Cache::add($viewKey, true, 1800)) {
+                $article->increment('view_count');
+            }
+        } catch (\Throwable $e) {
+            Log::debug('WikiController view_count increment failed: '.$e->getMessage());
+        }
 
         $relatedArticles = WikiArticle::where('pillar_id', $pillar->id)
             ->where('id', '!=', $article->id)
@@ -178,13 +183,17 @@ class WikiController extends Controller
         $terms = WikiGlossaryTerm::with('article.pillar')
             ->get()
             ->sortBy(function ($item) {
-                return Str::upper(substr(strip_tags($item->term), 0, 1));
+                $clean = trim(strip_tags((string) $item->term));
+
+                return mb_strtoupper(mb_substr($clean, 0, 1, 'UTF-8'), 'UTF-8');
             });
 
-        // Group by first character
+        // Group by first Unicode letter
         $groupedTerms = $terms->groupBy(function ($item) {
-            $firstChar = Str::upper(substr(trim(strip_tags($item->term)), 0, 1));
-            return preg_match('/[A-Z]/', $firstChar) ? $firstChar : '#';
+            $clean = trim(strip_tags((string) $item->term));
+            $firstChar = mb_strtoupper(mb_substr($clean, 0, 1, 'UTF-8'), 'UTF-8');
+
+            return preg_match('/^\p{L}$/u', $firstChar) ? $firstChar : '#';
         })->sortKeys();
 
         $pageTitle = 'Dubai Desert Safari Glossary & Terminology Index | Dunes Discovery';
@@ -215,15 +224,21 @@ class WikiController extends Controller
             return response()->json(['articles' => [], 'terms' => []]);
         }
 
+        $escaped = addcslashes($q, '%_!');
+        $likePattern = "%{$escaped}%";
+
         $articles = WikiArticle::published()
-            ->where(function ($query) use ($q) {
-                $query->where('title', 'like', "%{$q}%")
-                    ->orWhere('excerpt', 'like', "%{$q}%")
-                    ->orWhere('slug', 'like', "%{$q}%");
+            ->whereHas('pillar', fn ($p) => $p->where('status', 'active'))
+            ->where(function ($query) use ($likePattern) {
+                $query->whereRaw("title LIKE ? ESCAPE '!'", [$likePattern])
+                    ->orWhereRaw("excerpt LIKE ? ESCAPE '!'", [$likePattern])
+                    ->orWhereRaw("slug LIKE ? ESCAPE '!'", [$likePattern]);
             })
             ->with('pillar')
             ->take(5)
             ->get()
+            ->filter(fn ($a) => $a->pillar !== null)
+            ->values()
             ->map(function ($a) {
                 return [
                     'title' => $a->title,
@@ -234,8 +249,10 @@ class WikiController extends Controller
                 ];
             });
 
-        $terms = WikiGlossaryTerm::where('term', 'like', "%{$q}%")
-            ->orWhere('definition', 'like', "%{$q}%")
+        $terms = WikiGlossaryTerm::where(function ($query) use ($likePattern) {
+                $query->whereRaw("term LIKE ? ESCAPE '!'", [$likePattern])
+                    ->orWhereRaw("definition LIKE ? ESCAPE '!'", [$likePattern]);
+            })
             ->with('article.pillar')
             ->take(5)
             ->get()

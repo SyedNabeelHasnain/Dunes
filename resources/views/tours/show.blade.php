@@ -3,10 +3,17 @@
 @php
     $tourImages = $tour->getImageList();
     $heroAvifUrl = $tourImages[0] ?? resolve_tour_image($tour->hero_image);
+    $heroExt = strtolower(pathinfo((string) parse_url((string) $heroAvifUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+    $heroMime = match ($heroExt) {
+        'jpg', 'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        default => 'image/avif',
+    };
 @endphp
 
 @push('preloads')
-    <link rel="preload" as="image" href="{{ $heroAvifUrl }}" type="image/avif">
+    <link rel="preload" as="image" href="{{ $heroAvifUrl }}" type="{{ $heroMime }}">
 @endpush
 
 
@@ -133,10 +140,10 @@
               },
               "author": {
                 "@type": "Person",
-                "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+                "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
               },
-              "datePublished": {!! json_encode($rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : ($rev->created_at ? \Carbon\Carbon::parse($rev->created_at)->format('Y-m-d') : date('Y-m-d')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-              "reviewBody": {!! json_encode(Str::limit($rev->review_text, 280), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              "datePublished": {!! json_encode($rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : ($rev->created_at ? \Carbon\Carbon::parse($rev->created_at)->format('Y-m-d') : date('Y-m-d')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+              "reviewBody": {!! json_encode(Str::limit($rev->review_text, 280), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
             }{{ $loop->last ? '' : ',' }}
             @endforeach
           ],
@@ -1341,7 +1348,7 @@ if(window.fbq){
                 </div>
 
                 <div class="pt-4 border-t border-white/10">
-                    <button type="button" @click="closeModal(); document.querySelector('#booking-form')?.scrollIntoView({behavior: 'smooth'})" class="btn-desert-animated w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                    <button type="button" @click="closeModal(); $store.modal.open('booking', { tourId: {{ $tour->id }} })" class="btn-desert-animated w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 cursor-pointer">
                         <i class="bi bi-calendar-check-fill"></i>
                         <span>Book This Tour Now</span>
                     </button>
@@ -1359,6 +1366,7 @@ if(window.fbq){
     id="tour-gallery"
     x-data="{
         items: @js($tourGalleryItems),
+        reportedBroken: {},
         activeItem: null,
         lightboxOpen: false,
         currentIndex: 0,
@@ -1376,17 +1384,35 @@ if(window.fbq){
             document.body.classList.remove('overflow-hidden');
         },
         nextItem() {
-            if (!this.items.length) return;
+            if (!this.items.length) {
+                this.closeLightbox();
+                return;
+            }
             this.currentIndex = (this.currentIndex + 1) % this.items.length;
             this.activeItem = this.items[this.currentIndex];
         },
         prevItem() {
-            if (!this.items.length) return;
+            if (!this.items.length) {
+                this.closeLightbox();
+                return;
+            }
             this.currentIndex = (this.currentIndex - 1 + this.items.length) % this.items.length;
             this.activeItem = this.items[this.currentIndex];
         },
         reportBrokenLink(url, cardElement) {
+            if (!url) return;
+            this.items = this.items.filter(i => i.url !== url && i.thumbnail_url !== url);
             if (cardElement) { cardElement.remove(); }
+            if (this.lightboxOpen) {
+                if (!this.items.length) {
+                    this.closeLightbox();
+                } else {
+                    this.currentIndex = this.currentIndex % this.items.length;
+                    this.activeItem = this.items[this.currentIndex];
+                }
+            }
+            if (this.reportedBroken[url]) return;
+            this.reportedBroken[url] = true;
             fetch('{{ route('api.gallery.report-broken') }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
@@ -1539,7 +1565,7 @@ if(window.fbq){
                          :alt="activeItem.review_title || 'Guest Safari Photo'" 
                          class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
                          referrerpolicy="no-referrer"
-                         x-on:error="reportBrokenLink(activeItem.url); nextItem();">
+                         x-on:error="reportBrokenLink(activeItem.url)">
                 </template>
             </div>
 
@@ -1548,7 +1574,7 @@ if(window.fbq){
                     <div class="flex items-center justify-between gap-3 mb-4 pb-4 border-b border-white/10">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center font-black text-sm shrink-0">
-                                <span x-text="activeItem ? activeItem.reviewer_name.charAt(0).toUpperCase() : 'T'"></span>
+                                <span x-text="activeItem && activeItem.reviewer_name ? activeItem.reviewer_name.charAt(0).toUpperCase() : 'T'"></span>
                             </div>
                             <div>
                                 <h4 class="font-bold text-white text-sm sm:text-base leading-tight" x-text="activeItem ? activeItem.reviewer_name : 'Verified Guest'"></h4>

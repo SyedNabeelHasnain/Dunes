@@ -307,7 +307,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="py-12 text-center text-slate-400">
+                    <td colspan="9" class="py-12 text-center text-slate-400">
                         <i class="bi bi-calendar-x text-4xl block mb-2 opacity-50"></i>
                         No bookings match your current filter parameters.
                     </td>

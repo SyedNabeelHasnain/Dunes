@@ -61,7 +61,7 @@
             <button type="button" onclick="window.print()" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-full px-4 py-2.5 shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer min-h-[40px]">
                 <i class="bi bi-printer"></i> Print
             </button>
-            <a href="{{ route('booking.ticket.pdf', $booking->reference) }}" class="btn-desert-animated text-xs sm:text-sm font-bold rounded-full px-5 py-2.5 text-white shadow-xs inline-flex items-center gap-1.5 min-h-[40px]">
+            <a href="{{ route('booking.ticket.pdf', ['reference' => $booking->reference]) }}" class="btn-desert-animated text-xs sm:text-sm font-bold rounded-full px-5 py-2.5 text-white shadow-xs inline-flex items-center gap-1.5 min-h-[40px]">
                 <i class="bi bi-file-earmark-arrow-down"></i> Download PDF Ticket
             </a>
             @php

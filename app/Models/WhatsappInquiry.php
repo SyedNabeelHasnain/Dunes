@@ -13,6 +13,7 @@ class WhatsappInquiry extends Model
 
     protected $fillable = [
         'request_log_id',
+        'ref_code',
         'name',
         'phone',
         'email',

@@ -134,8 +134,10 @@ class PurgeTestBookingsCommand extends Command
 
         $purgedCount = 0;
         $purgedRefs = [];
+        $storagePhotosToDelete = [];
+        $voucherFilesToDelete = [];
 
-        DB::transaction(function () use ($testBookings, &$purgedCount, &$purgedRefs) {
+        DB::transaction(function () use ($testBookings, &$purgedCount, &$purgedRefs, &$storagePhotosToDelete, &$voucherFilesToDelete) {
             foreach ($testBookings as $booking) {
                 $bookingId = $booking->id;
                 $bookingRef = $booking->reference;
@@ -160,14 +162,13 @@ class PurgeTestBookingsCommand extends Command
                     $usage->delete();
                 }
 
-                // 4. Delete associated reviews and unlinked photos
+                // 4. Delete associated reviews (defer file deletion until after commit)
                 $reviews = Review::where('booking_id', $bookingId)->get();
                 foreach ($reviews as $review) {
                     if (! empty($review->photos) && is_array($review->photos)) {
                         foreach ($review->photos as $photo) {
                             if (is_string($photo) && str_starts_with($photo, '/storage/')) {
-                                $relativePath = str_replace('/storage/', '', $photo);
-                                Storage::disk('public')->delete($relativePath);
+                                $storagePhotosToDelete[] = str_replace('/storage/', '', $photo);
                             }
                         }
                     }
@@ -182,10 +183,10 @@ class PurgeTestBookingsCommand extends Command
                     ->where('entity_id', $bookingId)
                     ->delete();
 
-                // 6. Delete cached voucher PDF for this reference
+                // 6. Queue cached voucher PDF for deletion after DB commit
                 $voucherFile = storage_path('app/vouchers/' . $bookingRef . '.pdf');
                 if (file_exists($voucherFile)) {
-                    @unlink($voucherFile);
+                    $voucherFilesToDelete[] = $voucherFile;
                 }
 
                 // 7. Permanently force delete the booking record
@@ -196,7 +197,17 @@ class PurgeTestBookingsCommand extends Command
             }
         });
 
-        // 8. Clean up any remaining orphan test voucher PDF files matching DT-*.pdf
+        // Perform filesystem deletions ONLY after DB transaction commits cleanly
+        foreach (array_unique($storagePhotosToDelete) as $relativePath) {
+            Storage::disk('public')->delete($relativePath);
+        }
+        foreach (array_unique($voucherFilesToDelete) as $voucherFile) {
+            if (file_exists($voucherFile)) {
+                @unlink($voucherFile);
+            }
+        }
+
+        // 8. Clean up any remaining orphan test voucher PDF files matching known test prefixes
         $this->cleanOrphanVoucherPdfs(false);
 
         // 9. Invalidate KPI, social proof, and dashboard caches
@@ -216,7 +227,7 @@ class PurgeTestBookingsCommand extends Command
     }
 
     /**
-     * Clean any orphan test voucher PDF files matching DT-*.pdf from storage.
+     * Clean any orphan test voucher PDF files (strictly test prefixes & explicit test refs — never real customer vouchers).
      */
     protected function cleanOrphanVoucherPdfs(bool $dryRun = false): void
     {
@@ -225,7 +236,18 @@ class PurgeTestBookingsCommand extends Command
             return;
         }
 
-        $files = glob($vouchersDir . '/DT-*.pdf') ?: [];
+        $candidateFiles = array_merge(
+            glob($vouchersDir . '/DT-TEST-*.pdf') ?: [],
+            glob($vouchersDir . '/DT-ADMIN-*.pdf') ?: [],
+            glob($vouchersDir . '/DT-VERIFY-*.pdf') ?: []
+        );
+        foreach (self::EXPLICIT_TEST_REFS as $ref) {
+            $explicitPath = $vouchersDir . '/' . $ref . '.pdf';
+            if (file_exists($explicitPath)) {
+                $candidateFiles[] = $explicitPath;
+            }
+        }
+        $files = array_values(array_unique($candidateFiles));
         $deleted = 0;
 
         foreach ($files as $file) {

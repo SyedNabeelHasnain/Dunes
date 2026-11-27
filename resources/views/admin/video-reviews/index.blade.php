@@ -367,7 +367,7 @@
                 </span>
             </div>
             <div class="text-2xl font-black text-slate-900">{{ $stats['active'] }}</div>
-            <div class="text-[11px] text-emerald-600 font-bold mt-0.5">100% In Feed</div>
+            <div class="text-[11px] text-emerald-600 font-bold mt-0.5">{{ ($stats['total'] ?? 0) > 0 ? round((($stats['active'] ?? 0) / $stats['total']) * 100) : 0 }}% Active in Feed</div>
         </div>
 
         <!-- Card 3: Homepage Featured -->
@@ -474,7 +474,9 @@
                             <!-- Video Thumbnail & Preview -->
                             <td class="py-3.5 px-4 w-44">
                                 <div class="relative w-36 aspect-16/9 rounded-xl overflow-hidden bg-slate-900 shadow-2xs group cursor-pointer border border-slate-200"
-                                     @click="openPreview('{{ asset('videos/reviews/'.$video['filename']) }}', '{{ addslashes($video['title']) }}')">
+                                     data-url="{{ asset('videos/reviews/'.$video['filename']) }}"
+                                     data-title="{{ $video['title'] }}"
+                                     @click="openPreview($el.dataset.url, $el.dataset.title)">
                                     <img src="{{ asset('images/video-posters/'.$video['poster_filename']) }}" 
                                          alt="{{ $video['title'] }}" 
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform"
@@ -580,8 +582,9 @@
                             <!-- Actions -->
                             <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                 <div class="inline-flex items-center gap-1.5">
-                                    <button type="button" 
-                                            @click="openEdit({{ json_encode($video) }})"
+                                    <button type="button"
+                                            data-video="{{ json_encode($video) }}"
+                                            @click="openEdit(JSON.parse($el.dataset.video))"
                                             class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all"
                                             title="Edit Video Review & SEO">
                                         <i class="bi bi-pencil-fill text-xs"></i>
@@ -629,7 +632,8 @@
                 </button>
             </div>
 
-            <form id="editVideoReviewForm" x-bind:action="'/admin/video-reviews/' + (editingItem ? editingItem.id : '')" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <template x-if="editingItem">
+            <form id="editVideoReviewForm" x-bind:action="'/admin/video-reviews/' + editingItem.id" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="placements_submitted" value="1">
@@ -698,10 +702,16 @@
                         <input type="text" name="reviewer_name" x-model="editingItem.reviewer_name" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs">
                     </div>
 
-                    <!-- Reviewer Country -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Traveler Country</label>
-                        <input type="text" name="reviewer_country" x-model="editingItem.reviewer_country" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs">
+                    <!-- Reviewer Country & ISO Code -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Traveler Country</label>
+                            <input type="text" name="reviewer_country" x-model="editingItem.reviewer_country" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Code</label>
+                            <input type="text" name="reviewer_country_code" x-model="editingItem.reviewer_country_code" maxlength="4" placeholder="AE" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-center font-mono uppercase">
+                        </div>
                     </div>
 
                     <!-- Category -->
@@ -784,6 +794,11 @@
                                 <input type="checkbox" name="placement_tour" value="1" :checked="editingItem && editingItem.placements && editingItem.placements.tour" class="rounded text-primary focus:ring-primary">
                                 <span>Tour Detail Page Reviews</span>
                             </label>
+                            <label class="flex items-center gap-2 cursor-pointer font-semibold text-emerald-700">
+                                <input type="hidden" name="is_active" value="0">
+                                <input type="checkbox" name="is_active" value="1" :checked="editingItem && editingItem.is_active !== false" class="rounded text-emerald-600 focus:ring-emerald-500">
+                                <span>Active &amp; Published</span>
+                            </label>
                         </div>
                     </div>
 
@@ -827,6 +842,7 @@
                     </button>
                 </div>
             </form>
+            </template>
         </div>
     </div>
 

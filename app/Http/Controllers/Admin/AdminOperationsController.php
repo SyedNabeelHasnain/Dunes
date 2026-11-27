@@ -16,8 +16,14 @@ class AdminOperationsController extends Controller
      */
     public function index(Request $request)
     {
-        $selectedDate = $request->input('date', now()->format('Y-m-d'));
-        $targetDate = Carbon::parse($selectedDate)->startOfDay();
+        $selectedDate = (string) $request->input('date', now()->format('Y-m-d'));
+        try {
+            $targetDate = Carbon::parse($selectedDate)->startOfDay();
+            $selectedDate = $targetDate->format('Y-m-d');
+        } catch (\Throwable) {
+            $targetDate = now()->startOfDay();
+            $selectedDate = $targetDate->format('Y-m-d');
+        }
 
         $bookings = Booking::with(['tour', 'tier', 'addons', 'driver.defaultVehicle', 'vehicle'])
             ->whereDate('tour_date', $selectedDate)
@@ -147,20 +153,18 @@ class AdminOperationsController extends Controller
             }
         }
 
-        $booking->driver_id = $driverId;
-        $booking->vehicle_id = $vehicleId;
-        if ($pickupTime) {
-            $booking->pickup_time_slot = $pickupTime;
+        $booking->driver_id = $driverId ?: null;
+        $booking->vehicle_id = $vehicleId ?: null;
+        if ($request->has('pickup_time_slot') || $request->has('pickup_time')) {
+            $booking->pickup_time_slot = $pickupTime ?: null;
         }
         if ($request->filled('pickup_status')) {
             $booking->pickup_status = $request->input('pickup_status');
         }
-        if ($request->filled('driver_notes')) {
+        if ($request->has('driver_notes')) {
             $booking->driver_notes = $request->input('driver_notes');
         }
-        if ($driverId) {
-            $booking->driver_assigned_at = now();
-        }
+        $booking->driver_assigned_at = $driverId ? now() : null;
 
         // Synchronize backward-compatible [DISPATCH: ...] format in special_requests
         $driverObj = $driverId ? Driver::find($driverId) : null;
@@ -171,17 +175,18 @@ class AdminOperationsController extends Controller
         $plateNum = $vehicleObj?->short_plate ?: $request->input('vehicle_plate');
 
         $driverInfo = array_filter([
-            $pickupTime ? 'Pickup: ' . $pickupTime : null,
+            $booking->pickup_time_slot ? 'Pickup: ' . $booking->pickup_time_slot : null,
             $driverName ? 'Driver: ' . $driverName : null,
             $driverPhone ? 'Phone: ' . $driverPhone : null,
             $plateNum ? 'Plate: ' . $plateNum : null,
-            $request->input('driver_notes') ? 'Notes: ' . $request->input('driver_notes') : null,
+            $booking->driver_notes ? 'Notes: ' . $booking->driver_notes : null,
         ]);
 
-        if (!empty($driverInfo)) {
-            $notes = $booking->special_requests ?: '';
-            $cleanNotes = preg_replace('/\[DISPATCH:.*?\]/s', '', $notes);
+        $cleanNotes = trim((string) preg_replace('/\[DISPATCH:.*?\]/s', '', $booking->special_requests ?: ''));
+        if (! empty($driverInfo)) {
             $booking->special_requests = trim($cleanNotes . "\n[DISPATCH: " . implode(' | ', $driverInfo) . ']');
+        } else {
+            $booking->special_requests = $cleanNotes !== '' ? $cleanNotes : null;
         }
 
         $booking->save();
@@ -217,28 +222,26 @@ class AdminOperationsController extends Controller
         $vehicle = $vehicleId ? Vehicle::find($vehicleId) : null;
 
         $count = 0;
-        foreach ($data['booking_ids'] as $bid) {
-            $booking = Booking::find($bid);
-            if ($booking) {
-                $booking->driver_id = $driver->id;
-                $booking->vehicle_id = $vehicleId;
-                if (!empty($data['pickup_time_slot'])) {
-                    $booking->pickup_time_slot = $data['pickup_time_slot'];
-                }
-                $booking->driver_assigned_at = now();
-
-                $driverInfo = array_filter([
-                    $booking->pickup_time ? 'Pickup: ' . $booking->pickup_time : null,
-                    'Driver: ' . $driver->name,
-                    'Phone: ' . $driver->phone,
-                    $vehicle ? 'Plate: ' . $vehicle->short_plate : null,
-                ]);
-
-                $cleanNotes = preg_replace('/\[DISPATCH:.*?\]/s', '', $booking->special_requests ?: '');
-                $booking->special_requests = trim($cleanNotes . "\n[DISPATCH: " . implode(' | ', $driverInfo) . ']');
-                $booking->save();
-                $count++;
+        $bookingsBatch = Booking::whereIn('id', $data['booking_ids'])->get();
+        foreach ($bookingsBatch as $booking) {
+            $booking->driver_id = $driver->id;
+            $booking->vehicle_id = $vehicleId;
+            if (! empty($data['pickup_time_slot'])) {
+                $booking->pickup_time_slot = $data['pickup_time_slot'];
             }
+            $booking->driver_assigned_at = now();
+
+            $driverInfo = array_filter([
+                $booking->pickup_time ? 'Pickup: ' . $booking->pickup_time : null,
+                'Driver: ' . $driver->name,
+                'Phone: ' . $driver->phone,
+                $vehicle ? 'Plate: ' . $vehicle->short_plate : null,
+            ]);
+
+            $cleanNotes = preg_replace('/\[DISPATCH:.*?\]/s', '', $booking->special_requests ?: '');
+            $booking->special_requests = trim($cleanNotes . "\n[DISPATCH: " . implode(' | ', $driverInfo) . ']');
+            $booking->save();
+            $count++;
         }
 
         return back()->with('success', "Assigned Captain {$driver->name} to {$count} booking(s) successfully.");

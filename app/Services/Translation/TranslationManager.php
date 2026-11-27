@@ -37,6 +37,7 @@ class TranslationManager
     public function clearCache(): void
     {
         Cache::forget(self::CACHE_KEY);
+        Cache::forget('site_settings_cache');
     }
 
     /**
@@ -46,12 +47,16 @@ class TranslationManager
     {
         foreach ($settings as $key => $value) {
             $dbKey = match ($key) {
-                'active_service' => 'translation_active_service',
+                'active_service', 'translation_active_service' => 'translation_active_service',
                 'deepl_api_key', 'deepl_auth_key' => 'deepl_auth_key',
                 'deepl_endpoint_type' => 'deepl_endpoint_type',
                 'google_api_key', 'google_translate_api_key' => 'google_translate_api_key',
-                default => $key,
+                default => null,
             };
+
+            if ($dbKey === null) {
+                continue;
+            }
 
             Setting::updateOrCreate(
                 ['setting_key' => $dbKey],

@@ -15,7 +15,7 @@
                 Rating: {{ $review->rating }} / 5.0
             </span>
             <span style="display: inline-block; background-color: #f1f5f9; color: #475569; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; margin-left: 4px;">
-                Status: {{ ucfirst($review->status) }}
+                Status: {{ ucfirst((string) ($review->status ?? 'pending')) }}
             </span>
         @endif
     </div>
@@ -61,11 +61,15 @@
         <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #64748b; margin-bottom: 6px;">
             Attached Customer Photos ({{ count($review->photos) }}):
         </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            @foreach($review->photos as $photo)
-                <img src="{{ url($photo) }}" alt="Customer Safari Photo" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
-            @endforeach
-        </div>
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+            <tr>
+                @foreach($review->photos as $photo)
+                    <td style="padding: 0 8px 8px 0;">
+                        <img src="{{ str_starts_with((string) $photo, 'http') ? $photo : url($photo) }}" alt="Customer Safari Photo" width="80" height="80" style="display: block; width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    </td>
+                @endforeach
+            </tr>
+        </table>
     </div>
     @endif
 

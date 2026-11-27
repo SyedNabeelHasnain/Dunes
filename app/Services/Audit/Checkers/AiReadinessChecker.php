@@ -3,7 +3,6 @@
 namespace App\Services\Audit\Checkers;
 
 use App\Models\Setting;
-use Illuminate\Support\Facades\File;
 
 class AiReadinessChecker implements AuditCheckerInterface
 {
@@ -11,22 +10,21 @@ class AiReadinessChecker implements AuditCheckerInterface
     {
         $issues = [];
 
-        // 1. Robots.txt AI Crawlers Inspection
-        $robotsPath = public_path('robots.txt');
-        if (!File::exists($robotsPath)) {
+        // 1. Robots.txt AI Crawlers Inspection (reads authoritative CMS/static RobotsTxtService)
+        $robotsTxt = trim(app(\App\Services\Seo\RobotsTxtService::class)->getCurrentContent());
+        if ($robotsTxt === '') {
             $issues[] = [
                 'category' => 'ai_readiness',
                 'check_key' => 'ai_robots_txt_missing',
-                'title' => 'Missing public/robots.txt File',
-                'description' => 'The robots.txt file is absent from the public directory. AI crawlers and search spiders have no explicit directive guidance.',
+                'title' => 'Missing robots.txt Directives',
+                'description' => 'robots.txt directives are absent. AI crawlers and search spiders have no explicit directive guidance.',
                 'severity' => 'critical',
                 'verification_type' => 'automated',
                 'affected_url' => url('/robots.txt'),
-                'evidence' => 'public/robots.txt file does not exist on disk.',
-                'recommended_action' => 'Create a public/robots.txt specifying crawler rules and sitemap locations.',
+                'evidence' => 'RobotsTxtService returned empty directives.',
+                'recommended_action' => 'Configure robots.txt directives in CMS Technical SEO specifying crawler rules and sitemap locations.',
             ];
         } else {
-            $robotsTxt = File::get($robotsPath);
             $requiredAiBots = ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended'];
             $missingBots = [];
 

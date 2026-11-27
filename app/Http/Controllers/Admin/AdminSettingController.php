@@ -31,6 +31,7 @@ class AdminSettingController extends Controller
             'google_place_id', 'google_cid', 'google_review_url',
             'tripadvisor_location_id', 'tripadvisor_api_key',
             'site_hero_poster', 'site_default_image', 'seo_default_og_image',
+            'site_logo', 'site_logo_white', 'site_hero_video', 'about_story_image',
             'admin_email', 'admin_email_cc', 'admin_email_bcc',
             'email_verification_required',
             'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent', 'deposit_percentage',
@@ -379,7 +380,7 @@ class AdminSettingController extends Controller
             'promo_welcome_modal_timer_minutes', 'promo_welcome_modal_delay_seconds',
 
             // Google Integrations & Business Profile (Local SEO)
-            'google_active', 'google_gtm_id', 'google_ga4_id', 'google_analytics_id', 'google_tag_manager_id',
+            'google_active', 'google_gtm_id', 'google_ga4_id',
             'google_ads_id', 'google_conversion_label', 'google_site_verification', 'bing_site_verification', 'yandex_site_verification', 'baidu_site_verification', 'clarity_id', 'clarity_active', 'google_maps_api_key', 'google_places_api_key',
             'recaptcha_site_key', 'recaptcha_secret_key',
             'turnstile_enabled', 'turnstile_site_key', 'turnstile_secret_key',
@@ -404,7 +405,6 @@ class AdminSettingController extends Controller
             'admin_email', 'admin_email_cc', 'admin_email_bcc',
             'email_verification_required',
             'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent', 'deposit_percentage',
-            'cache_version',
 
             // Social Proof & Concierge Widget Controls
             'safari_matcher_enabled',
@@ -440,6 +440,9 @@ class AdminSettingController extends Controller
             'site_default_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
             'seo_default_og_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
             'seo_home_og_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'site_logo_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif,svg|max:8192',
+            'site_logo_white_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif,svg|max:8192',
+            'about_story_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ]);
 
         if (isset($settings['google_ads_id'])) {
@@ -449,6 +452,7 @@ class AdminSettingController extends Controller
         if ($request->hasFile('site_hero_poster_file')) {
             $file = $request->file('site_hero_poster_file');
             $ext = safe_uploaded_image_ext($file, 'avif');
+            \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($file->getRealPath(), $ext);
             $filename = 'hero-poster-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['site_hero_poster'] = '/images/' . $filename;
@@ -457,6 +461,7 @@ class AdminSettingController extends Controller
         if ($request->hasFile('seo_default_og_image_file') || $request->hasFile('site_default_image_file')) {
             $file = $request->file('seo_default_og_image_file') ?: $request->file('site_default_image_file');
             $ext = safe_uploaded_image_ext($file, 'avif');
+            \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($file->getRealPath(), $ext);
             $filename = 'og-default-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['seo_default_og_image'] = '/images/' . $filename;
@@ -466,6 +471,7 @@ class AdminSettingController extends Controller
         if ($request->hasFile('seo_home_og_image_file')) {
             $file = $request->file('seo_home_og_image_file');
             $ext = safe_uploaded_image_ext($file, 'avif');
+            \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($file->getRealPath(), $ext);
             $filename = 'og-home-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['seo_home_og_image'] = '/images/' . $filename;
@@ -473,7 +479,13 @@ class AdminSettingController extends Controller
 
         if ($request->hasFile('site_logo_file')) {
             $file = $request->file('site_logo_file');
-            $ext = safe_uploaded_image_ext($file, 'png');
+            $rawExt = strtolower((string) ($file->getClientOriginalExtension() ?: 'png'));
+            $ext = $rawExt === 'svg' ? 'svg' : safe_uploaded_image_ext($file, 'png');
+            if ($ext === 'svg') {
+                \App\Services\Security\SvgSanitizer::sanitizeFile($file->getRealPath());
+            } else {
+                \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($file->getRealPath(), $ext);
+            }
             $filename = 'logo-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['site_logo'] = '/images/' . $filename;
@@ -481,7 +493,13 @@ class AdminSettingController extends Controller
 
         if ($request->hasFile('site_logo_white_file')) {
             $file = $request->file('site_logo_white_file');
-            $ext = safe_uploaded_image_ext($file, 'png');
+            $rawExt = strtolower((string) ($file->getClientOriginalExtension() ?: 'png'));
+            $ext = $rawExt === 'svg' ? 'svg' : safe_uploaded_image_ext($file, 'png');
+            if ($ext === 'svg') {
+                \App\Services\Security\SvgSanitizer::sanitizeFile($file->getRealPath());
+            } else {
+                \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($file->getRealPath(), $ext);
+            }
             $filename = 'logo-white-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['site_logo_white'] = '/images/' . $filename;
@@ -490,73 +508,58 @@ class AdminSettingController extends Controller
         if ($request->hasFile('about_story_image_file')) {
             $file = $request->file('about_story_image_file');
             $ext = safe_uploaded_image_ext($file, 'avif');
+            \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($file->getRealPath(), $ext);
             $filename = 'about-story-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['about_story_image'] = '/images/' . $filename;
         }
 
         // Handle boolean switches that are omitted when unchecked
-        if ($request->has('google_gtm_id') || $request->has('google_ga4_id') || $request->has('google_ads_id')) {
-            $settings['google_active'] = $request->has('google_active') ? '1' : '0';
+        if ($request->has('google_gtm_id') || $request->has('google_ga4_id') || $request->has('google_ads_id') || $request->has('google_active')) {
+            $settings['google_active'] = $request->boolean('google_active') ? '1' : '0';
         }
 
         if ($request->has('meta_pixel_id') || $request->has('meta_access_token') || $request->has('meta_capi_token') || $request->has('meta_form_submitted')) {
-            $settings['meta_active'] = $request->input('meta_active', '0') === '1' ? '1' : '0';
+            $settings['meta_active'] = $request->boolean('meta_active') ? '1' : '0';
             if ($request->has('meta_form_submitted')) {
-                $settings['meta_capi_enabled'] = $request->input('meta_capi_enabled', '0') === '1' ? '1' : '0';
-                $settings['meta_send_ip_ua'] = $request->input('meta_send_ip_ua', '0') === '1' ? '1' : '0';
-            }
-        }
-
-        if ($request->has('promo_banner_form_submitted')) {
-            $bannerState = $request->has('promo_top_banner_enabled') ? '1' : '0';
-            $settings['promo_top_banner_enabled'] = $bannerState;
-            $settings['top_promo_banner_active'] = $bannerState;
-
-            // Synchronize coupon status for the banner code
-            $bannerCode = strtoupper(trim($request->input('promo_top_banner_code', 'DUNESWELCOME'))) ?: 'DUNESWELCOME';
-            try {
-                Coupon::where('code', $bannerCode)->update([
-                    'status' => $bannerState === '1' ? 'active' : 'inactive',
-                ]);
-            } catch (\Throwable $e) {
-            }
-        }
-
-        if ($request->has('promo_modal_form_submitted')) {
-            $modalState = $request->has('promo_welcome_modal_enabled') ? '1' : '0';
-            $settings['promo_welcome_modal_enabled'] = $modalState;
-            $settings['welcome_popup_active'] = $modalState;
-
-            // Synchronize welcome promo code status
-            try {
-                if ($modalState === '0') {
-                    Coupon::whereIn('code', ['DUNESWELCOME', 'FIRST25'])->update([
-                        'status' => 'inactive',
-                    ]);
+                $settings['meta_capi_enabled'] = $request->boolean('meta_capi_enabled') ? '1' : '0';
+                if ($request->has('meta_send_ip_ua')) {
+                    $settings['meta_send_ip_ua'] = $request->boolean('meta_send_ip_ua') ? '1' : '0';
                 }
-            } catch (\Throwable $e) {
             }
         }
 
         if ($request->has('gttd_form_submitted')) {
-            $settings['gttd_feed_enabled'] = $request->has('gttd_feed_enabled') ? '1' : '0';
+            $settings['gttd_feed_enabled'] = $request->boolean('gttd_feed_enabled') ? '1' : '0';
         }
 
         if ($request->has('indexnow_form_submitted')) {
-            $settings['indexnow_enabled'] = $request->has('indexnow_enabled') ? '1' : '0';
+            $settings['indexnow_enabled'] = $request->boolean('indexnow_enabled') ? '1' : '0';
         }
 
         if ($request->has('seo_form_submitted')) {
-            $settings['seo_index_tracking_params'] = $request->has('seo_index_tracking_params') ? '1' : '0';
+            $settings['seo_index_tracking_params'] = $request->boolean('seo_index_tracking_params') ? '1' : '0';
             if ($request->has('schema_use_verified_review_count_present')) {
-                $settings['schema_use_verified_review_count'] = $request->has('schema_use_verified_review_count') ? '1' : '0';
+                $settings['schema_use_verified_review_count'] = $request->boolean('schema_use_verified_review_count') ? '1' : '0';
             }
         }
 
         $actor = $request->user();
         $settingKeys = array_keys($settings);
-        $hasSecurityKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'security_'));
+        $securitySensitivePrefixes = ['security_', 'ziina_', 'antispam_', 'recaptcha_', 'turnstile_', 'notification_webhook_', 'admin_email'];
+        $securitySensitiveExact = ['meta_access_token', 'meta_capi_token', 'tripadvisor_api_key', 'email_verification_required'];
+        $hasSecurityKeys = collect($settingKeys)->contains(function ($k) use ($securitySensitivePrefixes, $securitySensitiveExact) {
+            if (in_array($k, $securitySensitiveExact, true)) {
+                return true;
+            }
+            foreach ($securitySensitivePrefixes as $prefix) {
+                if (str_starts_with($k, $prefix)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
         $hasPrivacyKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'privacy_'));
         $hasSeoKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'seo_')
             || str_starts_with($k, 'indexnow_')
@@ -613,9 +616,20 @@ class AdminSettingController extends Controller
         }
 
         $audit = app(\App\Services\Governance\ConfigAuditService::class);
+        $secretKeys = [
+            'ziina_access_token', 'ziina_webhook_secret', 'tripadvisor_api_key',
+            'google_places_api_key', 'google_maps_api_key', 'recaptcha_secret_key',
+            'turnstile_secret_key', 'gsc_oauth_access_token', 'bing_webmaster_api_key',
+            'meta_access_token', 'meta_capi_token', 'notification_webhook_secret',
+        ];
         foreach ($settings as $key => $value) {
             $normalizedNew = $value !== null ? trim((string) $value) : '';
             $oldVal = $existingValues[$key] ?? null;
+
+            // Preserve stored secrets when password inputs are intentionally submitted blank
+            if ($normalizedNew === '' && in_array($key, $secretKeys, true) && ! empty($oldVal) && ! $request->boolean('clear_'.$key)) {
+                continue;
+            }
 
             Setting::updateOrCreate(
                 ['setting_key' => $key],

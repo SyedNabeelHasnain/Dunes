@@ -54,7 +54,7 @@ class DynamicRedirectMiddleware
             if (str_starts_with($target, 'http://') || str_starts_with($target, 'https://')) {
                 $finalUrl = $target . ($queryString ? (str_contains($target, '?') ? '&' : '?') . $queryString : '');
             } else {
-                $finalUrl = url($target) . ($queryString ? '?' . $queryString : '');
+                $finalUrl = url($target) . ($queryString ? (str_contains($target, '?') ? '&' : '?') . $queryString : '');
             }
 
             return redirect($finalUrl, $status);

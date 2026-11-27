@@ -23,7 +23,9 @@ class ZiinaPaymentService
         $percent = app(SettingsService::class)->get('deposit_percentage')
             ?? app(SettingsService::class)->get('ziina_advance_percent', '25');
 
-        return is_numeric($percent) ? (int) $percent : 25;
+        $parsed = is_numeric($percent) ? (int) $percent : 25;
+
+        return max(1, min(100, $parsed));
     }
 
     /**
@@ -107,15 +109,25 @@ class ZiinaPaymentService
                 ];
             }
 
-            return $response->json();
+            $json = $response->json();
+            if (! is_array($json)) {
+                Log::error('Ziina Create Payment Intent Invalid JSON Response', [
+                    'status' => $response->status(),
+                    'body' => mb_substr($response->body(), 0, 500),
+                ]);
 
-        } catch (\Exception $e) {
+                return ['error' => 'Payment gateway returned an unexpected response. Please try again.'];
+            }
+
+            return $json;
+
+        } catch (\Throwable $e) {
             Log::error('Ziina Create Payment Intent Exception', [
                 'message' => $e->getMessage(),
                 'payload' => $payload,
             ]);
 
-            return ['error' => 'Connection failed: '.$e->getMessage()];
+            return ['error' => 'Unable to reach payment gateway right now. Please try again shortly.'];
         }
     }
 
@@ -151,20 +163,31 @@ class ZiinaPaymentService
                 $data = $response->json();
 
                 return [
-                    'error' => $data['message'] ?? 'Ziina error',
+                    'error' => is_array($data) && isset($data['message']) && is_string($data['message']) ? $data['message'] : 'Ziina error',
                     'details' => $data,
                 ];
             }
 
-            return $response->json();
+            $json = $response->json();
+            if (! is_array($json)) {
+                Log::error('Ziina Fetch Payment Intent Invalid JSON Response', [
+                    'status' => $response->status(),
+                    'body' => mb_substr($response->body(), 0, 500),
+                    'intent_id' => $intentId,
+                ]);
 
-        } catch (\Exception $e) {
+                return ['error' => 'Unexpected payment gateway response'];
+            }
+
+            return $json;
+
+        } catch (\Throwable $e) {
             Log::error('Ziina Fetch Payment Intent Exception', [
                 'message' => $e->getMessage(),
                 'intent_id' => $intentId,
             ]);
 
-            return ['error' => 'Connection failed: '.$e->getMessage()];
+            return ['error' => 'Unable to verify payment status right now.'];
         }
     }
 }

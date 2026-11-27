@@ -60,7 +60,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Additional Custom Path Disallows (one per line)</label>
-                <textarea name="custom_disallows" rows="3" placeholder="/private-staging/" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-mono"></textarea>
+                <textarea name="custom_disallows" rows="3" placeholder="/private-staging/" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-mono">{{ old('custom_disallows', $customDisallows ?? '') }}</textarea>
             </div>
 
             <div class="flex items-center justify-between pt-2">

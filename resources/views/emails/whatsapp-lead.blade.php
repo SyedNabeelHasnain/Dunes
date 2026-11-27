@@ -54,10 +54,19 @@
             </tr>
             @endif
             @if(!empty($pageUrl))
+            @php
+                $safePageHref = preg_match('#^https?://#i', (string) $pageUrl)
+                    ? $pageUrl
+                    : (str_starts_with((string) $pageUrl, '/') ? url($pageUrl) : null);
+            @endphp
             <tr>
                 <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: bold;">Source Page:</td>
                 <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #0f172a;">
-                    <a href="{{ $pageUrl }}" target="_blank" style="color: #64748b; text-decoration: underline; font-size: 11px; word-break: break-all;">{{ $pageUrl }}</a>
+                    @if($safePageHref)
+                        <a href="{{ $safePageHref }}" target="_blank" rel="noopener noreferrer" style="color: #64748b; text-decoration: underline; font-size: 11px; word-break: break-all;">{{ $pageUrl }}</a>
+                    @else
+                        <span style="color: #64748b; font-size: 11px; word-break: break-all;">{{ $pageUrl }}</span>
+                    @endif
                 </td>
             </tr>
             @endif

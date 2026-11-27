@@ -128,13 +128,13 @@ class BookingController extends Controller
             }
 
             // Strictly server-authoritative base safari pricing (never trust client-supplied base_price)
-            // Check overnight custom FIRST so VIP string matching doesn't downgrade Overnight (399 AED) to VIP (130 AED)
+            // Check Overnight and Morning BEFORE VIP so Morning VIP does not downgrade (140 -> 130)
             if ($isOvernightCustom) {
                 $basePrice = 399.0;
-            } elseif (stripos($baseName, 'VIP') !== false) {
-                $basePrice = 130.0;
             } elseif (stripos($baseName, 'Morning') !== false || $tourId === 2) {
                 $basePrice = 140.0;
+            } elseif (stripos($baseName, 'VIP') !== false) {
+                $basePrice = 130.0;
             } else {
                 $basePrice = 79.0;
             }
@@ -178,14 +178,14 @@ class BookingController extends Controller
                     if (! is_array($ca)) {
                         continue;
                     }
-                    $caId = strtolower(trim((string) ($ca['id'] ?? '')));
+                    $caId = strtolower(trim((string) ($ca['id'] ?? $ca['key'] ?? '')));
                     $caName = trim((string) ($ca['name'] ?? ''));
                     $matchedSpec = null;
 
                     if ($caId !== '' && isset($customAddonCatalog[$caId])) {
                         $matchedSpec = $customAddonCatalog[$caId];
                         $dedupKey = $caId;
-                    } elseif (stripos($caName, 'VIP Majlis') !== false || stripos($caName, 'Butler') !== false) {
+                    } elseif (stripos($caName, 'VIP Table') !== false || stripos($caName, 'VIP Majlis') !== false || stripos($caName, 'Butler') !== false) {
                         $matchedSpec = $customAddonCatalog['vip_table'];
                         $dedupKey = 'vip_table';
                     } elseif (stripos($caName, 'Shisha') !== false) {
@@ -410,9 +410,9 @@ class BookingController extends Controller
                     'tour_id' => $tourId,
                     'tier_id' => $tierId,
                     'tour_name' => $tour->name,
-                    'tier_name' => ($isCustomBuilder && $customQuoteData)
+                    'tier_name' => Str::limit(($isCustomBuilder && $customQuoteData)
                         ? ('Custom Safari Configurator: '.($customQuoteData['base_name'] ?? 'Tailored Package'))
-                        : ($tier->display_name ?: $tier->name),
+                        : ($tier->display_name ?: $tier->name), 100, ''),
                     'tour_date' => $date,
                     'adults' => $adults,
                     'children' => $children,
@@ -750,9 +750,13 @@ class BookingController extends Controller
                 $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
             }
             if (! $paymentRecord && ! empty($ref)) {
-                $paymentRecord = BookingPayment::where('notes', 'like', "{$ref}%")
-                    ->orWhere('payment_intent_id', $ref)
-                    ->first();
+                $paymentRecord = BookingPayment::where('payment_intent_id', $ref)->first();
+                if (! $paymentRecord && preg_match('/^QP-[A-Z0-9]{4,}$/i', $ref)) {
+                    $escapedRef = addcslashes($ref, '%_\\');
+                    $paymentRecord = BookingPayment::whereNull('booking_id')
+                        ->where('notes', 'like', "{$escapedRef}%")
+                        ->first();
+                }
             }
 
             if ($paymentRecord) {
@@ -793,10 +797,18 @@ class BookingController extends Controller
             $intentStatus = $intent['status'] ?? '';
 
             if ($intentStatus === 'completed') {
+                $intentCurrency = strtoupper((string) ($intent['currency_code'] ?? $intent['currency'] ?? 'AED'));
+                $intentTestMismatch = isset($intent['test']) && ((bool) $intent['test'] !== $this->ziina->isTestMode());
                 $shouldNotify = false;
                 $newStatus = 'paid';
 
-                if ($booking) {
+                if ($intentCurrency !== 'AED' || $intentTestMismatch) {
+                    Log::warning('Ziina ThankYou verification rejected due to currency or mode mismatch', [
+                        'intent_id' => $intentId,
+                        'currency' => $intentCurrency,
+                        'test_flag' => $intent['test'] ?? null,
+                    ]);
+                } elseif ($booking) {
                     $method = $booking->payment_method;
 
                     DB::transaction(function () use (
@@ -808,35 +820,41 @@ class BookingController extends Controller
                             : BookingPayment::where('booking_id', $lockedBooking->id)->where('payment_intent_id', $intentId)->lockForUpdate()->first();
 
                         $wasCompleted = ($lockedPayment && $lockedPayment->status === 'completed')
-                            || (! $lockedPayment && $lockedBooking && $lockedBooking->status === 'confirmed' && $lockedBooking->payment_status === 'paid');
+                            || (! $lockedPayment && $lockedBooking && $lockedBooking->status === 'confirmed' && in_array($lockedBooking->payment_status, ['paid', 'partial'], true));
 
                         if ($lockedPayment && $lockedPayment->status !== 'completed') {
                             $lockedPayment->update(['status' => 'completed']);
                         }
 
-                        $totalPaid = BookingPayment::where('booking_id', $lockedBooking->id)
+                        $totalPaid = (float) BookingPayment::where('booking_id', $lockedBooking->id)
                             ->where('status', 'completed')
                             ->sum('amount');
 
-                        if ($totalPaid <= 0 && isset($intent['amount'])) {
-                            $totalPaid = (float) ($intent['amount'] / 100);
+                        if ($totalPaid <= 0 && isset($intent['amount']) && is_numeric($intent['amount'])) {
+                            $totalPaid = round((float) $intent['amount'] / 100, 2);
+                        } elseif (isset($intent['amount']) && is_numeric($intent['amount']) && $lockedPayment) {
+                            $intentPaidAed = round((float) $intent['amount'] / 100, 2);
+                            if ($intentPaidAed > 0 && $intentPaidAed + 0.01 < (float) $lockedPayment->amount) {
+                                $totalPaid = min($totalPaid, $intentPaidAed);
+                            }
                         }
 
-                        $remBalance = max(0, (float) $lockedBooking->total - (float) $totalPaid);
-                        $newStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
+                        $remBalance = max(0, round((float) $lockedBooking->total - $totalPaid, 2));
+                        $newStatus = ($remBalance <= 0.01) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
+                        $bookingStatus = ($method === 'full' && $remBalance > 0.01) ? 'pending' : 'confirmed';
 
-                        if ($lockedBooking->payment_status !== $newStatus || $lockedBooking->balance_due != $remBalance || $lockedBooking->status !== 'confirmed') {
+                        if ($lockedBooking->payment_status !== $newStatus || abs((float) $lockedBooking->balance_due - $remBalance) >= 0.01 || $lockedBooking->status !== $bookingStatus) {
                             $lockedBooking->update([
                                 'payment_status' => $newStatus,
                                 'ziina_status' => $intentStatus,
-                                'status' => 'confirmed',
+                                'status' => $bookingStatus,
                                 'balance_due' => $remBalance,
                                 'payment_amount' => $totalPaid,
                             ]);
                         }
 
                         // Send booking confirmation email and record coupon on first completion only
-                        if (! $wasCompleted) {
+                        if (! $wasCompleted && $bookingStatus === 'confirmed') {
                             $this->recordCouponUsage($lockedBooking);
                             $this->recordBacklinkAttribution($lockedBooking);
                             $shouldNotify = true;
@@ -1059,11 +1077,10 @@ class BookingController extends Controller
         }
 
         try {
-            $alreadyRecorded = CouponUsage::where('booking_id', $booking->id)->exists();
-            if (! $alreadyRecorded) {
-                CouponUsage::create([
+            $usage = CouponUsage::firstOrCreate(
+                ['booking_id' => $booking->id],
+                [
                     'coupon_id' => $booking->coupon_id,
-                    'booking_id' => $booking->id,
                     'booking_reference' => $booking->reference,
                     'customer_name' => $booking->name,
                     'customer_email' => strtolower($booking->email),
@@ -1072,9 +1089,11 @@ class BookingController extends Controller
                     'order_subtotal' => (float) $booking->original_total,
                     'order_final_total' => (float) $booking->total,
                     'used_at' => now(),
-                ]);
+                ]
+            );
 
-                $coupon = Coupon::find($booking->coupon_id);
+            if ($usage->wasRecentlyCreated) {
+                $coupon = Coupon::where('id', $booking->coupon_id)->lockForUpdate()->first();
                 if ($coupon) {
                     $coupon->increment('used_count');
                 }
@@ -1157,7 +1176,7 @@ class BookingController extends Controller
         $subtotal = $resolvedPricing['authoritative'] ? $resolvedPricing['subtotal'] : 0.0;
         $total = $resolvedPricing['authoritative'] ? $resolvedPricing['total'] : 0.0;
 
-        // 1. Locate existing draft using persistent draft_token, session draft ID, request draft_id, or guest identity
+        // 1. Locate existing draft ONLY via cryptographically strong draft_token or active session ownership (prevents IDOR draft hijack)
         $sessionDraftId = session('active_booking_draft_id');
         $draftId = $request->input('draft_id');
         $draft = null;
@@ -1167,11 +1186,9 @@ class BookingController extends Controller
             $draft = Booking::where('draft_token', $draftToken)->where('status', 'draft')->first();
         }
 
-        // B. Match by draft_id if owned by current session or caller
-        if (! $draft && $draftId) {
-            if (($sessionDraftId && (int) $draftId === (int) $sessionDraftId) || empty($sessionDraftId)) {
-                $draft = Booking::where('id', $draftId)->where('status', 'draft')->first();
-            }
+        // B. Match by draft_id ONLY if owned by current session
+        if (! $draft && $draftId && $sessionDraftId && (int) $draftId === (int) $sessionDraftId) {
+            $draft = Booking::where('id', $draftId)->where('status', 'draft')->first();
         }
 
         // C. Match by active session draft ID
@@ -1179,18 +1196,10 @@ class BookingController extends Controller
             $draft = Booking::where('id', $sessionDraftId)->where('status', 'draft')->first();
         }
 
-        // D. Match by verified email in recent 24-hour window
-        if (! $draft && ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        // D. Match by email ONLY within same client IP in recent 24h window when no foreign draft_token was sent
+        if (! $draft && empty($draftToken) && ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $draft = Booking::where('email', $email)
-                ->where('status', 'draft')
-                ->where('created_at', '>=', now()->subHours(24))
-                ->latest()
-                ->first();
-        }
-
-        // E. Match by phone in recent 24-hour window
-        if (! $draft && ! empty($phone) && strlen(preg_replace('/[^0-9]/', '', $phone)) >= 7) {
-            $draft = Booking::where('phone', $phone)
+                ->where('ip_address', $request->ip())
                 ->where('status', 'draft')
                 ->where('created_at', '>=', now()->subHours(24))
                 ->latest()
@@ -1288,7 +1297,11 @@ class BookingController extends Controller
         }
 
         if ($date) {
-            $draft->tour_date = date('Y-m-d', strtotime($date));
+            try {
+                $draft->tour_date = \Carbon\Carbon::parse((string) $date)->format('Y-m-d');
+            } catch (\Throwable) {
+                $draft->tour_date = $draft->tour_date ?: now()->addDay()->format('Y-m-d');
+            }
         } elseif (empty($draft->tour_date)) {
             $draft->tour_date = now()->addDay()->format('Y-m-d');
         }
@@ -1339,8 +1352,9 @@ class BookingController extends Controller
     /**
      * Dedicated Abandoned Cart Checkout Recovery Page.
      */
-    public function recoverCheckout(Request $request, string $reference)
+    public function recoverCheckout(Request $request, ...$params)
     {
+        $reference = (string) end($params);
         $booking = Booking::with(['tour.tiers', 'tier', 'addons', 'coupon'])->where('reference', $reference)->first();
 
         if (! $booking) {
@@ -1418,8 +1432,9 @@ class BookingController extends Controller
     /**
      * Process checkout submission from the dedicated recovery page.
      */
-    public function processRecoverCheckout(Request $request, string $reference)
+    public function processRecoverCheckout(Request $request, ...$params)
     {
+        $reference = (string) end($params);
         $booking = Booking::with(['tour', 'tier', 'addons', 'coupon'])->where('reference', $reference)->first();
 
         if (! $booking) {
@@ -1498,7 +1513,17 @@ class BookingController extends Controller
             $defaultTier = $tour->tiers()->first();
             if ($defaultTier) {
                 $tier = $defaultTier;
-                $resolved = $this->resolveAuthoritativeDraftPricing($tour, $tier, $adults, $children, 0.0, $addonsTotal, $booking->coupon_code, $email, $booking->tour_date);
+                $resolved = $this->resolveAuthoritativeDraftPricing(
+                    $tour,
+                    $tier,
+                    max(1, (int) $booking->adults),
+                    max(0, (int) $booking->children),
+                    0.0,
+                    $addonsTotal,
+                    $booking->coupon,
+                    $email,
+                    $booking->tour_date ? (string) $booking->tour_date->format('Y-m-d') : null
+                );
             }
         }
 
@@ -1508,6 +1533,12 @@ class BookingController extends Controller
             $updatePayload['subtotal'] = $resolved['subtotal'];
             $updatePayload['addons_total'] = $addonsTotal;
             $updatePayload['discount_amount'] = $resolved['discount'];
+            if ((float) $resolved['discount'] <= 0 && $booking->coupon_id) {
+                $updatePayload['coupon_id'] = null;
+                $updatePayload['coupon_code'] = null;
+                $updatePayload['discount_type'] = null;
+                $updatePayload['discount_rate'] = 0.00;
+            }
             $updatePayload['original_total'] = round($resolved['subtotal'] + $addonsTotal, 2);
             $updatePayload['total'] = $resolved['total'];
         } elseif ((float) $booking->total > 0) {

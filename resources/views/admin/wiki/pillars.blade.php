@@ -3,7 +3,14 @@
 @section('page_title', 'Manage Knowledge Pillars')
 
 @section('content')
-<div class="space-y-6 max-w-5xl">
+<div class="space-y-6 max-w-5xl" x-data="{
+    editOpen: false,
+    editing: { id: null, name: '', slug: '', headline: '', description: '', icon: 'bi-compass', priority: 0, status: 'active' },
+    openEdit(p) {
+        this.editing = { ...p };
+        this.editOpen = true;
+    }
+}">
     <div class="flex items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
@@ -72,6 +79,21 @@
                     <span class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
                         {{ $p->articles_count }} {{ Str::plural('Guide', $p->articles_count) }}
                     </span>
+                    @php
+                        $pillarPayload = [
+                            'id' => $p->id,
+                            'name' => $p->getTranslation('name', 'en', true) ?: $p->name,
+                            'slug' => $p->slug,
+                            'headline' => $p->getTranslation('headline', 'en', false) ?? '',
+                            'description' => $p->getTranslation('description', 'en', false) ?? '',
+                            'icon' => $p->icon ?: 'bi-compass',
+                            'priority' => (int) $p->priority,
+                            'status' => $p->status ?: 'active',
+                        ];
+                    @endphp
+                    <button type="button" @click='openEdit(@json($pillarPayload))' class="p-1.5 text-slate-400 hover:text-amber-600 transition cursor-pointer" title="Edit Pillar">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
                     <a href="{{ localized_route('wiki.pillar', $p->slug) }}" target="_blank" class="p-1.5 text-slate-400 hover:text-primary transition" title="View Public Pillar">
                         <i class="bi bi-box-arrow-up-right"></i>
                     </a>
@@ -87,6 +109,59 @@
                 </div>
             </div>
             @endforeach
+        </div>
+    </div>
+
+    <!-- Edit Pillar Modal -->
+    <div x-show="editOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+        <div @click.outside="editOpen = false" class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-black text-slate-900">Edit Knowledge Pillar</h3>
+                <button type="button" @click="editOpen = false" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form :action="`{{ url('/admin/wiki/pillars') }}/${editing.id}`" method="POST" class="space-y-3">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Pillar Name *</label>
+                        <input type="text" name="name" x-model="editing.name" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Slug</label>
+                        <input type="text" name="slug" x-model="editing.slug" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Cornerstone Headline</label>
+                    <input type="text" name="headline" x-model="editing.headline" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Description</label>
+                    <textarea name="description" x-model="editing.description" rows="2" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs"></textarea>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Icon Class</label>
+                        <input type="text" name="icon" x-model="editing.icon" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Priority</label>
+                        <input type="number" name="priority" x-model="editing.priority" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
+                        <select name="status" x-model="editing.status" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" @click="editOpen = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 cursor-pointer">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

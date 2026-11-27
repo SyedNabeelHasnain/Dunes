@@ -11,19 +11,47 @@ use Illuminate\Support\Facades\Cache;
 class CmsContentService
 {
     /**
-     * Retrieve all active pages with their sections (cached).
+     * Retrieve all active pages with their sections (cached as plain arrays for serializable_classes=false safety).
      */
     public function getPage(string $slug): ?Page
     {
         try {
-            $pages = Cache::remember('cms_pages_cache', 3600, function () {
+            $payload = Cache::remember('cms_pages_cache', 3600, function () {
                 return Page::with(['sections' => function ($q) {
                     $q->orderBy('order', 'asc');
-                }])->where('status', 'published')->get();
+                }])->where('status', 'published')->get()->map(function (Page $page) {
+                    return [
+                        'attributes' => $page->getAttributes(),
+                        'sections' => $page->sections->map(fn (PageSection $s) => $s->getAttributes())->all(),
+                    ];
+                })->all();
             });
 
-            return $pages->firstWhere('slug', $slug);
+            if (! is_array($payload)) {
+                Cache::forget('cms_pages_cache');
+
+                return Page::with(['sections' => fn ($q) => $q->orderBy('order', 'asc')])
+                    ->where('status', 'published')
+                    ->where('slug', $slug)
+                    ->first();
+            }
+
+            foreach ($payload as $entry) {
+                if (! is_array($entry) || ! isset($entry['attributes']) || ($entry['attributes']['slug'] ?? null) !== $slug) {
+                    continue;
+                }
+
+                $page = (new Page)->newFromBuilder($entry['attributes']);
+                $sections = collect($entry['sections'] ?? [])->map(fn (array $s) => (new PageSection)->newFromBuilder($s));
+                $page->setRelation('sections', $sections);
+
+                return $page;
+            }
+
+            return null;
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('CmsContentService::getPage failed: '.$e->getMessage());
+
             return null;
         }
     }
@@ -94,28 +122,36 @@ class CmsContentService
     }
 
     /**
-     * Retrieve active menu items for a specific location.
+     * Retrieve active menu items for a specific location (cached as plain arrays for serializable_classes=false safety).
      */
     public function getMenuItems(string $location): Collection
     {
         try {
-            $items = Cache::remember("cms_menu_{$location}_cache", 3600, function () use ($location) {
+            $payload = Cache::remember("cms_menu_{$location}_cache", 3600, function () use ($location) {
                 return MenuItem::where('location', $location)
                     ->where('is_active', true)
                     ->orderBy('order', 'asc')
-                    ->get();
+                    ->get()
+                    ->map(fn (MenuItem $item) => $item->getAttributes())
+                    ->all();
             });
 
-            if (! is_iterable($items) || $items instanceof \__PHP_Incomplete_Class) {
+            if (! is_array($payload)) {
                 Cache::forget("cms_menu_{$location}_cache");
-                $items = MenuItem::where('location', $location)
+
+                return MenuItem::where('location', $location)
                     ->where('is_active', true)
                     ->orderBy('order', 'asc')
                     ->get();
             }
 
-            return $items instanceof Collection ? $items : collect($items);
+            return collect($payload)
+                ->filter(fn ($attrs) => is_array($attrs))
+                ->map(fn (array $attrs) => (new MenuItem)->newFromBuilder($attrs))
+                ->values();
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("CmsContentService::getMenuItems({$location}) failed: ".$e->getMessage());
+
             return collect();
         }
     }
@@ -127,12 +163,24 @@ class CmsContentService
     {
         try {
             Cache::forget('cms_pages_cache');
-            Cache::forget('cms_menu_header_cache');
-            Cache::forget('cms_menu_footer_desert_safaris_cache');
-            Cache::forget('cms_menu_footer_tours_cruises_cache');
-            Cache::forget('cms_menu_footer_trust_policies_cache');
-            Cache::forget('cms_menu_footer_contact_help_cache');
+            $locations = [
+                'header',
+                'footer_desert_safaris',
+                'footer_tours_cruises',
+                'footer_trust_policies',
+                'footer_contact_help',
+            ];
+            try {
+                $dbLocations = MenuItem::query()->distinct()->pluck('location')->filter()->all();
+                $locations = array_values(array_unique(array_merge($locations, $dbLocations)));
+            } catch (\Throwable $e) {
+                // Keep static defaults
+            }
+            foreach ($locations as $loc) {
+                Cache::forget("cms_menu_{$loc}_cache");
+            }
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('CmsContentService::clearCache failed: '.$e->getMessage());
         }
     }
 }

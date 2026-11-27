@@ -111,6 +111,7 @@
             </div>
 
             <div>
+                <input type="hidden" name="features_submitted" value="1">
                 <label class="block text-xs font-bold text-slate-700 mb-2">Safety & Desert Equipment</label>
                 @php $vehFeatures = $vehicle->features ?: []; @endphp
                 <div class="flex flex-wrap gap-3">

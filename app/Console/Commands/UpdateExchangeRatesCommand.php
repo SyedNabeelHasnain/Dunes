@@ -67,13 +67,20 @@ class UpdateExchangeRatesCommand extends Command
 
         $rates = $data['rates'];
 
-        $supportedCurrencies = [
-            'usd' => isset($rates['USD']) ? round((float) $rates['USD'], 4) : 0.2723,
-            'eur' => isset($rates['EUR']) ? round((float) $rates['EUR'], 4) : 0.2510,
-            'gbp' => isset($rates['GBP']) ? round((float) $rates['GBP'], 4) : 0.2150,
-            'sar' => isset($rates['SAR']) ? round((float) $rates['SAR'], 4) : 1.0210,
-            'inr' => isset($rates['INR']) ? round((float) $rates['INR'], 2) : 22.85,
+        $defaults = [
+            'usd' => ['key' => 'USD', 'precision' => 4, 'fallback' => 0.2723],
+            'eur' => ['key' => 'EUR', 'precision' => 4, 'fallback' => 0.2510],
+            'gbp' => ['key' => 'GBP', 'precision' => 4, 'fallback' => 0.2150],
+            'sar' => ['key' => 'SAR', 'precision' => 4, 'fallback' => 1.0210],
+            'inr' => ['key' => 'INR', 'precision' => 2, 'fallback' => 22.85],
         ];
+
+        $supportedCurrencies = [];
+        foreach ($defaults as $cur => $meta) {
+            $raw = $rates[$meta['key']] ?? null;
+            $val = (is_numeric($raw) && (float) $raw > 0) ? round((float) $raw, $meta['precision']) : $meta['fallback'];
+            $supportedCurrencies[$cur] = $val > 0 ? $val : $meta['fallback'];
+        }
 
         try {
             foreach ($supportedCurrencies as $cur => $rate) {

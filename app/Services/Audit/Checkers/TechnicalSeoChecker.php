@@ -11,6 +11,7 @@ use App\Models\WikiArticle;
 use App\Services\RedirectManagerService;
 use App\Services\Seo\CrawlerLogAnalyzerService;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class TechnicalSeoChecker implements AuditCheckerInterface
 {
@@ -54,9 +55,10 @@ class TechnicalSeoChecker implements AuditCheckerInterface
         // 2. Redirect Rules Health (Loops, Chains & 404 targets)
         $redirectService = app(RedirectManagerService::class);
         $rules = RedirectRule::where('is_active', true)->get();
+        $rulesMap = $rules->keyBy(fn ($r) => RedirectRule::normalizePath($r->source_path));
 
         foreach ($rules as $rule) {
-            $check = $redirectService->detectLoopOrChain($rule->source_path, $rule->target_path, $rule->id);
+            $check = $redirectService->detectLoopOrChain($rule->source_path, $rule->target_path, $rule->id, (int) $rule->status_code, $rulesMap);
             if ($check['is_loop']) {
                 $issues[] = [
                     'category' => 'technical_seo',
@@ -182,20 +184,32 @@ class TechnicalSeoChecker implements AuditCheckerInterface
         // 7. Contextual Orphan Page Detection (Published blogs/wiki with 0 inbound contextual links)
         try {
             $publishedBlogs = BlogPost::where('status', 'published')->get(['id', 'slug', 'title', 'content']);
-            $publishedWikis = WikiArticle::where('status', 'published')->with('pillar:id,slug')->get(['id', 'pillar_id', 'slug', 'title', 'content']);
-            $tourBodies = Tour::where('status', 'active')->pluck('full_desc')->implode("\n");
-            $allCorpus = strtolower(
-                $tourBodies."\n"
-                .$publishedBlogs->pluck('content')->implode("\n")."\n"
+            $publishedWikis = WikiArticle::where('status', 'published')->get(['id', 'content']);
+            $sharedCorpus = strtolower(
+                Tour::where('status', 'active')->pluck('full_desc')->implode("\n")."\n"
                 .$publishedWikis->pluck('content')->implode("\n")
             );
+            $blogBodiesById = [];
+            foreach ($publishedBlogs as $pb) {
+                $blogBodiesById[$pb->id] = strtolower((string) $pb->content);
+            }
 
             $orphanCount = 0;
             foreach ($publishedBlogs as $b) {
                 if ($orphanCount >= 5) {
                     break;
                 }
-                if (! str_contains($allCorpus, '/blog/'.strtolower((string) $b->slug))) {
+                $blogSlugPattern = '~(?:/blog/'.preg_quote(strtolower((string) $b->slug), '~').')(?:["\'?#/\s<]|$)~';
+                $hasInbound = preg_match($blogSlugPattern, $sharedCorpus) === 1;
+                if (! $hasInbound) {
+                    foreach ($blogBodiesById as $otherId => $otherBody) {
+                        if ($otherId !== $b->id && preg_match($blogSlugPattern, $otherBody) === 1) {
+                            $hasInbound = true;
+                            break;
+                        }
+                    }
+                }
+                if (! $hasInbound) {
                     $orphanCount++;
                     $issues[] = [
                         'category' => 'technical_seo',
@@ -210,7 +224,8 @@ class TechnicalSeoChecker implements AuditCheckerInterface
                     ];
                 }
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('TechnicalSeoChecker orphan check failed: '.$e->getMessage());
         }
 
         // 8. Observed Crawl Waste Anomaly Check (from Request Logs)
@@ -229,7 +244,8 @@ class TechnicalSeoChecker implements AuditCheckerInterface
                     'recommended_action' => 'Review Crawler Log Analyzer and map top 404 paths in Redirect Manager.',
                 ];
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('TechnicalSeoChecker crawl waste check failed: '.$e->getMessage());
         }
 
         return $issues;

@@ -150,7 +150,7 @@
                                 <div class="font-semibold text-slate-700">{{ $v->mulkiya_expiry_date->format('M j, Y') }}</div>
                                 @if($v->mulkiya_expiry_date->isPast())
                                     <span class="text-[10px] font-bold text-rose-600 block">EXPIRED</span>
-                                @elseif($v->mulkiya_expiry_date->diffInDays(now()) < 30)
+                                @elseif(now()->diffInDays($v->mulkiya_expiry_date, false) < 30)
                                     <span class="text-[10px] font-bold text-amber-600 block">Expires soon</span>
                                 @endif
                             @else

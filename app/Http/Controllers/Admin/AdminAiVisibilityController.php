@@ -97,7 +97,7 @@ class AdminAiVisibilityController extends Controller
             : $this->searchConsole->fetchBingCrawlStats();
 
         if ($request->wantsJson()) {
-            return response()->json($result, $result['success'] ? 200 : 200);
+            return response()->json($result, $result['success'] ? 200 : 422);
         }
 
         if ($result['success']) {

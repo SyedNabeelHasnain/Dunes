@@ -15,12 +15,13 @@ use Illuminate\Support\Facades\Storage;
 class SessionRecordingService
 {
     protected IpSecurityService $ipSecurity;
-    protected VisitorTrackerService $tracker;
 
-    public function __construct(IpSecurityService $ipSecurity, VisitorTrackerService $tracker)
+    protected const MAX_EVENTS_PER_SESSION = 5000;
+    protected const MAX_BYTES_PER_SESSION = 5242880; // 5 MB
+
+    public function __construct(IpSecurityService $ipSecurity)
     {
         $this->ipSecurity = $ipSecurity;
-        $this->tracker = $tracker;
     }
 
     /**
@@ -54,7 +55,7 @@ class SessionRecordingService
      */
     public function ingestBatch(string $sessionId, array $events, array $meta = []): ?VisitorSessionRecording
     {
-        if (empty($sessionId) || empty($events)) {
+        if (empty($sessionId) || empty($events) || ! $this->isEnabled()) {
             return null;
         }
 
@@ -70,19 +71,27 @@ class SessionRecordingService
             return null;
         }
 
-        // Clean session id
-        $safeSessionId = preg_replace('/[^a-zA-Z0-9_\-]/', '', $sessionId);
+        // Clean & bound session id
+        $safeSessionId = substr((string) preg_replace('/[^a-zA-Z0-9_\-]/', '', $sessionId), 0, 100);
         if (empty($safeSessionId)) {
             $safeSessionId = md5($clientIp . '_' . date('Ymd'));
         }
 
-        $subDir = 'recordings/' . date('Y-m');
-        $fullDir = storage_path('app/' . $subDir);
+        // Reuse existing recording storage_path across month boundaries so playback never splits across directories
+        $existingRecord = VisitorSessionRecording::where('session_id', $safeSessionId)->first();
+        if ($existingRecord && ! empty($existingRecord->storage_path)) {
+            $relativeFilePath = $existingRecord->storage_path;
+            $fullDir = dirname(storage_path('app/' . $relativeFilePath));
+        } else {
+            $subDir = 'recordings/' . date('Y-m');
+            $fullDir = storage_path('app/' . $subDir);
+            $relativeFilePath = $subDir . '/' . $safeSessionId . '.json.gz';
+        }
+
         if (! File::exists($fullDir)) {
             File::makeDirectory($fullDir, 0755, true, true);
         }
 
-        $relativeFilePath = $subDir . '/' . $safeSessionId . '.json.gz';
         $absoluteFilePath = storage_path('app/' . $relativeFilePath);
         $lockFilePath = $absoluteFilePath . '.lock';
 
@@ -91,13 +100,15 @@ class SessionRecordingService
             @flock($lockHandle, LOCK_EX);
         }
 
+        $recording = null;
+
         try {
             // Load existing events if recording file exists
             $existingEvents = [];
             if (File::exists($absoluteFilePath)) {
                 $raw = File::get($absoluteFilePath);
                 if ($raw !== false && ! empty($raw)) {
-                    $decoded = @gzdecode($raw);
+                    $decoded = @gzdecode($raw, self::MAX_BYTES_PER_SESSION * 4);
                     if ($decoded !== false) {
                         $existingEvents = json_decode($decoded, true) ?: [];
                     } else {
@@ -106,8 +117,12 @@ class SessionRecordingService
                 }
             }
 
-            // Merge, deduplicate, and chronologically sort events so multi-batch/unload requests never break playback
+            // Merge, deduplicate, cap, and chronologically sort events so multi-batch/unload requests never break playback
             $mergedEvents = $this->normalizeEvents(array_merge($existingEvents, $events));
+            if (count($mergedEvents) > self::MAX_EVENTS_PER_SESSION) {
+                // Keep earliest Meta/FullSnapshot events + latest tail up to cap
+                $mergedEvents = array_slice($mergedEvents, 0, self::MAX_EVENTS_PER_SESSION);
+            }
             $eventsCount = count($mergedEvents);
 
             // Calculate accurate session duration across chronological timestamps
@@ -124,55 +139,57 @@ class SessionRecordingService
             $jsonPayload = json_encode($mergedEvents, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             $compressed = gzencode($jsonPayload, 6);
             $bytesToWrite = $compressed !== false ? $compressed : $jsonPayload;
-            $tmpPath = $absoluteFilePath . '.tmp.' . uniqid('', true);
-            File::put($tmpPath, $bytesToWrite);
-            @rename($tmpPath, $absoluteFilePath);
-            $fileSizeBytes = strlen($bytesToWrite);
+            if (strlen($bytesToWrite) <= self::MAX_BYTES_PER_SESSION) {
+                $tmpPath = $absoluteFilePath . '.tmp.' . uniqid('', true);
+                File::put($tmpPath, $bytesToWrite);
+                @rename($tmpPath, $absoluteFilePath);
+                $fileSizeBytes = strlen($bytesToWrite);
+            } else {
+                $fileSizeBytes = File::exists($absoluteFilePath) ? (int) filesize($absoluteFilePath) : strlen($bytesToWrite);
+            }
+
+            // Check for inquiry associations (draft, whatsapp, contact — contacts table uses ip_address)
+            $hasInquiry = false;
+            try {
+                $hasInquiry = Booking::where(function ($q) use ($safeSessionId, $clientIp) {
+                    $q->where('draft_token', $safeSessionId)->orWhere('ip_address', $clientIp);
+                })->exists()
+                || Contact::where('ip_address', $clientIp)->exists()
+                || WhatsappInquiry::where('client_ip', $clientIp)->exists();
+            } catch (\Throwable $e) {
+                Log::debug('SessionRecordingService inquiry lookup failed: ' . $e->getMessage());
+            }
+
+            // Upsert database record inside the lock so concurrent batches stay consistent
+            $recording = VisitorSessionRecording::firstOrNew(['session_id' => $safeSessionId]);
+            $isNew = ! $recording->exists;
+
+            if ($isNew) {
+                $recording->client_ip = $clientIp;
+                $recording->country = $meta['country'] ?? null;
+                $recording->city = $meta['city'] ?? null;
+                $recording->device_type = $meta['device_type'] ?? 'desktop';
+                $recording->browser_name = $meta['browser_name'] ?? null;
+                $recording->os_name = $meta['os_name'] ?? null;
+                $recording->landing_page = $meta['current_page'] ?? null;
+                $recording->started_at = now();
+            }
+
+            $recording->exit_page = $meta['current_page'] ?? $recording->exit_page;
+            $recording->duration_seconds = max((int) ($recording->duration_seconds ?? 0), $durationSeconds);
+            $recording->events_count = $eventsCount;
+            $recording->storage_path = $relativeFilePath;
+            $recording->file_size_bytes = $fileSizeBytes;
+            $recording->has_inquiry = $hasInquiry || (bool) $recording->has_inquiry;
+            $recording->status = ($meta['is_final'] ?? false) ? 'completed' : 'recording';
+            $recording->last_event_at = now();
+            $recording->save();
         } finally {
             if ($lockHandle) {
                 @flock($lockHandle, LOCK_UN);
                 @fclose($lockHandle);
             }
         }
-
-        // Check for inquiry associations (draft, whatsapp, contact)
-        $hasInquiry = false;
-        try {
-            $hasInquiry = Booking::where(function ($q) use ($safeSessionId, $clientIp) {
-                $q->where('draft_token', $safeSessionId)->orWhere('ip_address', $clientIp);
-            })->exists()
-            || Contact::where(function ($q) use ($safeSessionId, $clientIp) {
-                $q->where('session_id', $safeSessionId)->orWhere('ip_address', $clientIp);
-            })->exists()
-            || WhatsappInquiry::where('client_ip', $clientIp)->exists();
-        } catch (\Throwable $e) {
-            // Non-blocking inquiry detection
-        }
-
-        // Upsert database record
-        $recording = VisitorSessionRecording::firstOrNew(['session_id' => $safeSessionId]);
-        $isNew = ! $recording->exists;
-
-        if ($isNew) {
-            $recording->client_ip = $clientIp;
-            $recording->country = $meta['country'] ?? null;
-            $recording->city = $meta['city'] ?? null;
-            $recording->device_type = $meta['device_type'] ?? 'desktop';
-            $recording->browser_name = $meta['browser_name'] ?? null;
-            $recording->os_name = $meta['os_name'] ?? null;
-            $recording->landing_page = $meta['current_page'] ?? null;
-            $recording->started_at = now();
-        }
-
-        $recording->exit_page = $meta['current_page'] ?? $recording->exit_page;
-        $recording->duration_seconds = max((int) ($recording->duration_seconds ?? 0), $durationSeconds);
-        $recording->events_count = $eventsCount;
-        $recording->storage_path = $relativeFilePath;
-        $recording->file_size_bytes = $fileSizeBytes;
-        $recording->has_inquiry = $hasInquiry || (bool) $recording->has_inquiry;
-        $recording->status = ($meta['is_final'] ?? false) ? 'completed' : 'recording';
-        $recording->last_event_at = now();
-        $recording->save();
 
         return $recording;
     }
@@ -196,12 +213,14 @@ class SessionRecordingService
             return [];
         }
 
-        // Check if gzipped (magic bytes 0x1f 0x8b)
+        // Check if gzipped (magic bytes 0x1f 0x8b) and always normalize events
         $isGzipped = (strlen($raw) >= 2 && substr($raw, 0, 2) === "\x1f\x8b");
         if ($isGzipped) {
             $decompressed = @gzdecode($raw);
             if ($decompressed !== false) {
-                return json_decode($decompressed, true) ?: [];
+                $events = json_decode($decompressed, true) ?: [];
+
+                return $this->normalizeEvents(is_array($events) ? $events : []);
             }
         }
 
@@ -416,25 +435,33 @@ class SessionRecordingService
     {
         $retentionDays = $days ?? $this->getRetentionDays();
         if ($retentionDays <= 0) {
-            return ['deleted_count' => 0, 'freed_bytes' => 0];
+            return [
+                'deleted_count' => 0,
+                'freed_bytes' => 0,
+                'retention_days' => $retentionDays,
+                'cutoff' => null,
+            ];
         }
 
         $cutoff = now()->subDays($retentionDays);
-
-        $recordings = VisitorSessionRecording::where('is_starred', false)
-            ->where('created_at', '<', $cutoff)
-            ->get();
-
         $deletedCount = 0;
         $freedBytes = 0;
 
-        foreach ($recordings as $rec) {
-            $bytes = $rec->file_size_bytes;
-            if ($this->deleteRecording($rec)) {
-                $deletedCount++;
-                $freedBytes += $bytes;
-            }
-        }
+        VisitorSessionRecording::where('is_starred', false)
+            ->where('created_at', '<', $cutoff)
+            ->chunkById(100, function ($recordings) use (&$deletedCount, &$freedBytes) {
+                foreach ($recordings as $rec) {
+                    $bytes = (int) $rec->file_size_bytes;
+                    $lockPath = ! empty($rec->storage_path) ? storage_path('app/' . $rec->storage_path . '.lock') : null;
+                    if ($this->deleteRecording($rec)) {
+                        if ($lockPath && File::exists($lockPath)) {
+                            @unlink($lockPath);
+                        }
+                        $deletedCount++;
+                        $freedBytes += $bytes;
+                    }
+                }
+            });
 
         return [
             'deleted_count' => $deletedCount,
@@ -454,17 +481,22 @@ class SessionRecordingService
             $query->where('is_starred', false);
         }
 
-        $recordings = $query->get();
         $deletedCount = 0;
         $freedBytes = 0;
 
-        foreach ($recordings as $rec) {
-            $bytes = $rec->file_size_bytes;
-            if ($this->deleteRecording($rec)) {
-                $deletedCount++;
-                $freedBytes += $bytes;
+        $query->chunkById(100, function ($recordings) use (&$deletedCount, &$freedBytes) {
+            foreach ($recordings as $rec) {
+                $bytes = (int) $rec->file_size_bytes;
+                $lockPath = ! empty($rec->storage_path) ? storage_path('app/' . $rec->storage_path . '.lock') : null;
+                if ($this->deleteRecording($rec)) {
+                    if ($lockPath && File::exists($lockPath)) {
+                        @unlink($lockPath);
+                    }
+                    $deletedCount++;
+                    $freedBytes += $bytes;
+                }
             }
-        }
+        });
 
         return [
             'deleted_count' => $deletedCount,
@@ -473,15 +505,19 @@ class SessionRecordingService
     }
 
     /**
-     * Get aggregate storage statistics.
+     * Get aggregate storage statistics in a single SQL query.
      */
     public function getStorageStats(): array
     {
-        $totalCount = VisitorSessionRecording::count();
-        $starredCount = VisitorSessionRecording::where('is_starred', true)->count();
-        $inquiriesCount = VisitorSessionRecording::where('has_inquiry', true)->count();
-        $totalBytes = (int) VisitorSessionRecording::sum('file_size_bytes');
-        $totalDurationSec = (int) VisitorSessionRecording::sum('duration_seconds');
+        $agg = VisitorSessionRecording::query()
+            ->selectRaw('COUNT(*) as total_count, SUM(CASE WHEN is_starred = 1 THEN 1 ELSE 0 END) as starred_count, SUM(CASE WHEN has_inquiry = 1 THEN 1 ELSE 0 END) as inquiries_count, COALESCE(SUM(file_size_bytes), 0) as total_bytes, COALESCE(SUM(duration_seconds), 0) as total_duration_sec')
+            ->first();
+
+        $totalCount = (int) ($agg->total_count ?? 0);
+        $starredCount = (int) ($agg->starred_count ?? 0);
+        $inquiriesCount = (int) ($agg->inquiries_count ?? 0);
+        $totalBytes = (int) ($agg->total_bytes ?? 0);
+        $totalDurationSec = (int) ($agg->total_duration_sec ?? 0);
 
         $formattedBytes = '0 KB';
         if ($totalBytes >= 1048576) {

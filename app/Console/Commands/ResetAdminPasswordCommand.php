@@ -13,9 +13,10 @@ class ResetAdminPasswordCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'admin:reset-password 
-                            {login=admin : The administrator username or email address} 
-                            {password=admin123 : The new password to assign}';
+    protected $signature = 'admin:reset-password
+                            {login : The administrator username or email address}
+                            {password : The new password to assign (minimum 10 characters)}
+                            {--create : Create the administrator account if it does not already exist}';
 
     /**
      * The console command description.
@@ -32,8 +33,8 @@ class ResetAdminPasswordCommand extends Command
         $login = trim((string) $this->argument('login'));
         $password = (string) $this->argument('password');
 
-        if (empty($login) || empty($password)) {
-            $this->error('Both login and password are required.');
+        if (empty($login) || strlen($password) < 10) {
+            $this->error('Both login and a password of at least 10 characters are required.');
 
             return self::FAILURE;
         }
@@ -46,15 +47,21 @@ class ResetAdminPasswordCommand extends Command
             $user->password = Hash::make($password);
             $user->save();
             $this->info("Successfully updated password for administrator [{$user->name} / {$user->email}].");
-        } else {
+        } elseif ($this->option('create')) {
             $isEmail = filter_var($login, FILTER_VALIDATE_EMAIL);
             $user = User::create([
                 'name' => $isEmail ? 'admin' : $login,
                 'email' => $isEmail ? $login : 'admin@dunesdiscoverytourism.com',
                 'password' => Hash::make($password),
-                'email_verified_at' => now(),
+                'role' => User::ROLE_SUPER_ADMIN,
+                'is_active' => true,
             ]);
+            $user->forceFill(['email_verified_at' => now()])->save();
             $this->info("Created new administrator account [{$user->name} / {$user->email}] with the specified password.");
+        } else {
+            $this->error("Administrator [{$login}] not found. Re-run with --create to provision a new account.");
+
+            return self::FAILURE;
         }
 
         return self::SUCCESS;

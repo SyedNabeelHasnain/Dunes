@@ -25,8 +25,27 @@ class AdminAuditController extends Controller
     public function index(Request $request): View
     {
         $latestRun = $this->auditService->getLatestRun();
+        $recentRuns = AuditRun::where('status', 'completed')->latest('id')->limit(15)->get();
+        $methodology = $this->auditService->getScoringMethodology();
+        $staffUsers = User::where('is_active', true)->orderBy('name')->get(['id', 'name', 'role']);
+
         if (! $latestRun) {
-            $latestRun = $this->auditService->runAudit('incremental', auth()->id());
+            $issues = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 25, 1, [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]);
+            $comparison = null;
+            $verificationCounts = [];
+
+            return view('admin.audit.index', compact(
+                'latestRun',
+                'issues',
+                'recentRuns',
+                'comparison',
+                'verificationCounts',
+                'methodology',
+                'staffUsers'
+            ));
         }
 
         $query = AuditIssue::with('assignee')->where('audit_run_id', $latestRun->id);
@@ -58,8 +77,6 @@ class AdminAuditController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        $recentRuns = AuditRun::where('status', 'completed')->latest('id')->limit(15)->get();
-
         $compareId = $request->integer('compare_with') ?: $latestRun->parent_run_id;
         $baselineRun = $compareId
             ? AuditRun::find($compareId)
@@ -71,9 +88,6 @@ class AdminAuditController extends Controller
             ->groupBy('verification_type')
             ->pluck('count', 'verification_type')
             ->toArray();
-
-        $methodology = $this->auditService->getScoringMethodology();
-        $staffUsers = User::where('is_active', true)->orderBy('name')->get(['id', 'name', 'role']);
 
         return view('admin.audit.index', compact(
             'latestRun',
@@ -116,7 +130,7 @@ class AdminAuditController extends Controller
 
     public function show(int $id, Request $request): View
     {
-        $run = AuditRun::with('issues.assignee')->findOrFail($id);
+        $run = AuditRun::findOrFail($id);
         $issues = $run->issues()
             ->with('assignee')
             ->orderByRaw("CASE severity WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END")
@@ -128,9 +142,8 @@ class AdminAuditController extends Controller
             ? AuditRun::find($run->parent_run_id)
             : AuditRun::where('status', 'completed')->where('id', '<', $run->id)->latest('id')->first();
         $comparison = $this->auditService->compareRuns($run, $baselineRun);
-        $staffUsers = User::where('is_active', true)->orderBy('name')->get(['id', 'name', 'role']);
 
-        return view('admin.audit.show', compact('run', 'issues', 'comparison', 'staffUsers'));
+        return view('admin.audit.show', compact('run', 'issues', 'comparison'));
     }
 
     public function updateIssue(Request $request, int $id): JsonResponse|RedirectResponse

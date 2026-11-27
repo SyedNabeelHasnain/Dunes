@@ -41,25 +41,118 @@ class RobotsTxtService
         return $this->defaultContent();
     }
 
+    /**
+     * Parse robots.txt into User-agent stanzas: [['agents' => [...], 'rules' => [['directive' => 'allow|disallow', 'path' => '...']]]]
+     */
+    private function parseStanzas(string $content): array
+    {
+        $stanzas = [];
+        $current = null;
+        $seenRuleInCurrent = false;
+
+        foreach (preg_split('/\R/', $content) ?: [] as $rawLine) {
+            $line = trim((string) preg_replace('/#.*$/', '', $rawLine));
+            if ($line === '') {
+                if ($current !== null && $seenRuleInCurrent) {
+                    $stanzas[] = $current;
+                    $current = null;
+                    $seenRuleInCurrent = false;
+                }
+                continue;
+            }
+
+            if (preg_match('/^User-agent:\s*(.+)$/i', $line, $m)) {
+                $agent = trim($m[1]);
+                if ($current === null || $seenRuleInCurrent) {
+                    if ($current !== null) {
+                        $stanzas[] = $current;
+                    }
+                    $current = ['agents' => [$agent], 'rules' => []];
+                    $seenRuleInCurrent = false;
+                } else {
+                    $current['agents'][] = $agent;
+                }
+                continue;
+            }
+
+            if ($current !== null && preg_match('/^(Allow|Disallow):\s*(.*)$/i', $line, $m)) {
+                $current['rules'][] = [
+                    'directive' => strtolower($m[1]),
+                    'path' => trim($m[2]),
+                ];
+                $seenRuleInCurrent = true;
+            }
+        }
+
+        if ($current !== null) {
+            $stanzas[] = $current;
+        }
+
+        return $stanzas;
+    }
+
     public function getBotStates(?string $content = null): array
     {
         $content ??= $this->getCurrentContent();
+        $stanzas = $this->parseStanzas($content);
         $states = [];
 
-        foreach (self::BOT_GROUPS as $groupKey => $group) {
+        foreach (self::BOT_GROUPS as $group) {
             foreach ($group['bots'] as $bot) {
-                $pattern = '/User-agent:\s*'.preg_quote($bot, '/').'\R+\s*(Allow|Disallow):\s*(\S+)/i';
                 $status = 'allow';
-                if (preg_match($pattern, $content, $m)) {
-                    $directive = strtolower($m[1]);
-                    $path = trim($m[2]);
-                    $status = ($directive === 'disallow' && $path === '/') ? 'disallow' : 'allow';
+                $botLower = strtolower($bot);
+                foreach ($stanzas as $stanza) {
+                    $agentsLower = array_map('strtolower', $stanza['agents']);
+                    if (! in_array($botLower, $agentsLower, true)) {
+                        continue;
+                    }
+                    foreach ($stanza['rules'] as $rule) {
+                        if ($rule['directive'] === 'disallow' && $rule['path'] === '/') {
+                            $status = 'disallow';
+                        } elseif ($rule['directive'] === 'allow' && $rule['path'] === '/') {
+                            $status = 'allow';
+                        }
+                    }
                 }
                 $states[$bot] = $status;
             }
         }
 
         return $states;
+    }
+
+    /**
+     * Extract custom User-agent: * rules beyond the baseline protected directives.
+     */
+    public function extractCustomDisallows(?string $content = null): string
+    {
+        $content ??= $this->getCurrentContent();
+        $stanzas = $this->parseStanzas($content);
+        $defaults = [
+            'allow:/',
+            'disallow:/admin/',
+            'disallow:/booking/draft',
+            'disallow:/ajax.php',
+        ];
+
+        $custom = [];
+        foreach ($stanzas as $stanza) {
+            if (! in_array('*', $stanza['agents'], true)) {
+                continue;
+            }
+            foreach ($stanza['rules'] as $rule) {
+                $sig = $rule['directive'].':'.$rule['path'];
+                if ($rule['path'] === '' || in_array(strtolower($sig), $defaults, true)) {
+                    continue;
+                }
+                $label = ucfirst($rule['directive']).': '.$rule['path'];
+                if (! in_array($label, $custom, true)) {
+                    $custom[] = $label;
+                }
+            }
+        }
+
+        return implode("\n", $custom);
     }
 
     /**
@@ -82,7 +175,7 @@ class RobotsTxtService
 
         foreach (preg_split('/\R/', $customDisallows) ?: [] as $line) {
             $trimmed = trim($line);
-            if ($trimmed !== '' && ! in_array($trimmed, ['Disallow: /search', 'Disallow: /thankyou', 'Disallow: /payment-cancel', 'Disallow: /unsubscribe/'], true)) {
+            if ($trimmed !== '' && ! in_array(strtolower($trimmed), ['disallow: /search', 'disallow: /thankyou', 'disallow: /payment-cancel', 'disallow: /unsubscribe/'], true)) {
                 $lines[] = str_starts_with(strtolower($trimmed), 'disallow:') || str_starts_with(strtolower($trimmed), 'allow:')
                     ? $trimmed
                     : 'Disallow: /'.ltrim($trimmed, '/');
@@ -126,8 +219,24 @@ class RobotsTxtService
             return $errors;
         }
 
-        if (preg_match('/User-agent:\s*\*\R+(?:Allow:[^\r\n]*\R+)*Disallow:\s*\/\s*$/im', $content)) {
-            $errors[] = 'Wildcard rule "User-agent: * Disallow: /" blocks the entire website from search indexing.';
+        foreach ($this->parseStanzas($content) as $stanza) {
+            if (! in_array('*', $stanza['agents'], true)) {
+                continue;
+            }
+            $hasAllowRoot = false;
+            $hasDisallowRoot = false;
+            foreach ($stanza['rules'] as $rule) {
+                if ($rule['directive'] === 'allow' && $rule['path'] === '/') {
+                    $hasAllowRoot = true;
+                }
+                if ($rule['directive'] === 'disallow' && $rule['path'] === '/') {
+                    $hasDisallowRoot = true;
+                }
+            }
+            if ($hasDisallowRoot && ! $hasAllowRoot) {
+                $errors[] = 'Wildcard rule "User-agent: * Disallow: /" blocks the entire website from search indexing.';
+                break;
+            }
         }
 
         foreach (['/search', '/thankyou', '/payment-cancel', '/unsubscribe/'] as $noindexPage) {
@@ -151,9 +260,13 @@ class RobotsTxtService
     {
         Setting::setVal('robots_txt_content', $content);
 
-        // Sync static public/robots.txt for web servers serving static files directly (skip during PHPUnit to avoid dirtying repo)
+        // Sync static public/robots.txt (and Hostinger ../public_html mirror if present) for web servers serving static files directly
         if (! App::runningUnitTests()) {
             @file_put_contents(public_path('robots.txt'), $content);
+            $hostingerPublic = base_path('../public_html');
+            if (is_dir($hostingerPublic) && is_writable($hostingerPublic)) {
+                @file_put_contents($hostingerPublic.DIRECTORY_SEPARATOR.'robots.txt', $content);
+            }
         }
     }
 

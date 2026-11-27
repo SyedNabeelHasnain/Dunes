@@ -52,7 +52,8 @@ class SecurityAppealController extends Controller
 
         $name = trim((string) ($validated['name'] ?? ($validated['full_name'] ?? '')));
         $reason = trim((string) ($validated['reason'] ?? ($validated['explanation'] ?? '')));
-        $actualClientIp = ! empty($validated['ip_address']) ? trim($validated['ip_address']) : $fallbackIp;
+        // Always bind unblock appeals to server-observed client IP (never trust user-supplied ip_address)
+        $actualClientIp = $fallbackIp;
 
         if (empty($name)) {
             if ($request->ajax() || $request->wantsJson()) {

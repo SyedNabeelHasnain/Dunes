@@ -535,6 +535,7 @@ $(document).ready(function() {
         $.ajax({
             url: "{{ route('admin.api.kpis') }}",
             type: "GET",
+            data: isManual ? { force: 1 } : {},
             dataType: "json",
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',

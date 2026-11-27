@@ -46,6 +46,15 @@
                     <label class="text-xs font-bold text-slate-900 cursor-pointer" for="meta_capi_enabled">Trigger Server Conversions API events directly to Meta Graph</label>
                 </div>
                 <div class="mt-2 text-[11px] text-slate-500">When enabled, server-side actions like Checkout initiated or WhatsApp clicks will submit secure telemetry directly to Meta via CAPI.</div>
+
+                <div class="flex items-center gap-3 mt-4 pt-4 border-t border-slate-200/70">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="meta_send_ip_ua" value="0">
+                        <input type="checkbox" name="meta_send_ip_ua" id="meta_send_ip_ua" value="1" {{ ($settings['meta_send_ip_ua'] ?? '1') !== '0' ? 'checked' : '' }} class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                    <label class="text-xs font-bold text-slate-900 cursor-pointer" for="meta_send_ip_ua">Include visitor IP address &amp; browser User-Agent in CAPI match signals</label>
+                </div>
             </div>
 
             <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80">

@@ -39,10 +39,21 @@ return [
         'places_api_key' => env('GOOGLE_PLACES_API_KEY', env('GOOGLE_MAPS_API_KEY')),
         'place_id' => env('GOOGLE_PLACE_ID', 'ChIJbWsIEIVEdEER4uHEhb2dbcQ'),
         'site_verification' => env('GOOGLE_SITE_VERIFICATION', ''),
+        'search_console_token' => env('GSC_OAUTH_ACCESS_TOKEN', ''),
     ],
 
     'bing' => [
         'site_verification' => env('BING_SITE_VERIFICATION', ''),
+        'webmaster_api_key' => env('BING_WEBMASTER_API_KEY', ''),
+    ],
+
+    'seo' => [
+        'server_access_log_path' => env('SERVER_ACCESS_LOG_PATH', ''),
+    ],
+
+    'deepl' => [
+        'auth_key' => env('DEEPL_AUTH_KEY', ''),
+        'endpoint_type' => env('DEEPL_ENDPOINT_TYPE', 'free'),
     ],
 
     'yandex' => [

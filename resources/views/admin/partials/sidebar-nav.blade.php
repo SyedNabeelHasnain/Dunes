@@ -1,13 +1,13 @@
 @php
     $isMobile = $isMobile ?? false;
-    $isAnalyticsGroup = request()->routeIs('admin.analytics.*') || request()->routeIs('admin.reports.*') || request()->routeIs('admin.security.ip-rules') || request()->routeIs('admin.audit.*');
+    $isAnalyticsGroup = request()->routeIs('admin.analytics.*') || request()->routeIs('admin.reports.*') || request()->routeIs('admin.security.ip-rules') || request()->routeIs('admin.audit.*') || request()->routeIs('admin.governance.*') || request()->routeIs('admin.health.*') || request()->routeIs('admin.ai-visibility.*') || request()->routeIs('admin.seo.crawl-analytics') || request()->routeIs('admin.settings.privacy*');
     $isBookingsGroup = request()->routeIs('admin.bookings.*') || request()->routeIs('admin.pricing.*');
     $isOperationsGroup = request()->routeIs('admin.operations.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.vehicles.*');
     $isCatalogGroup = request()->routeIs('admin.tours.*') || request()->routeIs('admin.addons.*') || request()->routeIs('admin.tiers.*');
     $isCommunicationsGroup = request()->routeIs('admin.inquiries.*') || request()->routeIs('admin.whatsapp.*') || request()->routeIs('admin.reviews.*') || request()->routeIs('admin.video-reviews.*');
     $isMarketingGroup = request()->routeIs('admin.coupons.*') || request()->routeIs('admin.subscribers.*') || request()->routeIs('admin.subscriber-groups.*') || request()->routeIs('admin.email-templates.*') || request()->routeIs('admin.campaigns.*') || request()->routeIs('admin.backlinks.*');
     $isContentGroup = request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.wiki.*') || request()->routeIs('admin.pages.*') || request()->routeIs('admin.menus.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.legal.*');
-    $isSettingsGroup = request()->routeIs('admin.settings.*');
+    $isSettingsGroup = request()->routeIs('admin.settings.*') && ! request()->routeIs('admin.settings.privacy*');
 @endphp
 
 <div x-data="{
@@ -537,8 +537,8 @@
             </a>
 
             <a href="{{ route('admin.wiki.index') }}" 
-               class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.wiki.index') || request()->routeIs('admin.wiki.create') || request()->routeIs('admin.wiki.edit') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
-                <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.wiki.index') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+               class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.wiki.index') || request()->routeIs('admin.wiki.articles.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.wiki.index') || request()->routeIs('admin.wiki.articles.*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
                 <span>Wiki Articles</span>
             </a>
 
@@ -694,7 +694,7 @@
                     <span>IP Rules & Firewall</span>
                 </div>
                 @php
-                    $pendingAppealsCount = \Illuminate\Support\Facades\Schema::hasTable('unblock_requests') ? \App\Models\UnblockRequest::where('status', 'pending')->count() : 0;
+                    $pendingAppealsCount = (int) ($sidebarCounts['pending_appeals'] ?? 0);
                 @endphp
                 @if($pendingAppealsCount > 0)
                     <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">

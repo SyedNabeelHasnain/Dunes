@@ -3,6 +3,7 @@
 namespace App\Services\Seo;
 
 use App\Models\BlogPost;
+use App\Models\Language;
 use App\Models\Page;
 use App\Models\SeoMetadata;
 use App\Models\SeoTemplate;
@@ -12,6 +13,7 @@ use App\Models\WikiPillar;
 use App\Services\SettingsService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -260,13 +262,19 @@ class SeoResolverService
         if (! $entity && $request) {
             try {
                 if (Schema::hasTable('pages')) {
-                    $slugPath = trim((string) preg_replace('#^(en|ar|ru|es|it)(/|$)#', '', trim($request->path(), '/')), '/') ?: 'home';
+                    $activeCodes = array_values(array_filter(array_map(
+                        static fn ($c) => preg_quote((string) $c, '#'),
+                        Language::getActiveCodes() ?: ['en', 'ar', 'ru', 'es', 'it']
+                    )));
+                    $localePattern = '#^('.implode('|', $activeCodes).')(/|$)#';
+                    $slugPath = trim((string) preg_replace($localePattern, '', trim($request->path(), '/')), '/') ?: 'home';
                     $cmsPage = Page::where('slug', $slugPath)->with('seoMeta')->first();
                     if ($cmsPage) {
                         $entity = $cmsPage;
                     }
                 }
-            } catch (\Throwable) {
+            } catch (\Throwable $e) {
+                Log::debug('SeoResolverService CMS page lookup failed: '.$e->getMessage());
                 $entity = null;
             }
         }
@@ -349,18 +357,25 @@ class SeoResolverService
         $existingRobots = (string) ($vars['pageRobots'] ?? '');
         if ($existingRobots !== 'noindex, nofollow') {
             $baseRobots = null;
+            $isItemRobotsOverride = false;
             if (! empty($seoMeta?->robots_directive)) {
                 $baseRobots = (string) $seoMeta->robots_directive;
+                $isItemRobotsOverride = true;
             } elseif ($entity && ! empty($entity->robots)) {
                 $baseRobots = (string) $entity->robots;
+                $isItemRobotsOverride = true;
             } elseif ($dbTemplate && ! empty($dbTemplate->robots_default) && $dbTemplate->updated_by !== null) {
                 $baseRobots = (string) $dbTemplate->robots_default;
             }
 
             if ($baseRobots !== null) {
-                $out['pageRobots'] = str_contains($existingRobots, 'noindex')
-                    ? $this->applyQueryParamRobotsPolicy($baseRobots, $request, $settings)
-                    : $baseRobots;
+                if ($request && $request->query() !== []) {
+                    $out['pageRobots'] = $this->applyQueryParamRobotsPolicy($baseRobots, $request, $settings);
+                } elseif (! $isItemRobotsOverride && str_contains($existingRobots, 'noindex')) {
+                    $out['pageRobots'] = $existingRobots;
+                } else {
+                    $out['pageRobots'] = $baseRobots;
+                }
             } elseif (str_contains($existingRobots, 'noindex') && $request && $request->query() !== [] && ($settings['seo_index_tracking_params'] ?? '0') === '1') {
                 $trackingKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'msclkid', 'wbraid', 'gbraid', 'gad_source'];
                 if (array_diff(array_keys($request->query()), $trackingKeys) === []) {
@@ -408,6 +423,16 @@ class SeoResolverService
             $siteSettings = $raw instanceof \Illuminate\Support\Collection ? $raw->all() : (is_array($raw) ? $raw : []);
         } elseif ($siteSettings instanceof \Illuminate\Support\Collection) {
             $siteSettings = $siteSettings->all();
+        }
+
+        // Preserve indexation on clean paginated blog listing URLs (?page=2, etc.)
+        if (
+            array_keys($query) === ['page']
+            && ctype_digit((string) ($query['page'] ?? ''))
+            && (int) $query['page'] >= 1
+            && $request->routeIs('blog.index', 'locale.blog.index')
+        ) {
+            return $baseRobots;
         }
 
         // Only allow pure tracking params to stay indexable if CMS explicitly sets seo_index_tracking_params = '1'

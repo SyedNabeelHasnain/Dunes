@@ -72,8 +72,8 @@ class AdminDashboardController extends Controller
             $recentBookingsCount = (int) ($bAgg->recent_bookings ?? 0);
             $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
 
-            $newInquiries = Contact::where('status', 'new')->count();
-            $totalInquiries = Contact::count();
+            $newInquiries = Contact::clean()->where('status', 'new')->count();
+            $totalInquiries = Contact::clean()->count();
             $totalWhatsappLeads = WhatsappInquiry::count();
             $unreadWhatsappLeads = WhatsappInquiry::where(function ($q) {
                 $q->where('is_read', false)->orWhereNull('is_read');
@@ -182,11 +182,12 @@ class AdminDashboardController extends Controller
             $stats = [
                 'revenue' => 0, 'total' => 0, 'confirmed' => 0, 'completed' => 0, 'confirmed_and_completed' => 0,
                 'pending' => 0, 'cancelled' => 0, 'drafts' => 0, 'aov' => 0, 'conversion_rate' => 0,
-                'new_inquiries' => 0, 'total_inquiries' => 0, 'whatsapp_leads' => 0,
+                'new_inquiries' => 0, 'total_inquiries' => 0, 'whatsapp_leads' => 0, 'unread_whatsapp_leads' => 0,
                 'subscribers_count' => 0, 'campaigns_count' => 0, 'campaigns_sent' => 0,
                 'active_tours' => 0, 'total_tours' => 0, 'total_reviews' => 0, 'approved_reviews' => 0,
                 'avg_rating' => 5.0, 'published_posts' => 0, 'total_posts' => 0,
                 'today_departures' => 0, 'upcoming_departures' => 0,
+                'active_backlinks' => 0, 'total_backlinks' => 0,
                 'timestamp' => now()->toIso8601String(),
             ];
             $recentBookings = collect();
@@ -252,8 +253,8 @@ class AdminDashboardController extends Controller
                 ->count('client_ip');
 
             // 2. Top Visited Pages
-            $topPages = RequestLog::where('request_timestamp', '>=', $startDate)
-                ->where('bot_indicator', 'Likely Human')
+            $topPages = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human'))
                 ->select('request_uri', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
                 ->groupBy('request_uri')
                 ->orderBy('views', 'desc')
@@ -261,9 +262,9 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // 3. Top Countries
-            $topCountries = RequestLog::where('request_timestamp', '>=', $startDate)
+            $topCountries = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
                 ->where('bot_indicator', 'Likely Human')
-                ->where('country', '!=', 'Not Available')
+                ->where('country', '!=', 'Not Available'))
                 ->select('country', \DB::raw('COUNT(*) as count'))
                 ->groupBy('country')
                 ->orderBy('count', 'desc')
@@ -271,8 +272,8 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // 4. Traffic Sources Channel Grouping
-            $trafficSources = RequestLog::where('request_timestamp', '>=', $startDate)
-                ->where('bot_indicator', 'Likely Human')
+            $trafficSources = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human'))
                 ->select(
                     \DB::raw("CASE 
                         WHEN utm_source IS NOT NULL AND utm_source != '' AND utm_source != 'Not Available' THEN utm_source
@@ -294,12 +295,12 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // 5. Top Referring Domains & URLs
-            $topReferrers = RequestLog::where('request_timestamp', '>=', $startDate)
+            $topReferrers = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
                 ->where('bot_indicator', 'Likely Human')
                 ->whereNotNull('referrer_url')
                 ->where('referrer_url', '!=', 'Not Available')
                 ->where('referrer_url', '!=', '')
-                ->where('referrer_url', '!=', 'direct')
+                ->where('referrer_url', '!=', 'direct'))
                 ->select('referrer_url as referrer', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
                 ->groupBy('referrer_url')
                 ->orderBy('views', 'desc')
@@ -307,11 +308,11 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // 6. Campaign & UTM Attribution
-            $campaigns = RequestLog::where('request_timestamp', '>=', $startDate)
+            $campaigns = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
                 ->where('bot_indicator', 'Likely Human')
                 ->whereNotNull('utm_campaign')
                 ->where('utm_campaign', '!=', 'Not Available')
-                ->where('utm_campaign', '!=', '')
+                ->where('utm_campaign', '!=', ''))
                 ->select('utm_campaign', 'utm_source', 'utm_medium', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
                 ->groupBy('utm_campaign', 'utm_source', 'utm_medium')
                 ->orderBy('views', 'desc')
@@ -319,7 +320,7 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // 7. Daily Traffic Trend (Time-Series for Chart.js)
-            $dailyTrend = RequestLog::where('request_timestamp', '>=', $startDate)
+            $dailyTrend = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate))
                 ->select(
                     \DB::raw('DATE(request_timestamp) as date'),
                     \DB::raw('COUNT(*) as total_views'),
@@ -331,15 +332,15 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // 8. Device & Browser Breakdown
-            $devices = RequestLog::where('request_timestamp', '>=', $startDate)
-                ->where('bot_indicator', 'Likely Human')
+            $devices = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human'))
                 ->select('device_type', \DB::raw('COUNT(*) as count'))
                 ->groupBy('device_type')
                 ->orderBy('count', 'desc')
                 ->get();
 
-            $browsers = RequestLog::where('request_timestamp', '>=', $startDate)
-                ->where('bot_indicator', 'Likely Human')
+            $browsers = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human'))
                 ->select('browser_name', \DB::raw('COUNT(*) as count'))
                 ->groupBy('browser_name')
                 ->orderBy('count', 'desc')
@@ -940,6 +941,8 @@ class AdminDashboardController extends Controller
 
         $verb = $mode === 'purge' ? 'permanently purged' : 'moved to Spam Quarantine';
         $message = "{$processed} spam inquiry(s) {$verb}".($blockedIpsCount > 0 ? " and {$blockedIpsCount} offending bot IP(s) blocked in Firewall." : '.');
+        Cache::forget('admin_dashboard_kpis');
+        Cache::forget('admin_sidebar_counts');
 
         return response()->json([
             'success' => true,
@@ -958,9 +961,11 @@ class AdminDashboardController extends Controller
         $inquiry = Contact::findOrFail($id);
         if ($inquiry->status === 'new') {
             $inquiry->update(['status' => 'read']);
+            Cache::forget('admin_dashboard_kpis');
+            Cache::forget('admin_sidebar_counts');
         }
 
-        $unreadCount = Contact::where('status', 'new')->count();
+        $unreadCount = Contact::clean()->where('status', 'new')->count();
 
         return response()->json([
             'success' => true,
@@ -980,6 +985,8 @@ class AdminDashboardController extends Controller
             $name = $inquiry->name ?: 'Inquiry';
 
             $this->purgeInquiryData($inquiry);
+            Cache::forget('admin_dashboard_kpis');
+            Cache::forget('admin_sidebar_counts');
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -1133,6 +1140,8 @@ class AdminDashboardController extends Controller
                         $count++;
                     }
                 });
+                Cache::forget('admin_dashboard_kpis');
+                Cache::forget('admin_sidebar_counts');
 
                 return response()->json([
                     'success' => true,
@@ -1161,6 +1170,8 @@ class AdminDashboardController extends Controller
                         }
                     }
                 }
+                Cache::forget('admin_dashboard_kpis');
+                Cache::forget('admin_sidebar_counts');
 
                 return response()->json([
                     'success' => true,
@@ -1174,6 +1185,8 @@ class AdminDashboardController extends Controller
                     'is_spam' => false,
                     'quarantined_at' => null,
                 ]);
+                Cache::forget('admin_dashboard_kpis');
+                Cache::forget('admin_sidebar_counts');
 
                 return response()->json([
                     'success' => true,
@@ -1183,6 +1196,8 @@ class AdminDashboardController extends Controller
 
             $newStatus = str_replace('status_', '', $action);
             $count = Contact::whereIn('id', $ids)->update(['status' => $newStatus]);
+            Cache::forget('admin_dashboard_kpis');
+            Cache::forget('admin_sidebar_counts');
 
             return response()->json([
                 'success' => true,

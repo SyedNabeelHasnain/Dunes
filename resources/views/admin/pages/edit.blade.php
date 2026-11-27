@@ -155,8 +155,15 @@
             <i class="bi bi-chevron-left text-slate-400"></i> Back to Pages CMS
         </a>
         <div class="flex items-center gap-2">
+            @php
+                $previewPath = match($page->slug) {
+                    'home' => '',
+                    'tours_sidebar' => 'tours',
+                    default => $page->slug,
+                };
+            @endphp
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/20">/{{ $page->slug }}</span>
-            <a href="{{ url('/' . ($page->slug === 'home' ? '' : $page->slug)) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sky-200 hover:bg-sky-50 text-sky-700 text-xs font-bold transition">
+            <a href="{{ url('/' . $previewPath) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sky-200 hover:bg-sky-50 text-sky-700 text-xs font-bold transition">
                 <i class="bi bi-box-arrow-up-right"></i> Preview Live
             </a>
         </div>

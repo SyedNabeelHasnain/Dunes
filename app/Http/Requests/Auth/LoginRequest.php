@@ -137,6 +137,16 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $authedUser = Auth::user();
+        if ($authedUser && isset($authedUser->is_active) && ! $authedUser->is_active) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Your staff account has been deactivated. Contact a Super Administrator.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

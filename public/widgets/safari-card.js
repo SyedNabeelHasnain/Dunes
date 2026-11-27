@@ -259,7 +259,7 @@
           </div>
         </div>
         <div class="ddt-widget-body">
-          <div class="ddt-widget-category">${escapeHtml(tour.category)}</div>
+          <div class="ddt-widget-category">${escapeHtml((tour.category && typeof tour.category === 'object') ? (tour.category.name || '') : (tour.category || ''))}</div>
           <h3 class="ddt-widget-title" itemprop="name">
             <a href="${escapeHtml(trackingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(tour.name)}</a>
           </h3>
@@ -286,7 +286,7 @@
             </a>
           </div>
           <div class="ddt-widget-attribution">
-            Official Partner of <a href="${escapeHtml(tour.url)}?utm_source=${refParam}" target="_blank" rel="noopener">Dunes Discovery Tourism</a>
+            Official Partner of <a href="${escapeHtml(tour.url)}?utm_source=${refParam}" target="_blank" rel="noopener noreferrer">Dunes Discovery Tourism</a>
           </div>
         </div>
       </div>
@@ -314,7 +314,7 @@
       if (container.getAttribute('data-dunes-initialized') === 'true') return;
 
       var apiBase = container.getAttribute('data-api-base') || defaultApiBase;
-      var tourSlug = container.getAttribute('data-tour') || 'evening-desert-safari';
+      var tourSlug = container.getAttribute('data-dunes-tour') || container.getAttribute('data-tour') || 'evening-desert-safari-dubai';
       var partnerRef = container.getAttribute('data-partner') || '';
 
       var apiUrl = apiBase.replace(/\/+$/, '') + '/api/v1/syndication/tours?tour=' + encodeURIComponent(tourSlug);

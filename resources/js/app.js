@@ -722,8 +722,9 @@ Alpine.store('currency', {
             const aed = parseFloat(el.dataset.aed);
             if (isNaN(aed) || aed <= 0) return;
 
-            const isOld = el.classList.contains('text-decoration-line-through') || 
-                          el.classList.contains('old') || 
+            const isOld = el.classList.contains('text-decoration-line-through') ||
+                          el.classList.contains('line-through') ||
+                          el.classList.contains('old') ||
                           el.classList.contains('rc-old-price');
             const isAddon = el.dataset.isAddon === 'true' || el.textContent.trim().startsWith('+');
             const noSub = el.dataset.noSub === 'true' || isOld;
@@ -779,6 +780,17 @@ Alpine.store('currency', {
     }
 });
 
+function escapeHtml(val) {
+    return String(val ?? '').replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[ch]));
+}
+window.escapeHtml = escapeHtml;
+
 let _bodyScrollLocked = 0;
 function lockBodyScroll() {
     _bodyScrollLocked++;
@@ -811,6 +823,7 @@ Alpine.store('mobileNav', {
         if (sheet) sheet.classList.toggle('active', this.open);
     },
     close() {
+        if (!this.open) return;
         this.open = false;
         unlockBodyScroll();
         const sheet = document.getElementById('mobileSheet') || document.getElementById('mainOffcanvas');
@@ -866,14 +879,17 @@ Alpine.store('modal', {
             return;
         }
 
-        // Close any other active modal first
+        const hadActiveModal = Boolean(this.active);
+        // Close any other active modal first (keeping existing body scroll lock)
         if (this.active && this.active !== id) {
             this.close(false);
         }
 
         this.active = id;
         this.data = data;
-        lockBodyScroll();
+        if (!hadActiveModal) {
+            lockBodyScroll();
+        }
 
         const isOffcanvas = el.classList.contains('offcanvas');
 
@@ -895,6 +911,10 @@ Alpine.store('modal', {
             el.setAttribute('aria-modal', 'true');
             void el.offsetWidth; // Force CSS reflow for smooth fade transition
             el.classList.add('show', 'active');
+
+            if (id === 'compare' && Alpine.store('compare')) {
+                Alpine.store('compare').renderDrawer();
+            }
 
             // Modal-specific state initializers
             if (id === 'booking' && window.App) {
@@ -920,11 +940,14 @@ Alpine.store('modal', {
                         customCard.classList.remove('hidden', 'd-none');
                         const itemsEl = document.getElementById('customBuilderSummaryItems');
                         if (itemsEl) {
+                            const addonsText = data.customQuote.addons?.length
+                                ? data.customQuote.addons.map(a => `${escapeHtml(a.name)} (+AED ${escapeHtml(a.price)})`).join(', ')
+                                : 'None';
                             itemsEl.innerHTML = `
-                                <div><strong>Base Safari:</strong> ${data.customQuote.base_name} (AED ${data.customQuote.base_price}/guest)</div>
-                                <div><strong>Vehicle Transfer:</strong> ${data.customQuote.transfer_name} (${data.customQuote.transfer_price > 0 ? '+AED ' + data.customQuote.transfer_price : 'Included'})</div>
-                                <div><strong>Motorsports:</strong> ${data.customQuote.sports_name} (${data.customQuote.sports_price > 0 ? '+AED ' + data.customQuote.sports_price + (data.customQuote.sports_type === 'per_person' ? '/guest' : '') : 'Included'})</div>
-                                <div><strong>Addons:</strong> ${data.customQuote.addons?.length ? data.customQuote.addons.map(a => a.name + ' (+AED ' + a.price + ')').join(', ') : 'None'}</div>
+                                <div><strong>Base Safari:</strong> ${escapeHtml(data.customQuote.base_name)} (AED ${escapeHtml(data.customQuote.base_price)}/guest)</div>
+                                <div><strong>Vehicle Transfer:</strong> ${escapeHtml(data.customQuote.transfer_name)} (${data.customQuote.transfer_price > 0 ? '+AED ' + escapeHtml(data.customQuote.transfer_price) : 'Included'})</div>
+                                <div><strong>Motorsports:</strong> ${escapeHtml(data.customQuote.sports_name)} (${data.customQuote.sports_price > 0 ? '+AED ' + escapeHtml(data.customQuote.sports_price) + (data.customQuote.sports_type === 'per_person' ? '/guest' : '') : 'Included'})</div>
+                                <div><strong>Addons:</strong> ${addonsText}</div>
                             `;
                         }
                         const priceEl = document.getElementById('customBuilderSummaryPrice');
@@ -936,17 +959,18 @@ Alpine.store('modal', {
 
                     const tierCardsEl = document.getElementById('tierCards');
                     if (tierCardsEl) {
+                        const guestTotal = (parseInt(data.customQuote.adults, 10) || 1) + (parseInt(data.customQuote.children, 10) || 0);
                         tierCardsEl.innerHTML = `
-                            <div class="tier-card selected" data-tier="1" data-price="${quoteBasePrice}" data-price-type="per package" data-guest-count="${data.customQuote.adults + data.customQuote.children}" data-capacity="${data.customQuote.adults + data.customQuote.children}">
+                            <div class="tier-card selected" data-tier="1" data-price="${escapeHtml(quoteBasePrice)}" data-price-type="per package" data-guest-count="${guestTotal}" data-capacity="${guestTotal}">
                                 <div class="tier-popular-badge">Configured Spec</div>
                                 <div class="tier-card-inner">
                                     <div class="tier-card-info">
-                                        <h4>${data.customQuote.base_name}</h4>
-                                        <p>${data.customQuote.transfer_name} &bull; ${data.customQuote.sports_name}</p>
+                                        <h4>${escapeHtml(data.customQuote.base_name)}</h4>
+                                        <p>${escapeHtml(data.customQuote.transfer_name)} &bull; ${escapeHtml(data.customQuote.sports_name)}</p>
                                     </div>
                                     <div class="tier-card-right">
                                         <div class="tier-card-price">
-                                            <div class="current" data-aed="${quoteBasePrice}">AED ${quoteBasePrice.toFixed(2)}</div>
+                                            <div class="current" data-aed="${escapeHtml(quoteBasePrice)}">AED ${quoteBasePrice.toFixed(2)}</div>
                                         </div>
                                         <div class="tier-card-check"><i class="bi bi-check-lg"></i></div>
                                     </div>
@@ -1157,6 +1181,7 @@ Alpine.store('compare', {
         const tourData = this.getTourData(id);
         this.items.push(tourData || { id: id });
         this.save();
+        this.renderDrawer();
 
         const tourName = tourData ? tourData.name : 'Tour';
         if (window.App && typeof window.App.toast === 'function') {
@@ -1243,9 +1268,9 @@ Alpine.store('compare', {
 
         if (bar) {
             if (count > 0) {
-                bar.classList.remove('d-none');
+                bar.classList.remove('hidden', 'd-none');
             } else {
-                bar.classList.add('d-none');
+                bar.classList.add('hidden');
             }
         }
 
@@ -1271,13 +1296,13 @@ Alpine.store('compare', {
         const tableWrap = document.getElementById('compareTableWrapper');
 
         if (this.items.length === 0) {
-            if (emptyState) emptyState.classList.remove('d-none');
-            if (tableWrap) tableWrap.classList.add('d-none');
+            if (emptyState) emptyState.classList.remove('hidden', 'd-none');
+            if (tableWrap) tableWrap.classList.add('hidden');
             return;
         }
 
-        if (emptyState) emptyState.classList.add('d-none');
-        if (tableWrap) tableWrap.classList.remove('d-none');
+        if (emptyState) emptyState.classList.add('hidden');
+        if (tableWrap) tableWrap.classList.remove('hidden', 'd-none');
 
         const allTours = this.getAllTours();
         const selectedTours = this.items.map(i => allTours.find(x => String(x.id) === this.getId(i))).filter(Boolean);
@@ -1302,85 +1327,86 @@ Alpine.store('compare', {
         });
 
         selectedTours.forEach(tour => {
+            const safeTourId = parseInt(tour.id, 10) || 0;
             if (rowHeader) {
                 const th = document.createElement('th');
                 th.style.width = `${Math.floor(100 / (selectedTours.length + 1))}%`;
                 th.style.verticalAlign = 'top';
-                th.className = 'pb-3';
+                th.className = 'pb-3 px-2 align-top';
                 th.innerHTML = `
-                    <div class="position-relative mb-2 rounded-3 overflow-hidden" style="height: 120px;">
-                        <img src="${tour.thumb}" alt="${tour.name}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <button type="button" class="btn btn-sm btn-dark rounded-circle position-absolute top-0 end-0 m-1 p-0 d-flex align-items-center justify-content-center" style="width: 26px; height: 26px;" onclick="Alpine.store('compare').remove('${tour.id}')" title="Remove from comparison">
+                    <div class="relative mb-2 rounded-xl overflow-hidden" style="height: 120px;">
+                        <img src="${escapeHtml(tour.thumb)}" alt="${escapeHtml(tour.name)}" class="w-full h-full object-cover">
+                        <button type="button" class="absolute top-1.5 end-1.5 w-7 h-7 rounded-full bg-slate-900/85 hover:bg-rose-600 text-white flex items-center justify-center transition-colors cursor-pointer" onclick="Alpine.store('compare').remove('${safeTourId}')" title="Remove from comparison" aria-label="Remove from comparison">
                             <i class="bi bi-x"></i>
                         </button>
                     </div>
-                    <h6 class="fw-bold text-white mb-1 line-clamp-1">${tour.name}</h6>
-                    <small class="text-warning"><i class="bi bi-star-fill me-1"></i>${tour.rating} (480+ Reviews)</small>
+                    <h6 class="font-bold text-white text-xs sm:text-sm mb-1 line-clamp-1">${escapeHtml(tour.name)}</h6>
+                    <small class="text-amber-400 text-xs"><i class="bi bi-star-fill me-1"></i>${escapeHtml(tour.rating)} (480+ Reviews)</small>
                 `;
                 rowHeader.appendChild(th);
             }
 
             if (rowPrice) {
                 const tdPrice = document.createElement('td');
-                tdPrice.className = 'py-3';
-                tdPrice.innerHTML = `<span class="h5 fw-bold text-warning" data-aed="${tour.min_price}">AED ${Math.round(tour.min_price)}</span> <small class="text-white-50">/ person</small>`;
+                tdPrice.className = 'py-3 px-2';
+                tdPrice.innerHTML = `<span class="text-base font-black text-amber-400" data-aed="${escapeHtml(tour.min_price)}">AED ${Math.round(Number(tour.min_price) || 0)}</span> <small class="text-slate-400 text-xs">/ person</small>`;
                 rowPrice.appendChild(tdPrice);
             }
 
             if (rowDuration) {
                 const td = document.createElement('td');
-                td.className = 'py-3 text-light small';
+                td.className = 'py-3 px-2 text-slate-200 text-xs';
                 td.textContent = tour.duration;
                 rowDuration.appendChild(td);
             }
 
             if (rowVehicle) {
                 const td = document.createElement('td');
-                td.className = 'py-3 text-light small';
+                td.className = 'py-3 px-2 text-slate-200 text-xs';
                 td.textContent = tour.vehicle;
                 rowVehicle.appendChild(td);
             }
 
             if (rowDuneBashing) {
                 const td = document.createElement('td');
-                td.className = 'py-3 text-light small';
+                td.className = 'py-3 px-2 text-slate-200 text-xs';
                 td.textContent = tour.dune_bashing;
                 rowDuneBashing.appendChild(td);
             }
 
             if (rowDining) {
                 const td = document.createElement('td');
-                td.className = 'py-3 text-light small';
+                td.className = 'py-3 px-2 text-slate-200 text-xs';
                 td.textContent = tour.dining;
                 rowDining.appendChild(td);
             }
 
             if (rowShows) {
                 const td = document.createElement('td');
-                td.className = 'py-3 text-light small';
+                td.className = 'py-3 px-2 text-slate-200 text-xs';
                 td.textContent = tour.shows;
                 rowShows.appendChild(td);
             }
 
             if (rowInclusions) {
                 const td = document.createElement('td');
-                td.className = 'py-3 text-light small';
+                td.className = 'py-3 px-2 text-slate-200 text-xs';
                 td.textContent = tour.inclusions;
                 rowInclusions.appendChild(td);
             }
 
             if (rowCancellation) {
                 const td = document.createElement('td');
-                td.className = 'py-3 text-success small fw-bold';
+                td.className = 'py-3 px-2 text-emerald-400 text-xs font-bold';
                 td.innerHTML = '<i class="bi bi-check2-circle me-1"></i>100% Free Refund up to 24h prior';
                 rowCancellation.appendChild(td);
             }
 
             if (rowAction) {
                 const td = document.createElement('td');
-                td.className = 'py-3';
+                td.className = 'py-3 px-2';
                 td.innerHTML = `
-                    <button type="button" class="btn btn-desert-animated w-100 rounded-pill py-2 fw-bold text-nowrap small shadow-sm" onclick="Alpine.store('modal').close(); Alpine.store('modal').open('booking', { tourId: '${tour.id}' });">
+                    <button type="button" class="btn-desert-animated w-full rounded-full py-2.5 px-3 font-bold text-white text-xs whitespace-nowrap shadow-sm cursor-pointer inline-flex items-center justify-center gap-1" onclick="Alpine.store('modal').close(); Alpine.store('modal').open('booking', { tourId: '${safeTourId}' });">
                         <i class="bi bi-calendar-check me-1"></i> Book This Tour
                     </button>
                 `;
@@ -1451,7 +1477,7 @@ document.addEventListener('click', (e) => {
             }
             if (target === '#whatsappModal') {
                 e.preventDefault();
-                this.openWhatsApp(trigger.dataset?.tourName || '', '');
+                window.App?.openWhatsApp(modalTrigger.dataset?.tourName || '', '');
                 return;
             }
             if (target === '#legalModal') {
@@ -1497,8 +1523,11 @@ document.addEventListener('click', (e) => {
 // Listen for Escape key to close active modals or drawer
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        Alpine.store('modal').close();
-        Alpine.store('mobileNav').close();
+        const modalStore = Alpine.store('modal');
+        if (modalStore && modalStore.active && modalStore.active !== 'search') {
+            modalStore.close();
+        }
+        Alpine.store('mobileNav')?.close();
         const popover = document.querySelector('.global-popover-overlay');
         if (popover) popover.remove();
     }
@@ -1592,8 +1621,8 @@ const App = {
         t.innerHTML = `
             <div class="toast-icon">${icons[type] || icons.info}</div>
             <div class="toast-content">
-                <div class="toast-title">${titles[type] || 'Notice'}</div>
-                <p class="toast-message">${msg}</p>
+                <div class="toast-title">${escapeHtml(titles[type] || 'Notice')}</div>
+                <p class="toast-message">${escapeHtml(msg)}</p>
             </div>
             <button type="button" class="toast-close" aria-label="Close notification"><i class="bi bi-x-lg"></i></button>
         `;
@@ -3166,30 +3195,34 @@ const App = {
             });
         });
 
-        document.getElementById('calendarTrigger')?.addEventListener('click', () => {
-            try {
-                input.showPicker();
-            } catch (e) {
-                input.click();
-            }
-        });
+        if (wrapper.dataset.dateCardsBound !== '1') {
+            wrapper.dataset.dateCardsBound = '1';
 
-        document.getElementById('datePrev')?.addEventListener('click', () => {
-            wrapper.scrollBy({ left: -220, behavior: 'smooth' });
-        });
-        document.getElementById('dateNext')?.addEventListener('click', () => {
-            wrapper.scrollBy({ left: 220, behavior: 'smooth' });
-        });
+            document.getElementById('calendarTrigger')?.addEventListener('click', () => {
+                try {
+                    input.showPicker();
+                } catch (e) {
+                    input.click();
+                }
+            });
 
-        input.addEventListener('change', () => {
-            const val = input.value;
-            wrapper.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
-            const matchingCard = wrapper.querySelector(`.date-card[data-date="${val}"]`);
-            if (matchingCard) {
-                matchingCard.classList.add('selected');
-                matchingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-        });
+            document.getElementById('datePrev')?.addEventListener('click', () => {
+                wrapper.scrollBy({ left: -220, behavior: 'smooth' });
+            });
+            document.getElementById('dateNext')?.addEventListener('click', () => {
+                wrapper.scrollBy({ left: 220, behavior: 'smooth' });
+            });
+
+            input.addEventListener('change', () => {
+                const val = input.value;
+                wrapper.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+                const matchingCard = wrapper.querySelector(`.date-card[data-date="${val}"]`);
+                if (matchingCard) {
+                    matchingCard.classList.add('selected');
+                    matchingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            });
+        }
     },
 
     getFormattedPhone(input) {
@@ -3750,6 +3783,10 @@ const App = {
         validateStep1(false);
 
         tourSelect?.addEventListener('change', () => {
+            if (window.customBuilderQuote) {
+                validateStep1(false);
+                return;
+            }
             this.syncTourGuestRules(tourSelect.value);
             this.loadTiers(tourSelect.value);
             validateStep1(false);
@@ -3922,8 +3959,8 @@ const App = {
                         <i class="bi bi-geo-alt-fill text-xs"></i>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="font-extrabold text-slate-900 text-xs truncate leading-tight">${item.name}</div>
-                        <div class="text-[11px] font-medium text-slate-500 truncate mt-0.5">${item.detail || 'Dubai, United Arab Emirates'}</div>
+                        <div class="font-extrabold text-slate-900 text-xs truncate leading-tight">${escapeHtml(item.name)}</div>
+                        <div class="text-[11px] font-medium text-slate-500 truncate mt-0.5">${escapeHtml(item.detail || 'Dubai, United Arab Emirates')}</div>
                     </div>
                     <i class="bi bi-arrow-up-left text-slate-300 text-xs shrink-0"></i>
                 `;
@@ -4071,7 +4108,7 @@ const App = {
 
     initDraftAutoSave() {
         let draftTimer = null;
-        let activeDraftId = null;
+        this._activeDraftId = null;
 
         const triggerDraftSave = () => {
             clearTimeout(draftTimer);
@@ -4089,16 +4126,21 @@ const App = {
                     const children = document.getElementById('bookingChildren')?.value || 0;
                     const location = document.getElementById('bookingLocation')?.value;
                     const baseTotal = this.calculateBaseTotal();
+                    const draftTokenEl = document.getElementById('bookingDraftToken');
+                    const draftToken = draftTokenEl?.value || '';
 
                     try {
-                        const res = await fetch('/api/v1/booking/draft', {
+                        const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
+                        const res = await fetch('/booking/draft', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrf
                             },
                             body: JSON.stringify({
-                                draft_id: activeDraftId,
+                                draft_id: this._activeDraftId,
+                                draft_token: draftToken || undefined,
                                 name: name,
                                 email: email,
                                 phone: phone,
@@ -4113,8 +4155,20 @@ const App = {
                             })
                         });
                         const data = await res.json();
-                        if (data.success && data.draft_id) {
-                            activeDraftId = data.draft_id;
+                        if (data.success) {
+                            if (data.draft_id) this._activeDraftId = data.draft_id;
+                            if (data.draft_token) {
+                                const form = document.getElementById('bookingForm');
+                                let tokInp = document.getElementById('bookingDraftToken');
+                                if (!tokInp && form) {
+                                    tokInp = document.createElement('input');
+                                    tokInp.type = 'hidden';
+                                    tokInp.id = 'bookingDraftToken';
+                                    tokInp.name = 'draft_token';
+                                    form.appendChild(tokInp);
+                                }
+                                if (tokInp) tokInp.value = data.draft_token;
+                            }
                         }
                     } catch (e) {}
                 }
@@ -4236,6 +4290,13 @@ const App = {
         this.selectedAddons = [];
         this.updateTotal();
 
+        const reqSeq = (this._tiersReqSeq = (this._tiersReqSeq || 0) + 1);
+        if (this._tiersAbortController) {
+            try { this._tiersAbortController.abort(); } catch (e) {}
+        }
+        const abortController = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        this._tiersAbortController = abortController;
+
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
             const res = await fetch('/ajax.php', {
@@ -4244,9 +4305,11 @@ const App = {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: 'action=getTiers&tour_id=' + tourId + '&_token=' + encodeURIComponent(csrfToken)
+                body: 'action=getTiers&tour_id=' + encodeURIComponent(tourId) + '&_token=' + encodeURIComponent(csrfToken),
+                signal: abortController ? abortController.signal : undefined
             });
             const raw = await res.text();
+            if (reqSeq !== this._tiersReqSeq || window.customBuilderQuote) return;
             const data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
 
             if (data.tiers?.length) {
@@ -4262,17 +4325,17 @@ const App = {
                         else if (/(1|single|solo)/i.test(t.name || '')) guestCount = 1;
                         else guestCount = 1;
                     }
-                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-child-price="${t.child_price || 0}" data-name="${t.name}" data-price-type="${pType}" data-guest-count="${guestCount}" data-capacity="${guestCount}">
+                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${escapeHtml(t.id)}" data-price="${escapeHtml(t.price)}" data-child-price="${escapeHtml(t.child_price || 0)}" data-name="${escapeHtml(t.name)}" data-price-type="${escapeHtml(pType)}" data-guest-count="${guestCount}" data-capacity="${guestCount}">
                         ${t.is_popular ? '<div class="tier-popular-badge">Popular</div>' : ''}
                         <div class="tier-card-inner">
                             <div class="tier-card-info">
-                                <h4>${t.name}</h4>
-                                <p>${t.description || ''}</p>
+                                <h4>${escapeHtml(t.name)}</h4>
+                                <p>${escapeHtml(t.description || '')}</p>
                             </div>
                             <div class="tier-card-right">
                                 <div class="tier-card-price">
-                                    ${save ? `<div class="old" data-aed="${t.old_price}">AED ${t.old_price}</div>` : ''}
-                                    <div class="current" data-aed="${t.price}">AED ${t.price}</div>
+                                    ${save ? `<div class="old" data-aed="${escapeHtml(t.old_price)}">AED ${escapeHtml(t.old_price)}</div>` : ''}
+                                    <div class="current" data-aed="${escapeHtml(t.price)}">AED ${escapeHtml(t.price)}</div>
                                 </div>
                                 <div class="tier-card-check"><i class="bi bi-check-lg"></i></div>
                             </div>
@@ -4308,26 +4371,28 @@ const App = {
             if (data.addons?.length) {
                 let ah = '';
                 data.addons.forEach(a => {
-                    const iconName = a.icon ? (a.icon.startsWith('bi-') ? a.icon : 'bi-' + a.icon) : 'bi-plus-circle';
+                    const rawIcon = String(a.icon || 'bi-plus-circle').replace(/[^a-zA-Z0-9\s\-_]/g, '');
+                    const iconName = rawIcon ? (rawIcon.startsWith('bi-') ? rawIcon : 'bi-' + rawIcon) : 'bi-plus-circle';
                     const visualHtml = a.image 
-                        ? `<img src="/images/${a.image}" alt="${a.name}" class="w-8 h-8 rounded-xl object-cover shrink-0 border border-orange-200/60 shadow-2xs" loading="lazy">`
+                        ? `<img src="/images/${escapeHtml(a.image)}" alt="${escapeHtml(a.name)}" class="w-8 h-8 rounded-xl object-cover shrink-0 border border-orange-200/60 shadow-2xs" loading="lazy">`
                         : `<div class="w-8 h-8 rounded-xl bg-orange-50 text-primary border border-orange-200/60 flex items-center justify-center shrink-0 text-sm"><i class="${iconName}"></i></div>`;
                     const priceType = (a.price_type || 'per_person').toLowerCase();
                     const priceTypeLabel = priceType === 'per_person' ? '/guest' : '/booking';
-                    ah += `<div class="addon-card-horizontal group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-primary/60 hover:shadow-md transition-all cursor-pointer select-none shrink-0" data-addon="${a.id}" data-price="${a.price}" data-price-type="${priceType}">
-                        <input type="checkbox" name="addons[]" value="${a.id}" class="sr-only">
+                    const parsedPrice = parseFloat(a.price) || 0;
+                    ah += `<div class="addon-card-horizontal group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-primary/60 hover:shadow-md transition-all cursor-pointer select-none shrink-0" data-addon="${escapeHtml(a.id)}" data-price="${parsedPrice}" data-price-type="${escapeHtml(priceType)}">
+                        <input type="checkbox" name="addons[]" value="${escapeHtml(a.id)}" class="sr-only">
                         <div class="addon-check-abs hidden absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-500 text-white items-center justify-center text-[10px] font-black shadow-2xs">
                             <i class="bi bi-check-lg"></i>
                         </div>
                         <div>
                             <div class="flex items-center gap-2.5 mb-2 pr-6">
                                 ${visualHtml}
-                                <h5 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-tight truncate" title="${a.name}">${a.name}</h5>
+                                <h5 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-tight truncate" title="${escapeHtml(a.name)}">${escapeHtml(a.name)}</h5>
                             </div>
-                            <p class="text-[11px] text-slate-500 font-medium line-clamp-2 mb-3 leading-relaxed min-h-[32px]">${a.description || 'Optional safari enhancement'}</p>
+                            <p class="text-[11px] text-slate-500 font-medium line-clamp-2 mb-3 leading-relaxed min-h-[32px]">${escapeHtml(a.description || 'Optional safari enhancement')}</p>
                         </div>
                         <div class="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
-                            <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 font-black text-xs font-mono border border-slate-200/80 shadow-2xs" data-aed="${a.price}" data-is-addon="true">+AED ${parseFloat(a.price).toFixed(2)}${priceTypeLabel}</span>
+                            <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 font-black text-xs font-mono border border-slate-200/80 shadow-2xs"><span data-aed="${parsedPrice}" data-is-addon="true">+AED ${parsedPrice.toFixed(2)}</span>${priceTypeLabel}</span>
                             <span class="addon-status-label inline-flex items-center gap-1 text-[11px] font-extrabold text-primary bg-orange-50 hover:bg-orange-100 border border-orange-200/80 px-2.5 py-0.5 rounded-full transition-all">+ Add</span>
                         </div>
                     </div>`;
@@ -4373,6 +4438,7 @@ const App = {
                 if (addons) addons.style.display = 'none';
             }
         } catch (e) {
+            if (e && e.name === 'AbortError') return;
             container.innerHTML = '<div class="tier-placeholder text-danger"><i class="bi bi-exclamation-circle me-2"></i>Error loading packages</div>';
         }
     },
@@ -4775,6 +4841,9 @@ const App = {
         this.selectedTier = null;
         this.selectedPrice = 0;
         this.selectedAddons = [];
+        this._activeDraftId = null;
+        const draftTokenEl = document.getElementById('bookingDraftToken');
+        if (draftTokenEl) draftTokenEl.value = '';
         this.syncTourGuestRules(null);
         this._pendingSubmitAfterOtp = null;
         window.pendingPromoCode = null;
@@ -4922,19 +4991,24 @@ const App = {
                 e.preventDefault();
 
                 const isContactForm = form.id === 'contactForm';
-                const errEl = isContactForm ? document.getElementById('contactErrorMessage') : document.getElementById('bookingError');
+                const isWhatsappForm = form.id === 'whatsappForm' || form.id === 'whatsappModalForm';
+                const errEl = isContactForm
+                    ? document.getElementById('contactErrorMessage')
+                    : (isWhatsappForm ? document.getElementById('waError') : document.getElementById('bookingError'));
                 const contactErrBanner = isContactForm ? document.getElementById('contactErrorAlert') : null;
                 const contactOkBanner = isContactForm ? document.getElementById('contactSuccessAlert') : null;
-                const showFormError = (msgHtml) => {
+                const showFormError = (msgText) => {
+                    const lines = Array.isArray(msgText) ? msgText : [String(msgText ?? '')];
+                    const safeHtml = lines.map(line => escapeHtml(line)).join('<br>');
                     if (isContactForm && contactErrBanner && errEl) {
-                        errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + msgHtml;
+                        errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + safeHtml;
                         contactErrBanner.classList.remove('hidden');
                         contactErrBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     } else if (errEl) {
-                        errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + msgHtml;
+                        errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + safeHtml;
                         errEl.classList.remove('hidden', 'd-none');
                     } else {
-                        this.toast(msgHtml, 'error');
+                        this.toast(lines.join(' '), 'error');
                     }
                 };
 
@@ -5131,27 +5205,25 @@ const App = {
                     }
 
                     // Google reCAPTCHA Enterprise
-                    if ((action === 'booking' || action === 'contact' || action === 'logWhatsApp') && window.RECAPTCHA_SITE_KEY) {
+                    const recaptchaKey = window.RECAPTCHA_SITE_KEY || window.DunesConfig?.recaptcha_site_key || '';
+                    if ((action === 'booking' || action === 'contact' || action === 'logWhatsApp') && recaptchaKey) {
                         try {
                             if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha.enterprise || typeof window.grecaptcha.enterprise.execute !== 'function') {
                                 await new Promise((resolve, reject) => {
                                     const s = document.createElement('script');
-                                    s.src = 'https://www.google.com/recaptcha/enterprise.js?render=' + window.RECAPTCHA_SITE_KEY;
+                                    s.src = 'https://www.google.com/recaptcha/enterprise.js?render=' + encodeURIComponent(recaptchaKey);
                                     s.async = true;
-                                    s.onload = resolve;
-                                    s.onerror = reject;
+                                    const timeoutId = setTimeout(() => reject(new Error('reCAPTCHA load timeout')), 6000);
+                                    s.onload = () => { clearTimeout(timeoutId); resolve(); };
+                                    s.onerror = (err) => { clearTimeout(timeoutId); reject(err); };
                                     document.head.appendChild(s);
                                 });
                             }
                             await new Promise(r => window.grecaptcha.enterprise.ready(r));
-                            const token = await window.grecaptcha.enterprise.execute(window.RECAPTCHA_SITE_KEY, { action });
+                            const token = await window.grecaptcha.enterprise.execute(recaptchaKey, { action });
                             fd.set('g-recaptcha-response', token);
                         } catch (e) {
-                            console.error('ReCaptcha error:', e);
-                            if (!isContactForm) {
-                                showFormError('Security verification failed. Please refresh and try again.');
-                                return;
-                            }
+                            console.warn('ReCaptcha notice:', e);
                         }
                     }
 
@@ -5171,7 +5243,13 @@ const App = {
                     try { data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim()); } catch (e) { data = null; }
 
                     if (!data) {
-                        showFormError(isContactForm ? 'Could not submit your inquiry right now. Please refresh and try again.' : 'Payment could not be initiated. Please try again.');
+                        showFormError(
+                            isContactForm
+                                ? 'Could not submit your inquiry right now. Please refresh and try again.'
+                                : (isWhatsappForm
+                                    ? 'Could not initiate WhatsApp chat right now. Please try again.'
+                                    : 'Booking could not be processed right now. Please try again.')
+                        );
                         return;
                     }
 
@@ -5267,8 +5345,11 @@ const App = {
 
                         let msg = data.message || 'An error occurred';
                         if (data.errors && typeof data.errors === 'object') {
-                            const errorList = Object.values(data.errors).flat();
-                            if (errorList.length > 0) msg = errorList.join('<br>');
+                            const errorList = Object.values(data.errors).flat().map(String);
+                            if (errorList.length > 0) {
+                                showFormError(errorList);
+                                return;
+                            }
                         }
                         showFormError(msg);
                     }
@@ -5319,42 +5400,7 @@ const App = {
             });
         });
 
-        // Dedicated Safari Customizer & Modal Guest Quantity Increment / Decrement
-        const bindCounter = (minusId, plusId, countId, min, max, onChange) => {
-            const minusBtn = document.getElementById(minusId);
-            const plusBtn = document.getElementById(plusId);
-            const countEl = document.getElementById(countId);
-            if (!minusBtn || !plusBtn) return;
-
-            minusBtn.addEventListener('click', () => {
-                let current = parseInt(countEl?.innerText || countEl?.value || '1');
-                if (current > min) {
-                    current--;
-                    if (countEl) {
-                        if (countEl.innerText !== undefined) countEl.innerText = current;
-                        if (countEl.value !== undefined) countEl.value = current;
-                    }
-                    if (typeof onChange === 'function') onChange(current);
-                }
-            });
-
-            plusBtn.addEventListener('click', () => {
-                let current = parseInt(countEl?.innerText || countEl?.value || '1');
-                if (current < max) {
-                    current++;
-                    if (countEl) {
-                        if (countEl.innerText !== undefined) countEl.innerText = current;
-                        if (countEl.value !== undefined) countEl.value = current;
-                    }
-                    if (typeof onChange === 'function') onChange(current);
-                }
-            });
-        };
-
-        bindCounter('customizerAdultsMinus', 'customizerAdultsPlus', 'customizerAdultsCount', 1, 30);
-        bindCounter('customizerChildrenMinus', 'customizerChildrenPlus', 'customizerChildrenCount', 0, 20);
-        bindCounter('modalAdultsMinus', 'modalAdultsPlus', 'modalAdultsCount', 1, 30);
-        bindCounter('modalChildrenMinus', 'modalChildrenPlus', 'modalChildrenCount', 0, 20);
+        // Note: Customizer page owns #customizerAdultsPlus/#customizerAdultsMinus/#customizerChildrenPlus/#customizerChildrenMinus handlers directly
     },
 
     initFAQ() {
@@ -6043,22 +6089,6 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
                 promo: promoCode
             });
         }
-        if (targetTourId) {
-            const tourSelect = document.getElementById('bookingTour');
-            if (tourSelect) {
-                tourSelect.value = targetTourId;
-                tourSelect.dispatchEvent(new Event('change'));
-            }
-        }
-        if (promoCode) {
-            const promoInput = document.getElementById('bookingPromoCode');
-            if (promoInput) {
-                promoInput.value = promoCode;
-                if (typeof window.validateCurrentPromo === 'function') {
-                    setTimeout(() => window.validateCurrentPromo(), 300);
-                }
-            }
-        }
     },
 
     get waUrl() {
@@ -6101,66 +6131,96 @@ Alpine.data('safariMatcherQuiz', (config = {}) => ({
         }
     },
 
+    resolveTourBySlug(slug, fallbackId) {
+        const catalog = Alpine.store('compare')?.getAllTours?.() || [];
+        const match = catalog.find(t => String(t.slug) === String(slug));
+        return match ? {
+            tourId: String(match.id),
+            price: match.min_price ? ('AED ' + Math.round(Number(match.min_price))) : null,
+            duration: match.duration || null,
+            title: match.name || null
+        } : { tourId: String(fallbackId), price: null, duration: null, title: null };
+    },
+
     calculateMatch() {
         if (this.answers.type === 'quad_buggy') {
+            const slug = this.answers.style === 'thrill' ? 'dune-buggy-rental-dubai' : 'desert-safari-quad-biking-dubai';
+            const resolved = this.resolveTourBySlug(slug, slug === 'dune-buggy-rental-dubai' ? '8' : '4');
             this.matchedTour = {
-                title: 'Can-Am Dune Buggy & Quad Safari',
+                title: resolved.title || 'Can-Am Dune Buggy & Quad Safari',
                 category: 'Motorsports',
-                duration: '4-5 Hours',
+                duration: resolved.duration || '4-5 Hours',
                 rating: '4.9 (850+ Reviews)',
                 desc: 'Self-drive powerful 1000cc Can-Am Turbo or 400cc ATV quad bikes across open high red dunes with professional lead marshal.',
-                price: 'AED 350',
-                tourId: '3'
+                price: resolved.price || 'AED 350',
+                tourId: resolved.tourId
+            };
+        } else if (this.answers.type === 'city') {
+            const slug = this.answers.style === 'luxury' ? 'abu-dhabi-city-tour-from-dubai' : 'dubai-city-tour';
+            const resolved = this.resolveTourBySlug(slug, slug === 'abu-dhabi-city-tour-from-dubai' ? '6' : '5');
+            this.matchedTour = {
+                title: resolved.title || 'Dubai City Tour & Iconic Landmarks',
+                category: 'City Tours',
+                duration: resolved.duration || '5-8 Hours',
+                rating: '4.9 (780+ Reviews)',
+                desc: 'Guided sightseeing across iconic UAE architecture, Burj Khalifa viewpoints, Palm Jumeirah, heritage souks, or Sheikh Zayed Grand Mosque.',
+                price: resolved.price || 'AED 130',
+                tourId: resolved.tourId
             };
         } else if (this.answers.type === 'water') {
+            const resolved = this.resolveTourBySlug('dhow-cruise-catamaran-cruise-dinner-dubai', '7');
             this.matchedTour = {
-                title: 'Dubai Marina Luxury Dhow Cruise Dinner',
+                title: resolved.title || 'Dubai Marina Luxury Dhow Cruise Dinner',
                 category: 'Cruises',
-                duration: '3 Hours',
+                duration: resolved.duration || '3 Hours',
                 rating: '4.8 (640+ Reviews)',
                 desc: 'Glide past illuminated skyscrapers of Dubai Marina and JBR on a glass-enclosed luxury catamaran with 5-star international buffet.',
-                price: 'AED 150',
-                tourId: '6'
+                price: resolved.price || 'AED 150',
+                tourId: resolved.tourId
             };
         } else if (this.answers.time === 'morning') {
+            const resolved = this.resolveTourBySlug('morning-desert-safari-dubai', '2');
             this.matchedTour = {
-                title: 'Morning Desert Safari with Camel Trek',
+                title: resolved.title || 'Morning Desert Safari with Camel Trek',
                 category: 'Morning Safari',
-                duration: '4 Hours',
+                duration: resolved.duration || '4 Hours',
                 rating: '4.8 (720+ Reviews)',
                 desc: 'Enjoy crisp morning desert air, soft red sunrise dunes, thrilling dune bashing, sandboarding, and traditional camel riding.',
-                price: 'AED 130',
-                tourId: '4'
+                price: resolved.price || 'AED 130',
+                tourId: resolved.tourId
             };
         } else if (this.answers.time === 'overnight') {
+            const resolved = this.resolveTourBySlug('overnight-desert-safari-dubai', '3');
             this.matchedTour = {
-                title: 'Overnight Stargazing Safari & Camp',
+                title: resolved.title || 'Overnight Stargazing Safari & Camp',
                 category: 'Overnight Glamping',
-                duration: '18 Hours',
+                duration: resolved.duration || '18 Hours',
                 rating: '4.9 (410+ Reviews)',
                 desc: 'Full evening desert safari followed by private Bedouin tent stay, night campfire stargazing, and fresh cooked morning breakfast.',
-                price: 'AED 350',
-                tourId: '5'
+                price: resolved.price || 'AED 798',
+                tourId: resolved.tourId
             };
         } else if (this.answers.style === 'luxury') {
+            const resolved = this.resolveTourBySlug('evening-desert-safari-dubai', '1');
             this.matchedTour = {
                 title: 'VIP Luxury Desert Safari with Table Service',
                 category: 'VIP Luxury',
-                duration: '6-7 Hours',
+                duration: resolved.duration || '6-7 Hours',
                 rating: '4.9 (980+ Reviews)',
                 desc: 'Private 4x4 Land Cruiser hotel pickup, VIP elevated stage-side table, dedicated private waiter service, and premium BBQ dinner.',
                 price: 'AED 250',
-                tourId: '2'
+                tourId: resolved.tourId
             };
         } else {
+            const resolved = this.resolveTourBySlug('evening-desert-safari-dubai', '1');
             this.matchedTour = {
-                title: 'Premium Evening Desert Safari Dubai',
+                title: resolved.title || 'Evening Desert Safari Dubai',
                 category: 'Desert Safari',
-                duration: '6-7 Hours',
+                duration: resolved.duration || '6-7 Hours',
                 rating: '4.9 (1,200+ Reviews)',
                 desc: "Dubai's flagship red dunes experience with extreme dune bashing, camel riding, sandboarding, 5-star live BBQ dinner and 3 cultural shows.",
-                price: 'AED 150',
-                tourId: '1'
+                price: resolved.price || 'AED 79',
+                tourId: resolved.tourId
             };
         }
     },
@@ -6204,7 +6264,14 @@ Alpine.data('customSafariModal', (config = {}) => ({
     get total() {
         let baseTotal = this.base.price * this.adults;
         let transferTotal = (this.transfer.type === 'flat') ? this.transfer.price : (this.transfer.price * this.adults);
-        let sportsTotal = (this.sports.type === 'flat') ? this.sports.price : (this.sports.price * this.adults);
+        let sportsTotal = 0;
+        if (this.sports.price > 0) {
+            if (this.sports.type === 'flat' && /buggy|1000cc/i.test(this.sports.name || '')) {
+                sportsTotal = this.sports.price * Math.max(1, Math.ceil(this.adults / 2));
+            } else {
+                sportsTotal = (this.sports.type === 'flat') ? this.sports.price : (this.sports.price * this.adults);
+            }
+        }
         let addonsTotal = 0;
         this.addons.forEach(a => {
             addonsTotal += (a.type === 'flat') ? a.price : (a.price * this.adults);
@@ -6230,7 +6297,7 @@ Alpine.data('customSafariModal', (config = {}) => ({
             sports_name: this.sports.name,
             sports_price: this.sports.price,
             sports_type: this.sports.type,
-            addons: this.addons.map(a => ({ key: a.key, name: a.name, price: a.price, type: a.type })),
+            addons: this.addons.map(a => ({ id: a.key, key: a.key, name: a.name, price: a.price, type: a.type })),
             adults: this.adults,
             children: 0,
             subtotal: this.total,
@@ -6260,7 +6327,6 @@ Alpine.data('customSafariModal', (config = {}) => ({
             const tourSelect = document.getElementById('bookingTour');
             if (tourSelect && this.base.tourId) {
                 tourSelect.value = this.base.tourId;
-                tourSelect.dispatchEvent(new Event('change'));
             }
             const adultsInput = document.getElementById('bookingAdults');
             if (adultsInput) adultsInput.value = this.adults;
@@ -6487,6 +6553,10 @@ Alpine.data('globalSearchModal', (config = {}) => ({
     selectCategory(slug) {
         this.categoryFilter = slug;
         this.selectedIndex = -1;
+        if (slug === 'all') {
+            this.serverResults = [];
+            this.serverQuery = '';
+        }
     },
 
     clearQuery() {
@@ -6553,17 +6623,18 @@ Alpine.data('globalSearchModal', (config = {}) => ({
 
     highlightMatch(text) {
         if (!text) return '';
+        const safeText = escapeHtml(text);
         const q = this.query.trim();
-        if (q.length < 2) return text;
+        if (q.length < 2) return safeText;
 
-        const words = q.split(/\s+/).filter(w => w.length > 1).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-        if (words.length === 0) return text;
+        const words = q.split(/\s+/).filter(w => w.length > 1).map(w => escapeHtml(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        if (words.length === 0) return safeText;
 
         try {
             const regex = new RegExp('(' + words.join('|') + ')', 'gi');
-            return text.replace(regex, '<mark class="bg-amber-100 text-orange-950 font-black px-0.5 rounded">$1</mark>');
+            return safeText.replace(regex, '<mark class="bg-amber-100 text-orange-950 font-black px-0.5 rounded">$1</mark>');
         } catch (e) {
-            return text;
+            return safeText;
         }
     }
 }));

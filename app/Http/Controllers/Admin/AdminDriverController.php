@@ -9,6 +9,7 @@ use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdminDriverController extends Controller
 {
@@ -66,7 +67,7 @@ class AdminDriverController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'license_number' => 'nullable|string|max:100',
-            'phone' => 'required|string|max:50|unique:drivers,phone',
+            'phone' => ['required', 'string', 'max:50', Rule::unique('drivers', 'phone')->whereNull('deleted_at')],
             'email' => 'nullable|email|max:255',
             'photo' => $request->hasFile('photo') ? 'image|mimes:jpeg,png,jpg,webp,avif|max:3072' : 'nullable|string|max:500',
             'languages' => 'nullable|array',
@@ -163,7 +164,7 @@ class AdminDriverController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'license_number' => 'nullable|string|max:100',
-            'phone' => 'required|string|max:50|unique:drivers,phone,' . $id,
+            'phone' => ['required', 'string', 'max:50', Rule::unique('drivers', 'phone')->ignore($id)->whereNull('deleted_at')],
             'email' => 'nullable|email|max:255',
             'photo' => $request->hasFile('photo') ? 'image|mimes:jpeg,png,jpg,webp,avif|max:3072' : 'nullable|string|max:500',
             'languages' => 'nullable|array',
@@ -176,6 +177,10 @@ class AdminDriverController extends Controller
             'rating' => 'nullable|numeric|min:1|max:5',
             'notes' => 'nullable|string|max:1000',
         ]);
+
+        if ($request->boolean('languages_submitted') && ! $request->has('languages')) {
+            $data['languages'] = [];
+        }
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
@@ -194,10 +199,15 @@ class AdminDriverController extends Controller
             $data['photo'] = ltrim(trim($request->input('photo')), '/');
         }
 
+        $oldVehicleId = $driver->default_vehicle_id;
         $driver->update($data);
 
-        if (!empty($data['default_vehicle_id'])) {
-            Vehicle::where('id', $data['default_vehicle_id'])->update(['default_driver_id' => $driver->id]);
+        $newVehicleId = $data['default_vehicle_id'] ?? null;
+        if ($oldVehicleId && (string) $oldVehicleId !== (string) $newVehicleId) {
+            Vehicle::where('id', $oldVehicleId)->where('default_driver_id', $driver->id)->update(['default_driver_id' => null]);
+        }
+        if (! empty($newVehicleId)) {
+            Vehicle::where('id', $newVehicleId)->update(['default_driver_id' => $driver->id]);
         }
 
         return redirect()->route('admin.drivers.index')->with('success', "Driver {$driver->name} updated successfully.");
@@ -245,8 +255,14 @@ class AdminDriverController extends Controller
     public function runSheet($id, Request $request)
     {
         $driver = Driver::with(['defaultVehicle'])->findOrFail($id);
-        $date = $request->input('date', now()->format('Y-m-d'));
-        $targetDate = Carbon::parse($date);
+        $date = (string) $request->input('date', now()->format('Y-m-d'));
+        try {
+            $targetDate = Carbon::parse($date)->startOfDay();
+            $date = $targetDate->format('Y-m-d');
+        } catch (\Throwable) {
+            $targetDate = now()->startOfDay();
+            $date = $targetDate->format('Y-m-d');
+        }
 
         $bookings = Booking::with(['tour', 'tier', 'addons', 'vehicle'])
             ->where('driver_id', $driver->id)

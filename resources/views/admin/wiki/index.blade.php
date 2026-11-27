@@ -111,14 +111,14 @@
                                             <span class="px-1.5 py-0.5 rounded-sm bg-amber-50 border border-amber-200 text-amber-700 text-[9px] font-bold">Featured</span>
                                         @endif
                                     </div>
-                                    <div class="text-[11px] text-slate-400 font-mono">/wiki/{{ $a->pillar->slug }}/{{ $a->slug }}</div>
+                                    <div class="text-[11px] text-slate-400 font-mono">/wiki/{{ $a->pillar?->slug ?? 'uncategorized' }}/{{ $a->slug }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="py-3.5 px-4">
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                                <i class="bi {{ $a->pillar->icon ?: 'bi-compass' }}"></i>
-                                {{ $a->pillar->name }}
+                                <i class="bi {{ $a->pillar?->icon ?: 'bi-compass' }}"></i>
+                                {{ $a->pillar?->name ?? 'Unassigned' }}
                             </span>
                         </td>
                         <td class="py-3.5 px-4 text-center">
@@ -137,9 +137,11 @@
                         </td>
                         <td class="py-3.5 px-4 text-right pe-4">
                             <div class="flex items-center justify-end gap-1.5">
+                                @if($a->pillar)
                                 <a href="{{ localized_route('wiki.article', ['pillarSlug' => $a->pillar->slug, 'articleSlug' => $a->slug]) }}" target="_blank" class="p-1.5 text-slate-400 hover:text-primary transition" title="View Public Page">
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
+                                @endif
                                 <a href="{{ route('admin.wiki.articles.edit', $a->id) }}" class="p-1.5 text-slate-400 hover:text-amber-600 transition" title="Edit Article">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>

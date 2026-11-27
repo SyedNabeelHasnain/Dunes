@@ -134,24 +134,41 @@
     </div>
 
     <!-- Main Tabs -->
-    <div x-data="{ currentTab: '{{ $tab === 'headers' ? 'headers' : (request()->has('appeals_page') || $appealStatus !== 'all' ? 'appeals' : 'rules') }}' }" class="space-y-4">
+    @php
+        $initialTab = in_array($tab, ['headers', 'spam', 'verified_emails'])
+            ? $tab
+            : (request()->has('appeals_page') || $appealStatus !== 'all'
+                ? 'appeals'
+                : (request()->has('spam_page')
+                    ? 'spam'
+                    : (request()->has('verified_page') || request()->filled('verified_search') ? 'verified_emails' : 'rules')));
+    @endphp
+    <div x-data="{ currentTab: '{{ $initialTab }}' }" class="space-y-4">
         <!-- Tab Pill Navigation -->
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
             <div class="flex flex-wrap items-center gap-2">
                 <button type="button" @click="currentTab = 'rules'" :class="currentTab === 'rules' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
                     <i class="bi bi-sliders"></i> IP Access Rules
-                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">{{ $rules->total() }}</span>
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono" :class="currentTab === 'rules' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'">{{ $rules->total() }}</span>
                 </button>
                 <button type="button" @click="currentTab = 'appeals'" :class="currentTab === 'appeals' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
                     <i class="bi bi-envelope-paper-fill"></i> Unblock Review Requests
                     @if($stats['pending_appeals'] > 0)
                         <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-white font-bold animate-pulse">{{ $stats['pending_appeals'] }}</span>
                     @else
-                        <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono">{{ $unblockRequests->total() }}</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono" :class="currentTab === 'appeals' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'">{{ $unblockRequests->total() }}</span>
                     @endif
                 </button>
                 <button type="button" @click="currentTab = 'headers'" :class="currentTab === 'headers' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
                     <i class="bi bi-shield-check"></i> HTTP Security Headers &amp; CSP
+                </button>
+                <button type="button" @click="currentTab = 'spam'" :class="currentTab === 'spam' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
+                    <i class="bi bi-bug-fill"></i> Spam Shield Events
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono" :class="currentTab === 'spam' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'">{{ $stats['spam_events_count'] ?? 0 }}</span>
+                </button>
+                <button type="button" @click="currentTab = 'verified_emails'" :class="currentTab === 'verified_emails' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
+                    <i class="bi bi-patch-check-fill"></i> Verified Emails
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono" :class="currentTab === 'verified_emails' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'">{{ $stats['verified_emails_count'] ?? 0 }}</span>
                 </button>
             </div>
 
@@ -264,6 +281,23 @@
 
                                 <td class="py-3.5 px-4 text-right pe-4 whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-1.5">
+                                        @php
+                                            $rulePayload = [
+                                                'id' => $rule->id,
+                                                'ip_address' => $rule->ip_address,
+                                                'ip_mask' => $rule->ip_mask,
+                                                'mode' => $rule->mode,
+                                                'status' => $rule->status,
+                                                'label' => $rule->label ?? '',
+                                                'reason' => $rule->reason ?? '',
+                                                'update_url' => route('admin.security.ip-rules.update', $rule->id),
+                                            ];
+                                        @endphp
+                                        <!-- Edit Rule -->
+                                        <button type="button" data-rule="{{ json_encode($rulePayload) }}" onclick="openEditRuleModal(JSON.parse(this.dataset.rule))" class="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition cursor-pointer" title="Edit IP Rule">
+                                            <i class="bi bi-pencil-square text-primary"></i>
+                                        </button>
+
                                         <!-- Toggle Mode (Block vs Ignore) -->
                                         <form method="POST" action="{{ route('admin.security.ip-rules.toggle-mode', $rule->id) }}">
                                             @csrf
@@ -488,6 +522,161 @@
                 </form>
             </div>
         </div>
+
+        <!-- ==================== TAB 4: SPAM SHIELD EVENTS ==================== -->
+        <div x-show="currentTab === 'spam'" x-cloak class="space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-sm font-extrabold text-slate-900">Contact &amp; Form Spam Shield Telemetry</h2>
+                    <p class="text-xs text-slate-500">Blocked, quarantined, and auto-firewall-banned bot submissions intercepted by the multi-layer spam guard.</p>
+                </div>
+                <form method="POST" action="{{ route('admin.security.spam-events.purge') }}" onsubmit="return confirm('Purge matching spam event telemetry logs?')" class="flex items-center gap-2 shrink-0">
+                    @csrf
+                    <select name="days" class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
+                        <option value="30">Older than 30 days</option>
+                        <option value="7">Older than 7 days</option>
+                        <option value="90">Older than 90 days</option>
+                        <option value="0">Purge ALL logs</option>
+                    </select>
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition cursor-pointer">
+                        <i class="bi bi-trash3"></i> Purge Logs
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                <th class="py-3 px-4">Timestamp</th>
+                                <th class="py-3 px-4">Channel &amp; IP</th>
+                                <th class="py-3 px-4">Sender Snippet</th>
+                                <th class="py-3 px-4 text-center">Score</th>
+                                <th class="py-3 px-4">Action</th>
+                                <th class="py-3 px-4">Triggered Signals</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse($spamEvents ?? [] as $ev)
+                            <tr class="hover:bg-slate-50/60 transition-colors">
+                                <td class="py-3 px-4 whitespace-nowrap text-[11px] text-slate-500">
+                                    {{ $ev->created_at ? $ev->created_at->format('M d, Y H:i') : 'N/A' }}
+                                </td>
+                                <td class="py-3 px-4 whitespace-nowrap">
+                                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold uppercase text-[10px]">{{ $ev->channel ?: 'contact' }}</span>
+                                    <div class="font-mono font-bold text-slate-900 mt-1">{{ $ev->ip_address ?: '—' }}</div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="font-bold text-slate-800">{{ $ev->email ?: ($ev->name_snippet ?: 'Anonymous') }}</div>
+                                    @if($ev->subject_snippet)
+                                        <div class="text-[11px] text-slate-500 line-clamp-1">{{ $ev->subject_snippet }}</div>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="px-2 py-0.5 rounded-full font-mono font-black text-[11px] {{ ($ev->spam_score ?? 0) >= 80 ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800' }}">
+                                        {{ (int) ($ev->spam_score ?? 0) }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 whitespace-nowrap">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-900 text-white">{{ str_replace('_', ' ', (string) ($ev->action_taken ?: 'blocked')) }}</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="flex flex-wrap gap-1 max-w-md">
+                                        @foreach((array) ($ev->reasons ?? []) as $reasonTag)
+                                            <span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-mono text-[10px]">{{ $reasonTag }}</span>
+                                        @endforeach
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-10 text-slate-400 text-xs">
+                                    <i class="bi bi-shield-check text-2xl text-slate-300 block mb-2"></i>
+                                    No spam shield events logged yet.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if(isset($spamEvents) && $spamEvents->hasPages())
+                <div class="p-4 border-t border-slate-100 bg-white">
+                    {{ $spamEvents->appends(array_merge(request()->query(), ['tab' => 'spam']))->links() }}
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- ==================== TAB 5: VERIFIED CUSTOMER EMAILS ==================== -->
+        <div x-show="currentTab === 'verified_emails'" x-cloak class="space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <form method="GET" action="{{ route('admin.security.ip-rules') }}" class="flex items-center gap-2">
+                    <input type="hidden" name="tab" value="verified_emails">
+                    <input type="text" name="verified_search" value="{{ $verifiedEmailSearch ?? '' }}" placeholder="Search verified email..." class="w-60 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 outline-hidden focus:border-primary">
+                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold cursor-pointer">Search</button>
+                    @if(!empty($verifiedEmailSearch))
+                        <a href="{{ route('admin.security.ip-rules', ['tab' => 'verified_emails']) }}" class="text-xs font-bold text-slate-500 hover:text-slate-800">Reset</a>
+                    @endif
+                </form>
+
+                <form method="POST" action="{{ route('admin.security.verified-emails.store') }}" class="flex flex-wrap items-center gap-2">
+                    @csrf
+                    <input type="email" name="email" required placeholder="customer@example.com" class="w-64 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-mono text-slate-800 outline-hidden focus:border-primary">
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition cursor-pointer">
+                        <i class="bi bi-patch-check-fill"></i> Manually Verify Email
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                <th class="py-3 px-4">Email Address</th>
+                                <th class="py-3 px-4">Verified At</th>
+                                <th class="py-3 px-4 text-right pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse($verifiedEmails ?? [] as $ve)
+                            <tr class="hover:bg-slate-50/60 transition-colors">
+                                <td class="py-3 px-4 font-mono font-bold text-slate-900">{{ $ve->email }}</td>
+                                <td class="py-3 px-4 text-slate-500 text-[11px]">
+                                    {{ $ve->verified_at ? $ve->verified_at->format('M d, Y H:i') : 'N/A' }}
+                                    @if($ve->verified_at)
+                                        <span class="text-slate-400">({{ $ve->verified_at->diffForHumans() }})</span>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-4 text-right pe-4 whitespace-nowrap">
+                                    <form method="POST" action="{{ route('admin.security.verified-emails.destroy', $ve->id) }}" onsubmit="return confirm('Revoke OTP verification for {{ $ve->email }}? They will be asked to re-verify on next submission.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition cursor-pointer">
+                                            <i class="bi bi-x-circle"></i> Revoke
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center py-10 text-slate-400 text-xs">
+                                    <i class="bi bi-envelope-check text-2xl text-slate-300 block mb-2"></i>
+                                    No verified customer emails found.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if(isset($verifiedEmails) && $verifiedEmails->hasPages())
+                <div class="p-4 border-t border-slate-100 bg-white">
+                    {{ $verifiedEmails->appends(array_merge(request()->query(), ['tab' => 'verified_emails']))->links() }}
+                </div>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 
@@ -564,6 +753,58 @@
     </div>
 </div>
 
+<!-- Edit Rule Modal -->
+<div id="editRuleModal" onclick="if(event.target === this) closeEditRuleModal()" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 max-w-lg w-full shadow-2xl relative">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-5">
+            <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="bi bi-pencil-square text-primary"></i> Edit IP Rule: <code id="editRuleIpDisplay" class="font-mono text-sm text-primary"></code>
+            </h3>
+            <button type="button" onclick="closeEditRuleModal()" class="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">&times;</button>
+        </div>
+
+        <form id="editRuleForm" method="POST" action="" class="space-y-4">
+            @csrf
+            @method('PUT')
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label for="edit_rule_mode" class="block text-xs font-bold text-slate-700 mb-1">Rule Mode <span class="text-rose-500">*</span></label>
+                    <select id="edit_rule_mode" name="mode" required class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-900 outline-hidden focus:border-primary">
+                        <option value="ignore_analytics">Ignore Analytics</option>
+                        <option value="block">Block Access (Firewall)</option>
+                        <option value="monitor">Monitor Only</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="edit_rule_status" class="block text-xs font-bold text-slate-700 mb-1">Status <span class="text-rose-500">*</span></label>
+                    <select id="edit_rule_status" name="status" required class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-900 outline-hidden focus:border-primary">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="edit_rule_label" class="block text-xs font-bold text-slate-700 mb-1">Friendly Label / Identity</label>
+                <input type="text" id="edit_rule_label" name="label" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 outline-hidden focus:border-primary">
+            </div>
+
+            <div>
+                <label for="edit_rule_reason" class="block text-xs font-bold text-slate-700 mb-1">Reason / Notes</label>
+                <textarea id="edit_rule_reason" name="reason" rows="3" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 outline-hidden focus:border-primary"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeEditRuleModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">Cancel</button>
+                <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-dark shadow-md transition cursor-pointer">
+                    <i class="bi bi-check-circle-fill"></i> Update Rule
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 function openAddRuleModal() {
@@ -573,8 +814,25 @@ function openAddRuleModal() {
 function closeAddRuleModal() {
     document.getElementById('addRuleModal').classList.add('hidden');
 }
+function openEditRuleModal(rule) {
+    const form = document.getElementById('editRuleForm');
+    form.action = rule.update_url;
+    document.getElementById('editRuleIpDisplay').textContent = rule.ip_address + (rule.ip_mask ? '/' + rule.ip_mask : '');
+    document.getElementById('edit_rule_mode').value = rule.mode || 'ignore_analytics';
+    document.getElementById('edit_rule_status').value = rule.status || 'active';
+    document.getElementById('edit_rule_label').value = rule.label || '';
+    document.getElementById('edit_rule_reason').value = rule.reason || '';
+    document.getElementById('editRuleModal').classList.remove('hidden');
+    document.getElementById('edit_rule_label')?.focus();
+}
+function closeEditRuleModal() {
+    document.getElementById('editRuleModal').classList.add('hidden');
+}
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeAddRuleModal();
+    if (e.key === 'Escape') {
+        closeAddRuleModal();
+        closeEditRuleModal();
+    }
 });
 
 async function purgeLogsForIp(ip) {

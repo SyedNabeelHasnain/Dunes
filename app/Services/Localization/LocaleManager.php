@@ -9,12 +9,24 @@ use Illuminate\Support\Facades\Log;
 class LocaleManager
 {
     /**
+     * Validate and normalize locale code to strictly [a-z]{2}(-[a-z]{2})? preventing path traversal.
+     */
+    protected function assertValidCode(string|Language $locale): string
+    {
+        $code = strtolower(trim($locale instanceof Language ? (string) $locale->code : $locale));
+        if (! preg_match('/^[a-z]{2}(?:-[a-z]{2})?$/', $code)) {
+            throw new \InvalidArgumentException("Invalid locale code [{$code}].");
+        }
+
+        return $code;
+    }
+
+    /**
      * Build the complete locale ecosystem for a given language code or Language model.
      */
     public function buildLocale(string|Language $locale): bool
     {
-        $code = $locale instanceof Language ? $locale->code : (string) $locale;
-        $code = strtolower(trim($code));
+        $code = $this->assertValidCode($locale);
         $langDir = base_path('lang/'.$code);
 
         File::ensureDirectoryExists($langDir);
@@ -24,12 +36,7 @@ class LocaleManager
         if (! File::exists($uiFilePath)) {
             $baseUiPath = base_path('lang/en/ui.php');
             if (File::exists($baseUiPath)) {
-                $presetPath = base_path('lang/ar/ui.php');
-                if ($code === 'ar' && File::exists($presetPath)) {
-                    // Already exists or preset available
-                } else {
-                    File::copy($baseUiPath, $uiFilePath);
-                }
+                File::copy($baseUiPath, $uiFilePath);
             } else {
                 File::put($uiFilePath, "<?php\n\nreturn [\n    // UI translations for {$code}\n];\n");
             }
@@ -70,21 +77,23 @@ class LocaleManager
      */
     public function removeLocale(string|Language $locale): bool
     {
-        $code = $locale instanceof Language ? $locale->code : (string) $locale;
-        $code = strtolower(trim($code));
+        $code = $this->assertValidCode($locale);
 
         if ($code === 'en') {
             throw new \InvalidArgumentException('Default English (en) locale cannot be removed.');
         }
 
+        $langRoot = realpath(base_path('lang'));
         $langDir = base_path('lang/'.$code);
-        if (File::isDirectory($langDir)) {
-            File::deleteDirectory($langDir);
+        $realLangDir = realpath($langDir);
+        if ($langRoot && $realLangDir && File::isDirectory($realLangDir) && str_starts_with($realLangDir, $langRoot . DIRECTORY_SEPARATOR)) {
+            File::deleteDirectory($realLangDir);
         }
 
         $jsonFilePath = base_path('lang/'.$code.'.json');
-        if (File::exists($jsonFilePath)) {
-            File::delete($jsonFilePath);
+        $realJson = realpath($jsonFilePath);
+        if ($langRoot && $realJson && File::exists($realJson) && str_starts_with($realJson, $langRoot . DIRECTORY_SEPARATOR)) {
+            File::delete($realJson);
         }
 
         Language::clearLanguageCache();
@@ -99,8 +108,11 @@ class LocaleManager
      */
     public function isLocaleBuilt(string|Language $locale): bool
     {
-        $code = $locale instanceof Language ? $locale->code : (string) $locale;
-        $code = strtolower(trim($code));
+        try {
+            $code = $this->assertValidCode($locale);
+        } catch (\InvalidArgumentException) {
+            return false;
+        }
         $langDir = base_path('lang/'.$code);
         $uiFile = $langDir.'/ui.php';
 

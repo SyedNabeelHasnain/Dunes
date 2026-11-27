@@ -68,6 +68,10 @@ class ApprovalWorkflowService
             throw new InvalidArgumentException("Approval #{$approval->id} is not pending review.");
         }
 
+        if ($approval->requested_by !== null && (int) $approval->requested_by === (int) $reviewer->id) {
+            throw new InvalidArgumentException('Requesters cannot approve their own change proposal.');
+        }
+
         $payload = is_array($approval->payload) ? $approval->payload : [];
 
         return DB::transaction(function () use ($approval, $reviewer, $notes, $payload) {
@@ -107,6 +111,10 @@ class ApprovalWorkflowService
     {
         if (! $reviewer->hasAnyPermission(['governance.approve', '*'])) {
             throw new InvalidArgumentException('Reviewer lacks approval permission.');
+        }
+
+        if ($approval->status !== 'pending_review') {
+            throw new InvalidArgumentException("Approval #{$approval->id} is not pending review.");
         }
 
         $approval->update([
@@ -179,11 +187,22 @@ class ApprovalWorkflowService
         $statusCode = (int) ($payload['status_code'] ?? 301);
         $target = $statusCode === 410 ? '' : trim((string) ($payload['target_path'] ?? ''));
 
+        if ($statusCode !== 410 && $target !== '') {
+            if (! str_starts_with($target, '/') && ! filter_var($target, FILTER_VALIDATE_URL)) {
+                throw new InvalidArgumentException('Invalid redirect target URL.');
+            }
+            $loopError = app(RedirectManagerService::class)->detectLoopOrChain($source, $target, null, $statusCode);
+            if ($loopError !== null) {
+                throw new InvalidArgumentException($loopError);
+            }
+        }
+
         RedirectRule::updateOrCreate(
-            ['source_path' => $source, 'is_active' => true],
+            ['source_path' => $source],
             [
                 'target_path' => $target,
                 'status_code' => $statusCode,
+                'is_active' => true,
                 'notes' => $payload['notes'] ?? null,
                 'source_type' => $payload['source_type'] ?? 'approved',
                 'created_by' => $payload['created_by'] ?? null,

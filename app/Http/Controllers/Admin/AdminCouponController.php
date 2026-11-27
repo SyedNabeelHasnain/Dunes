@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdminCouponController extends Controller
 {
@@ -92,7 +93,7 @@ class AdminCouponController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|max:50|unique:coupons,code',
+            'code' => ['required', 'string', 'max:50', Rule::unique('coupons', 'code')->whereNull('deleted_at')],
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'discount_type' => 'required|in:percentage,fixed,per_person',
@@ -177,7 +178,7 @@ class AdminCouponController extends Controller
         $coupon = Coupon::findOrFail($id);
 
         $request->validate([
-            'code' => 'required|string|max:50|unique:coupons,code,'.$coupon->id,
+            'code' => ['required', 'string', 'max:50', Rule::unique('coupons', 'code')->ignore($coupon->id)->whereNull('deleted_at')],
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'discount_type' => 'required|in:percentage,fixed,per_person',
@@ -242,6 +243,21 @@ class AdminCouponController extends Controller
         $coupon = Coupon::findOrFail($id);
         $code = $coupon->code;
         $coupon->delete();
+
+        if (in_array($code, ['DUNESWELCOME', 'FIRST25'], true)) {
+            Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => '0']);
+            Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => '0']);
+            Setting::updateOrCreate(['setting_key' => 'welcome_popup_active'], ['setting_value' => '0']);
+            Setting::updateOrCreate(['setting_key' => 'promo_welcome_modal_enabled'], ['setting_value' => '0']);
+        } elseif ($code === 'MATCH5') {
+            Setting::updateOrCreate(['setting_key' => 'concierge_promo_active'], ['setting_value' => '0']);
+        } elseif ($code === 'SAVE5') {
+            Setting::updateOrCreate(['setting_key' => 'exit_intent_promo_active'], ['setting_value' => '0']);
+        }
+        Cache::forget('site_settings_cache');
+        Cache::forget('site_home_cache');
+        Cache::forget('featured_active_coupons');
+        app(SettingsService::class)->clearCache();
 
         return redirect()->route('admin.coupons.index')->with('success', "Coupon {$code} archived successfully.");
     }
@@ -415,6 +431,25 @@ class AdminCouponController extends Controller
      */
     public function updatePopupSettings(Request $request)
     {
+        $request->validate([
+            'welcome_popup_discount' => 'nullable|numeric|min:0|max:100',
+            'welcome_popup_timer_mins' => 'nullable|integer|min:1|max:1440',
+            'welcome_popup_delay_sec' => 'nullable|integer|min:0|max:300',
+            'welcome_popup_headline' => 'nullable|string|max:255',
+            'welcome_popup_subheadline' => 'nullable|string|max:500',
+            'top_promo_banner_text' => 'nullable|string|max:255',
+            'top_promo_banner_code' => 'nullable|string|max:50',
+            'top_promo_banner_badge' => 'nullable|string|max:80',
+            'concierge_promo_discount' => 'nullable|numeric|min:0|max:100',
+            'concierge_promo_code' => 'nullable|string|max:50',
+            'exit_intent_promo_discount' => 'nullable|numeric|min:0|max:100',
+            'exit_intent_promo_code' => 'nullable|string|max:50',
+            'social_proof_source' => 'nullable|in:all,bookings_only,custom_only',
+            'social_proof_initial_delay' => 'nullable|integer|min:0|max:300',
+            'social_proof_duration' => 'nullable|integer|min:1|max:60',
+            'social_proof_interval' => 'nullable|integer|min:1|max:300',
+        ]);
+
         $allowed = [
             'welcome_popup_active',
             'welcome_popup_discount',

@@ -54,6 +54,18 @@ class ProfileController extends Controller
             ], 'userDeletion');
         }
 
+        if ($user->normalizedRole() === \App\Models\User::ROLE_SUPER_ADMIN) {
+            $otherSuperAdmins = \App\Models\User::where('role', \App\Models\User::ROLE_SUPER_ADMIN)
+                ->where('is_active', true)
+                ->where('id', '!=', $user->id)
+                ->count();
+            if ($otherSuperAdmins === 0) {
+                return Redirect::route('profile.edit')->withErrors([
+                    'password' => 'Cannot delete the last active Super Administrator account.',
+                ], 'userDeletion');
+            }
+        }
+
         Auth::logout();
 
         $user->delete();

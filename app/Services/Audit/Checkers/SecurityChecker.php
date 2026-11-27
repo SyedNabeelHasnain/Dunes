@@ -103,12 +103,11 @@ class SecurityChecker implements AuditCheckerInterface
                     'recommended_action' => 'Verify SecurityHeaders middleware and Security > HTTP Security Headers policy.',
                 ];
             }
-            break;
         }
 
         // 5. Production Cron Token Advisory
         if ($appEnv === 'production') {
-            $cronToken = trim((string) (Config::get('services.cron.secret') ?: env('CRON_SECRET_TOKEN', '')));
+            $cronToken = trim((string) Config::get('services.cron.secret_token', ''));
             if ($cronToken === '' || $cronToken === 'dunes_cron_2026') {
                 $issues[] = [
                     'category' => 'security',

@@ -15,7 +15,7 @@ class RedirectManagerService
      * Resolves incoming URL path against active dynamic redirects.
      * Returns array ['target' => string, 'status' => int] or null.
      */
-    public function resolve(string $rawPath): ?array
+    public function resolve(string $rawPath, bool $recordHit = true): ?array
     {
         $normalized = RedirectRule::normalizePath($rawPath);
         $map = $this->getActiveMap();
@@ -35,11 +35,18 @@ class RedirectManagerService
             $maxHops = 5;
 
             while ($hops < $maxHops) {
+                if (str_starts_with($target, 'http://') || str_starts_with($target, 'https://')) {
+                    $targetHost = strtolower((string) parse_url($target, PHP_URL_HOST));
+                    $appHost = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
+                    if ($targetHost !== '' && $appHost !== '' && preg_replace('/^www\./', '', $targetHost) !== preg_replace('/^www\./', '', $appHost)) {
+                        break;
+                    }
+                }
                 $nextNormalized = RedirectRule::normalizePath($target);
                 if (isset($map[$nextNormalized]) && (int) $map[$nextNormalized]['status_code'] !== 410) {
                     if (isset($visited[$nextNormalized])) {
-                        // Loop detected in chain; break out to prevent infinite redirect
-                        break;
+                        // Loop detected in chain; refuse to emit an infinite redirect
+                        return null;
                     }
                     $visited[$nextNormalized] = true;
                     $target = (string) $map[$nextNormalized]['target_path'];
@@ -50,13 +57,15 @@ class RedirectManagerService
             }
         }
 
-        // Asynchronously or safely update hit count
-        try {
-            DB::table('redirect_rules')
-                ->where('id', $ruleData['id'])
-                ->increment('hit_count', 1, ['last_hit_at' => now()]);
-        } catch (\Throwable $e) {
-            // Non-blocking
+        // Asynchronously or safely update hit count (skipped during admin dry-run simulator tests)
+        if ($recordHit) {
+            try {
+                DB::table('redirect_rules')
+                    ->where('id', $ruleData['id'])
+                    ->increment('hit_count', 1, ['last_hit_at' => now()]);
+            } catch (\Throwable $e) {
+                // Non-blocking
+            }
         }
 
         return [
@@ -69,8 +78,13 @@ class RedirectManagerService
     /**
      * Detects redirect loops or chained hops before saving a rule.
      */
-    public function detectLoopOrChain(string $sourcePath, ?string $targetPath, ?int $ignoreId = null, int $statusCode = 301): array
-    {
+    public function detectLoopOrChain(
+        string $sourcePath,
+        ?string $targetPath,
+        ?int $ignoreId = null,
+        int $statusCode = 301,
+        ?\Illuminate\Support\Collection $preloadedRules = null
+    ): array {
         if ($statusCode === 410) {
             return [
                 'is_loop' => false,
@@ -82,7 +96,23 @@ class RedirectManagerService
         }
 
         $source = RedirectRule::normalizePath($sourcePath);
-        $target = RedirectRule::normalizePath((string) $targetPath);
+        $rawTarget = trim((string) $targetPath);
+
+        if (str_starts_with($rawTarget, 'http://') || str_starts_with($rawTarget, 'https://')) {
+            $targetHost = strtolower((string) parse_url($rawTarget, PHP_URL_HOST));
+            $appHost = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
+            if ($targetHost !== '' && $appHost !== '' && preg_replace('/^www\./', '', $targetHost) !== preg_replace('/^www\./', '', $appHost)) {
+                return [
+                    'is_loop' => false,
+                    'is_chain' => false,
+                    'final_target' => $rawTarget,
+                    'hops' => [$source, $rawTarget],
+                    'message' => 'Clean external redirect.',
+                ];
+            }
+        }
+
+        $target = RedirectRule::normalizePath($rawTarget);
 
         if ($source === $target) {
             return [
@@ -94,11 +124,15 @@ class RedirectManagerService
             ];
         }
 
-        $query = RedirectRule::where('is_active', true);
-        if ($ignoreId) {
-            $query->where('id', '!=', $ignoreId);
+        if ($preloadedRules !== null) {
+            $existingRules = $preloadedRules->filter(fn ($r) => ! $ignoreId || (int) $r->id !== $ignoreId);
+        } else {
+            $query = RedirectRule::where('is_active', true);
+            if ($ignoreId) {
+                $query->where('id', '!=', $ignoreId);
+            }
+            $existingRules = $query->get()->keyBy(fn ($r) => RedirectRule::normalizePath($r->source_path));
         }
-        $existingRules = $query->get()->keyBy(fn ($r) => RedirectRule::normalizePath($r->source_path));
 
         $visited = [$source => true];
         $current = $target;
@@ -114,9 +148,22 @@ class RedirectManagerService
             }
 
             if (isset($existingRules[$current])) {
+                if ((int) $existingRules[$current]->status_code === 410) {
+                    break;
+                }
                 $isChain = true;
                 $visited[$current] = true;
-                $next = RedirectRule::normalizePath($existingRules[$current]->target_path);
+                $nextRaw = trim((string) $existingRules[$current]->target_path);
+                if (str_starts_with($nextRaw, 'http://') || str_starts_with($nextRaw, 'https://')) {
+                    $nextHost = strtolower((string) parse_url($nextRaw, PHP_URL_HOST));
+                    $appHost = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
+                    if ($nextHost !== '' && $appHost !== '' && preg_replace('/^www\./', '', $nextHost) !== preg_replace('/^www\./', '', $appHost)) {
+                        $chain[] = $nextRaw;
+                        $finalTarget = $nextRaw;
+                        break;
+                    }
+                }
+                $next = RedirectRule::normalizePath($nextRaw);
                 $chain[] = $next;
                 $finalTarget = $next;
                 $current = $next;

@@ -21,9 +21,10 @@ trait NormalizesLocalizedInputs
     }
 
     /**
-     * Normalize translatable fields in array so they accept either array or string.
+     * Normalize translatable fields in array so they accept either array or string,
+     * preserving untouched locales on an existing model when updating.
      */
-    protected function normalizeLocalizedData(array $data, array $translatableFields): array
+    protected function normalizeLocalizedData(array $data, array $translatableFields, ?\Illuminate\Database\Eloquent\Model $existingModel = null): array
     {
         foreach ($translatableFields as $field) {
             $arField = $field.'_ar';
@@ -31,23 +32,41 @@ trait NormalizesLocalizedInputs
                 continue;
             }
 
+            $existing = [];
+            if ($existingModel && method_exists($existingModel, 'getTranslations')) {
+                $existing = $existingModel->getTranslations($field);
+            }
+
             $val = $data[$field];
             if (is_array($val)) {
                 if (array_key_exists($arField, $data) && is_string($data[$arField]) && ! array_key_exists('ar', $val)) {
                     $val['ar'] = $data[$arField];
                 }
-                $nonEmpty = array_filter($val, fn ($v) => $v !== null && $v !== '');
-                // If English key missing, assign from first available non-empty translation
-                if (empty($val['en']) && ! empty($nonEmpty)) {
-                    $firstKey = array_key_first($nonEmpty);
-                    $val['en'] = $nonEmpty[$firstKey];
+                $merged = $existing;
+                foreach ($val as $loc => $v) {
+                    if ($v !== null && $v !== '') {
+                        $merged[$loc] = $v;
+                    } elseif ($loc !== 'en') {
+                        unset($merged[$loc]);
+                    }
                 }
-                $data[$field] = $val;
+                $nonEmpty = array_filter($merged, fn ($v) => $v !== null && $v !== '');
+                // If English key missing, assign from first available non-empty translation
+                if (empty($merged['en']) && ! empty($nonEmpty)) {
+                    $firstKey = array_key_first($nonEmpty);
+                    $merged['en'] = $nonEmpty[$firstKey];
+                }
+                $data[$field] = $merged;
             } elseif (is_string($val)) {
-                // Backward compatibility: single string maps to English default (+ optional _ar companion)
-                $normalized = ['en' => $val];
+                // Backward compatibility: single string updates English (+ optional _ar companion) while preserving other locales
+                $normalized = $existing;
+                $normalized['en'] = $val;
                 if (array_key_exists($arField, $data) && is_string($data[$arField])) {
-                    $normalized['ar'] = $data[$arField];
+                    if ($data[$arField] !== '') {
+                        $normalized['ar'] = $data[$arField];
+                    } else {
+                        unset($normalized['ar']);
+                    }
                 }
                 $data[$field] = $normalized;
             }

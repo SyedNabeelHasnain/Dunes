@@ -134,10 +134,10 @@
           },
           "author": {
             "@type": "Person",
-            "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+            "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
           },
-          "datePublished": {!! json_encode($rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : date('Y-m-d'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "reviewBody": {!! json_encode(Str::limit($rev->review_text ?: 'Incredible desert safari experience with Dunes Discovery Tourism.', 200), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+          "datePublished": {!! json_encode($rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : date('Y-m-d'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "reviewBody": {!! json_encode(Str::limit($rev->review_text ?: 'Incredible desert safari experience with Dunes Discovery Tourism.', 200), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
         }{{ $loop->last ? '' : ',' }}
         @endforeach
       ]@endif

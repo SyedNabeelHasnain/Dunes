@@ -192,13 +192,13 @@
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-100 text-xs">
                         <thead class="bg-slate-50 text-slate-600 font-bold">
-                            <tr><th class="px-4 py-3 text-left">Referrer URL</th><th class="px-4 py-3 text-right">Visits (30d)</th></tr>
+                            <tr><th class="px-4 py-3 text-left">Referrer URL</th><th class="px-4 py-3 text-right">Visits ({{ $days }}d)</th></tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @forelse($aiReferrals as $ref)
                                 <tr><td class="px-4 py-2.5 font-mono text-[11px]">{{ $ref->referrer_url }}</td><td class="px-4 py-2.5 text-right font-bold">{{ $ref->visits }}</td></tr>
                             @empty
-                                <tr><td colspan="2" class="px-6 py-6 text-center text-slate-500">No external AI platform referral hits recorded in the last 30 days.</td></tr>
+                                <tr><td colspan="2" class="px-6 py-6 text-center text-slate-500">No external AI platform referral hits recorded in the last {{ $days }} days.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -226,6 +226,9 @@
                         <div class="p-6 text-center text-xs text-slate-500">No manual AI citation observations logged yet.</div>
                     @endforelse
                 </div>
+                @if($observations instanceof \Illuminate\Pagination\AbstractPaginator && $observations->hasPages())
+                    <div class="px-4 py-3 border-t border-slate-100">{{ $observations->links() }}</div>
+                @endif
             </div>
         </div>
     </div>

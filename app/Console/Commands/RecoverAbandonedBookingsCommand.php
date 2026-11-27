@@ -64,6 +64,16 @@ class RecoverAbandonedBookingsCommand extends Command
             ->where('email', 'not like', '%@guest.local')
             ->get();
 
+        $candidateEmails = $bookings->pluck('email')->filter()->unique()->values();
+        $completedByEmail = $candidateEmails->isNotEmpty()
+            ? Booking::whereIn('email', $candidateEmails)
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->where('created_at', '>=', $startTime)
+                ->select('email', 'created_at')
+                ->get()
+                ->groupBy(fn ($b) => strtolower(trim((string) $b->email)))
+            : collect();
+
         $count = 0;
         foreach ($bookings as $booking) {
             if (! filter_var($booking->email, FILTER_VALIDATE_EMAIL)) {
@@ -78,10 +88,9 @@ class RecoverAbandonedBookingsCommand extends Command
             }
 
             // Exclude if customer has already completed another booking subsequently
-            $hasCompletedOther = Booking::where('email', $booking->email)
-                ->whereIn('status', ['confirmed', 'completed'])
-                ->where('created_at', '>=', $booking->created_at)
-                ->exists();
+            $emailKey = strtolower(trim((string) $booking->email));
+            $hasCompletedOther = ($completedByEmail->get($emailKey) ?? collect())
+                ->contains(fn ($c) => $c->created_at && $booking->created_at && $c->created_at->gte($booking->created_at));
 
             if ($hasCompletedOther) {
                 continue;

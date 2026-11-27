@@ -19,7 +19,10 @@ class ConfigAuditService
         'token',
         'api_key',
         'apikey',
+        'auth_key',
+        'access_key',
         'private_key',
+        'credential',
         'webhook_secret',
         'smtp_pass',
     ];

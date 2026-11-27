@@ -24,6 +24,7 @@ class SetLocale
         if ($request->is('admin*') || $request->is('api*') || $request->is('ajax*')) {
             App::setLocale('en');
             Carbon::setLocale('en');
+            $this->clearLocaleUrlDefault();
             view()->share('currentLocale', 'en');
             view()->share('isRtl', false);
             view()->share('textDir', 'ltr');
@@ -33,11 +34,12 @@ class SetLocale
 
         $segment1 = $request->segment(1);
 
-        // Rule 1: English is root default. Any request to /en or /en/* gets 301-redirected to / or /*
+        // Rule 1: English is root default. Any request to /en or /en/* gets 301-redirected to / or /* (safe against /\evil.com open redirect)
         if ($segment1 === 'en') {
             $segments = $request->segments();
             array_shift($segments);
-            $targetPath = '/'.implode('/', $segments);
+            $safeRest = ltrim(str_replace('\\', '', implode('/', $segments)), '/');
+            $targetPath = '/' . $safeRest;
             $queryString = $request->getQueryString();
             $targetUrl = $targetPath.($queryString ? '?'.$queryString : '');
 
@@ -65,7 +67,8 @@ class SetLocale
                 $knownInactiveLocales = ['fr', 'de', 'zh', 'pt', 'nl', 'tr', 'pl', 'ja', 'ko', 'hi', 'ur', 'fa', 'he', 'id', 'ms', 'th', 'vi', 'sv', 'no', 'da', 'fi', 'el', 'cs', 'ro', 'hu', 'uk'];
                 if (count($segments) > 1 || in_array($segment1, $knownInactiveLocales, true)) {
                     array_shift($segments);
-                    $targetPath = empty($segments) ? '/' : '/'.implode('/', $segments);
+                    $safeRest = ltrim(str_replace('\\', '', implode('/', $segments)), '/');
+                    $targetPath = $safeRest === '' ? '/' : '/'.$safeRest;
                     $queryString = $request->getQueryString();
 
                     return redirect($targetPath.($queryString ? '?'.$queryString : ''), 301);
@@ -84,6 +87,8 @@ class SetLocale
 
         if ($currentLocale !== 'en') {
             URL::defaults(['locale' => $currentLocale]);
+        } else {
+            $this->clearLocaleUrlDefault();
         }
 
         if (! InternalHttpProbeService::isProbing() && $request->hasSession()) {
@@ -101,5 +106,22 @@ class SetLocale
         view()->share('activeLanguages', $activeLanguages);
 
         return $next($request);
+    }
+
+    private function clearLocaleUrlDefault(): void
+    {
+        $defaults = URL::getDefaultParameters();
+        if (! array_key_exists('locale', $defaults)) {
+            return;
+        }
+
+        unset($defaults['locale']);
+        $urlGenerator = app('url');
+        $reset = \Closure::bind(function (array $params): void {
+            if (is_object($this->routeGenerator)) {
+                $this->routeGenerator->defaultParameters = $params;
+            }
+        }, $urlGenerator, \Illuminate\Routing\UrlGenerator::class);
+        $reset($defaults);
     }
 }

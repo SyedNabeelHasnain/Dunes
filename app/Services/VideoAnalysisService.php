@@ -102,8 +102,8 @@ class VideoAnalysisService
             'data' => [
                 'video_filename' => $videoFilename,
                 'poster_filename' => $posterWebp,
-                'poster_url' => asset('images/video-posters/' . $posterWebp),
-                'poster_jpg_url' => asset('images/video-posters/' . $posterJpg),
+                'poster_url' => File::exists($webpPath) ? asset('images/video-posters/' . $posterWebp) : null,
+                'poster_jpg_url' => File::exists($jpgPath) ? asset('images/video-posters/' . $posterJpg) : null,
                 'title' => $nlpData['title'],
                 'reviewer_name' => $nlpData['reviewer_name'],
                 'reviewer_country' => $nlpData['reviewer_country'],
@@ -148,21 +148,12 @@ class VideoAnalysisService
                 File::makeDirectory($reviewsDir, 0755, true, true);
             }
 
-            // Check if identical video already exists on disk or in media_assets
+            // Check if identical video already exists in indexed media_assets
             $matchedExisting = null;
             if ($hash) {
                 $assetMatch = \App\Models\MediaAsset::where('file_hash', $hash)->where('media_type', 'video')->first();
                 if ($assetMatch && File::exists(public_path($assetMatch->file_path))) {
                     $matchedExisting = public_path($assetMatch->file_path);
-                }
-
-                if (! $matchedExisting && File::exists($reviewsDir)) {
-                    foreach (File::files($reviewsDir) as $existingFile) {
-                        if (@hash_file('sha256', $existingFile->getRealPath()) === $hash) {
-                            $matchedExisting = $existingFile->getRealPath();
-                            break;
-                        }
-                    }
                 }
             }
 
@@ -178,8 +169,11 @@ class VideoAnalysisService
             }
 
             $origName = pathinfo($videoInput->getClientOriginalName(), PATHINFO_FILENAME);
-            $ext = strtolower($videoInput->getClientOriginalExtension() ?: 'mp4');
-            $baseSlug = $customSlug ?: (Str::slug($origName) ?: 'customer-review') . '-' . time();
+            $allowedVideoExts = ['mp4', 'mov', 'webm', 'm4v'];
+            $rawExt = strtolower($videoInput->getClientOriginalExtension() ?: 'mp4');
+            $ext = in_array($rawExt, $allowedVideoExts, true) ? $rawExt : 'mp4';
+            $safeCustomSlug = $customSlug ? Str::slug($customSlug) : '';
+            $baseSlug = $safeCustomSlug ?: (Str::slug($origName) ?: 'customer-review') . '-' . time();
             $targetFilename = $baseSlug . '.' . $ext;
 
             $targetPath = $reviewsDir . DIRECTORY_SEPARATOR . $targetFilename;
@@ -200,9 +194,19 @@ class VideoAnalysisService
             ];
         }
 
-        // String input (existing filename from library or relative path)
-        $cleanInput = trim($videoInput);
-        $cleanInput = str_replace(['\\', 'public/'], ['/', ''], $cleanInput);
+        // String input (existing filename from library or relative path) — strictly jailed to public/videos & public/media
+        $cleanInput = trim(str_replace("\0", '', $videoInput));
+        $cleanInput = ltrim(str_replace(['\\', 'public/'], ['/', ''], $cleanInput), '/');
+        if ($cleanInput === '' || str_contains($cleanInput, '..')) {
+            throw new \InvalidArgumentException('Invalid video filename.');
+        }
+
+        $allowedVideoExts = ['mp4', 'mov', 'webm', 'm4v'];
+        $allowedRoots = array_values(array_filter([
+            realpath(public_path('videos/reviews')),
+            realpath(public_path('videos')),
+            realpath(public_path('media')),
+        ]));
 
         $candidates = [
             public_path($cleanInput),
@@ -213,9 +217,19 @@ class VideoAnalysisService
 
         $foundPath = null;
         foreach ($candidates as $cand) {
-            if (File::exists($cand) && is_file($cand)) {
-                $foundPath = $cand;
-                break;
+            $real = realpath($cand);
+            if (! $real || ! is_file($real)) {
+                continue;
+            }
+            $ext = strtolower(pathinfo($real, PATHINFO_EXTENSION));
+            if (! in_array($ext, $allowedVideoExts, true)) {
+                continue;
+            }
+            foreach ($allowedRoots as $root) {
+                if (str_starts_with($real, $root . DIRECTORY_SEPARATOR)) {
+                    $foundPath = $real;
+                    break 2;
+                }
             }
         }
 
@@ -224,7 +238,8 @@ class VideoAnalysisService
         }
 
         $filename = basename($foundPath);
-        $baseSlug = $customSlug ?: Str::slug(pathinfo($filename, PATHINFO_FILENAME));
+        $safeCustomSlug = $customSlug ? Str::slug($customSlug) : '';
+        $baseSlug = $safeCustomSlug ?: Str::slug(pathinfo($filename, PATHINFO_FILENAME));
 
         return [
             'full_path' => $foundPath,
@@ -301,6 +316,7 @@ class VideoAnalysisService
                 '-of', 'default=noprint_wrappers=1:nokey=1',
                 $videoFullPath,
             ]);
+            $probeProc->setTimeout(20);
             $probeProc->run();
             if ($probeProc->isSuccessful() && is_numeric(trim($probeProc->getOutput()))) {
                 $duration = max(1, (int) round((float) trim($probeProc->getOutput())));
@@ -310,6 +326,8 @@ class VideoAnalysisService
         }
 
         $timestamp = max(1.0, min(5.0, $duration * 0.2));
+        $jpgFullPath = $postersDir . DIRECTORY_SEPARATOR . $jpgName;
+        $webpFullPath = $postersDir . DIRECTORY_SEPARATOR . $webpName;
 
         // Generate JPG
         try {
@@ -318,11 +336,12 @@ class VideoAnalysisService
                 '-i', $videoFullPath,
                 '-vframes', '1',
                 '-q:v', '2',
-                $postersDir . DIRECTORY_SEPARATOR . $jpgName,
+                $jpgFullPath,
             ]);
+            $jpgProc->setTimeout(20);
             $jpgProc->run();
         } catch (\Throwable $e) {
-            // Ignore
+            Log::warning('FFmpeg JPG poster extraction failed: ' . $e->getMessage());
         }
 
         // Generate WebP
@@ -332,19 +351,20 @@ class VideoAnalysisService
                 '-i', $videoFullPath,
                 '-vframes', '1',
                 '-quality', '85',
-                $postersDir . DIRECTORY_SEPARATOR . $webpName,
+                $webpFullPath,
             ]);
+            $webpProc->setTimeout(20);
             $webpProc->run();
         } catch (\Throwable $e) {
-            // Ignore
+            Log::warning('FFmpeg WebP poster extraction failed: ' . $e->getMessage());
         }
 
         return [
             'success' => true,
             'duration' => $duration,
             'duration_int' => $duration,
-            'poster_webp' => $webpName,
-            'poster_jpg' => $jpgName,
+            'poster_webp' => (file_exists($webpFullPath) && filesize($webpFullPath) > 0) ? $webpName : null,
+            'poster_jpg' => (file_exists($jpgFullPath) && filesize($jpgFullPath) > 0) ? $jpgName : null,
             'transcript' => '',
             'english_translation' => '',
             'language' => 'en',
@@ -407,7 +427,7 @@ class VideoAnalysisService
         ];
 
         foreach ($countryKeywords as $keyword => $info) {
-            if (str_contains($combinedText, $keyword)) {
+            if (preg_match('/\b' . preg_quote($keyword, '/') . '\b/iu', $combinedText)) {
                 $country = $info['country'];
                 $countryCode = $info['code'];
                 break;
@@ -429,8 +449,11 @@ class VideoAnalysisService
             $category = 'desert_camp';
         }
 
-        // Link to active tour
-        $tours = Tour::where('status', 'active')->select('id', 'name', 'slug', 'category')->get();
+        // Link to active tour (via category_id -> category relation, never nonexistent tours.category column)
+        $tours = Tour::where('status', 'active')
+            ->with('category:id,slug')
+            ->select('id', 'name', 'slug', 'category_id')
+            ->get();
         $matchedTour = null;
 
         // Try direct keyword matching with tour slug or name
@@ -451,15 +474,17 @@ class VideoAnalysisService
         // If not matched, match by category
         if (! $matchedTour && $tours->isNotEmpty()) {
             if ($category === 'buggy_quad') {
-                $matchedTour = $tours->firstWhere('slug', 'dune-buggy-dubai')
-                    ?? $tours->firstWhere('category', 'quad-bike')
+                $matchedTour = $tours->firstWhere('slug', 'dune-buggy-rental-dubai')
+                    ?? $tours->firstWhere('slug', 'dune-buggy-dubai')
+                    ?? $tours->first(fn ($t) => in_array($t->category?->slug, ['quad-bike', 'buggy-quad', 'desert-safaris'], true))
                     ?? $tours->first();
             } elseif ($category === 'city_tours') {
                 $matchedTour = $tours->firstWhere('slug', 'dubai-city-tour')
-                    ?? $tours->firstWhere('category', 'city-tours')
+                    ?? $tours->first(fn ($t) => in_array($t->category?->slug, ['city-tours', 'city-tour'], true))
                     ?? $tours->first();
             } elseif ($category === 'vip_luxury') {
                 $matchedTour = $tours->firstWhere('slug', 'vip-desert-safari-dubai')
+                    ?? $tours->firstWhere('slug', 'evening-desert-safari-dubai')
                     ?? $tours->first();
             } else {
                 $matchedTour = $tours->firstWhere('slug', 'evening-desert-safari-dubai')
@@ -470,11 +495,11 @@ class VideoAnalysisService
         $tourSlug = $matchedTour ? $matchedTour->slug : 'evening-desert-safari-dubai';
         $tourName = $matchedTour ? $matchedTour->name : 'Evening Desert Safari Dubai';
 
-        // 3. Extract Reviewer / Traveler Name
+        // 3. Extract Reviewer / Traveler Name (case-sensitive proper noun capture)
         $reviewerName = null;
-        if (preg_match('/(?:my name is|i am|i\'m|we are|we\'re|this is)\s+([A-Z][a-z]+(?:\s+(?:and|&)\s+[A-Z][a-z]+)?)/i', $english, $nm)) {
+        if (preg_match('/(?:[Mm]y name is|[Ii] am|[Ii]\'m|[Ww]e are|[Ww]e\'re|[Tt]his is)\s+([A-Z][a-z]+(?:\s+(?:and|&)\s+[A-Z][a-z]+)?)/', $english, $nm)) {
             $reviewerName = trim($nm[1]);
-        } elseif (preg_match('/(?:me llamo|soy)\s+([A-Z][a-z]+)/i', $transcript, $nm)) {
+        } elseif (preg_match('/(?:[Mm]e llamo|[Ss]oy)\s+([A-Z][a-z]+)/', $transcript, $nm)) {
             $reviewerName = trim($nm[1]);
         }
 
@@ -510,7 +535,7 @@ class VideoAnalysisService
         }
 
         // 6. Generate Full VideoObject Description
-        $description = "{$reviewerName} from {$country} shares their authentic experience after enjoying the {$tourName} with Dunes Discovery Tourism in Dubai. Highly praising safari guide Malik, vehicle safety, red dunes bashing, and exceptional Arabian hospitality.";
+        $description = "{$reviewerName} from {$country} shares their authentic experience after enjoying the {$tourName} with Dunes Discovery Tourism in Dubai, praising our licensed safari captains, vehicle safety, red dunes bashing, and Arabian hospitality.";
 
         // 7. Keywords
         $keywords = implode(', ', [

@@ -165,20 +165,25 @@ class AdminBacklinkController extends Controller
         ]);
 
         try {
-            $backlink->update([
+            $updatePayload = [
                 'source_url' => $validated['source_url'],
                 'target_url' => $validated['target_url'],
                 'anchor_text' => $validated['anchor_text'] ?? null,
                 'rel_type' => $validated['rel_type'],
                 'status' => $validated['status'],
-                'domain_authority' => $validated['domain_authority'] ?? null,
+                'domain_authority' => $validated['domain_authority'] ?? $backlink->domain_authority,
                 'platform' => $validated['platform'] ?? $backlink->platform,
-                'partner_name' => $validated['partner_name'] ?? null,
-                'partner_email' => $validated['partner_email'] ?? null,
-                'cost_aed' => $validated['cost_aed'] ?? 0.00,
-                'campaign' => $validated['campaign'] ?? null,
+                'partner_name' => $validated['partner_name'] ?? $backlink->partner_name,
+                'campaign' => $validated['campaign'] ?? $backlink->campaign,
                 'notes' => $validated['notes'] ?? null,
-            ]);
+            ];
+            if ($request->has('partner_email')) {
+                $updatePayload['partner_email'] = $validated['partner_email'] ?? null;
+            }
+            if ($request->has('cost_aed')) {
+                $updatePayload['cost_aed'] = $validated['cost_aed'] ?? 0.00;
+            }
+            $backlink->update($updatePayload);
 
             if ($request->boolean('live_check')) {
                 $backlink->verifyHealth();
@@ -264,7 +269,7 @@ class AdminBacklinkController extends Controller
     {
         $limit = min((int) $request->input('limit', 25), 50);
         $backlinks = Backlink::whereIn('status', ['active', 'pending', 'lost'])
-            ->orderByRaw('last_crawled_at IS NULL DESC, last_crawled_at ASC')
+            ->orderByRaw('last_checked_at IS NULL DESC, last_checked_at ASC')
             ->limit($limit)
             ->get();
 

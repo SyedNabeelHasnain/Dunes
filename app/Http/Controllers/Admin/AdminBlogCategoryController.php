@@ -4,19 +4,33 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
+use App\Models\BlogTag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AdminBlogCategoryController extends Controller
 {
     /**
-     * Display a listing of categories.
+     * Display a listing of categories and blog tags.
      */
     public function index()
     {
         $categories = BlogCategory::orderBy('priority', 'asc')->get();
+        $tags = BlogTag::withCount('posts')->orderBy('name', 'asc')->get();
 
-        return view('admin.blog-categories.index', compact('categories'));
+        return view('admin.blog-categories.index', compact('categories', 'tags'));
+    }
+
+    protected function uniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($name) ?: 'category-'.time();
+        $candidate = $base;
+        $counter = 2;
+        while (BlogCategory::where('slug', $candidate)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $candidate = $base.'-'.$counter++;
+        }
+
+        return $candidate;
     }
 
     /**
@@ -32,7 +46,7 @@ class AdminBlogCategoryController extends Controller
 
         BlogCategory::create([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => $this->uniqueSlug((string) $request->name),
             'priority' => $request->priority,
             'status' => $request->status,
             'description' => $request->description,
@@ -56,7 +70,7 @@ class AdminBlogCategoryController extends Controller
 
         $category->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => $this->uniqueSlug((string) $request->name, $category->id),
             'priority' => $request->priority,
             'status' => $request->status,
             'description' => $request->description,
@@ -74,5 +88,63 @@ class AdminBlogCategoryController extends Controller
         $category->delete();
 
         return redirect()->route('admin.blog-categories.index')->with('success', 'Category deleted successfully.');
+    }
+
+    /**
+     * Create a new blog tag.
+     */
+    public function storeTag(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:120|unique:blog_tags,name',
+        ]);
+
+        $name = trim((string) $request->input('name'));
+        $base = Str::slug($name) ?: 'tag-'.time();
+        $slug = $base;
+        $i = 2;
+        while (BlogTag::where('slug', $slug)->exists()) {
+            $slug = $base.'-'.$i++;
+        }
+
+        BlogTag::create(['name' => $name, 'slug' => $slug]);
+
+        return redirect()->route('admin.blog-categories.index')->with('success', "Blog tag '{$name}' created successfully.");
+    }
+
+    /**
+     * Update an existing blog tag.
+     */
+    public function updateTag(Request $request, string $id)
+    {
+        $tag = BlogTag::findOrFail($id);
+        $request->validate([
+            'name' => 'required|string|max:120|unique:blog_tags,name,'.$tag->id,
+        ]);
+
+        $name = trim((string) $request->input('name'));
+        $base = Str::slug($name) ?: 'tag-'.time();
+        $slug = $base;
+        $i = 2;
+        while (BlogTag::where('slug', $slug)->where('id', '!=', $tag->id)->exists()) {
+            $slug = $base.'-'.$i++;
+        }
+
+        $tag->update(['name' => $name, 'slug' => $slug]);
+
+        return redirect()->route('admin.blog-categories.index')->with('success', "Blog tag '{$name}' updated successfully.");
+    }
+
+    /**
+     * Delete a blog tag and detach from posts.
+     */
+    public function destroyTag(string $id)
+    {
+        $tag = BlogTag::findOrFail($id);
+        $name = $tag->name;
+        $tag->posts()->detach();
+        $tag->delete();
+
+        return redirect()->route('admin.blog-categories.index')->with('success', "Blog tag '{$name}' deleted successfully.");
     }
 }

@@ -22,19 +22,18 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->encryptCookies(except: [
+            'ddt_consent_v1',
+        ]);
         $middleware->alias([
             'permission' => \App\Http\Middleware\RequirePermission::class,
         ]);
         $middleware->validateCsrfTokens(except: [
-            'stripe/*',
             'api/*',
             'ajax.php',
-            'security/unblock-request',
-        ]);
-        $middleware->web(prepend: [
-            \App\Http\Middleware\IpFirewallMiddleware::class,
         ]);
         $middleware->web(append: [
+            \App\Http\Middleware\IpFirewallMiddleware::class,
             TrackVisitor::class,
             \App\Http\Middleware\TrackBacklinkReferralMiddleware::class,
             \App\Http\Middleware\DynamicRedirectMiddleware::class,
@@ -46,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\IpFirewallMiddleware::class,
         ]);
         $middleware->api(append: [
+            SecurityHeaders::class,
             \App\Http\Middleware\RobotsHeaderMiddleware::class,
         ]);
     })
@@ -65,45 +65,63 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
             }
 
+            $isAuthOrAdminPath = $request->is('admin*', 'login', 'profile*', 'password*', 'confirm-password', 'forgot-password', 'reset-password*');
+
             if ($e->getStatusCode() === 419) {
-                if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
+                if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax() || $request->expectsJson()) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Security token expired. Please refresh the page.',
                     ], 419);
                 }
 
-                return redirect()->route('login')
-                    ->with('status', 'Your session expired for security reasons. Please enter your credentials to sign in.')
+                if ($isAuthOrAdminPath) {
+                    return redirect()->route('login')
+                        ->with('status', 'Your session expired for security reasons. Please enter your credentials to sign in.')
+                        ->withInput($request->except('password', '_token'));
+                }
+
+                return redirect()->back()
+                    ->with('error', 'Your session expired. Please refresh the page and try again.')
                     ->withInput($request->except('password', '_token'));
             }
 
             if ($e->getStatusCode() === 429) {
-                if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
+                if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax() || $request->expectsJson()) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Too many requests. Please wait a moment and try again.',
                     ], 429);
                 }
 
-                return redirect()->route('login')
-                    ->with('status', 'Too many requests were detected from your network. Please wait a moment and try again.')
+                if ($isAuthOrAdminPath) {
+                    return redirect()->route('login')
+                        ->with('status', 'Too many requests were detected from your network. Please wait a moment and try again.')
+                        ->withInput($request->except('password', '_token'));
+                }
+
+                return redirect()->back()
+                    ->with('error', 'Too many requests were detected. Please wait a moment and try again.')
                     ->withInput($request->except('password', '_token'));
             }
         });
 
         $exceptions->render(function (DecryptException $e, Request $request) {
-            if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
+            if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax() || $request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Session expired. Please refresh the page.',
-                ], 200);
+                ], 419);
             }
 
+            $sessionCookie = (string) config('session.cookie', 'laravel_session');
+            $recallerCookie = \Illuminate\Support\Facades\Auth::guard('web')->getRecallerName();
+
             return redirect($request->fullUrl())
+                ->withCookie(cookie()->forget($sessionCookie))
                 ->withCookie(cookie()->forget('laravel_session'))
                 ->withCookie(cookie()->forget('laravel-session'))
                 ->withCookie(cookie()->forget('XSRF-TOKEN'))
-                ->withCookie(cookie()->forget('remember_web'));
+                ->withCookie(cookie()->forget($recallerCookie));
         });
     })->create();

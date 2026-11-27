@@ -38,8 +38,10 @@ class WelcomeOfferMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $discountLabel = rtrim(rtrim(number_format($this->discount, 2, '.', ''), '0'), '.');
+
         return new Envelope(
-            subject: "Your 25% OFF Voucher: {$this->code} - Dunes Discovery Tourism"
+            subject: "Your {$discountLabel}% OFF Voucher: {$this->code} - Dunes Discovery Tourism"
         );
     }
 

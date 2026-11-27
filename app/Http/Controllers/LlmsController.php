@@ -202,20 +202,26 @@ class LlmsController extends Controller
         }
 
         try {
-            $wikiPillars = WikiPillar::where('status', 'active')->with(['articles' => fn ($q) => $q->where('status', 'published')->take(2)])->get();
+            $wikiPillars = WikiPillar::where('status', 'active')
+                ->with(['articles' => fn ($q) => $q->where('status', 'published')->with('seoMeta')->orderBy('priority')])
+                ->get();
             if ($wikiPillars->isNotEmpty()) {
                 $md .= "## Knowledge Portal & Desert Safari Wiki\n\n";
                 $md .= '- [Dubai Desert Safari Knowledge Portal]('.url('/wiki')."): Authoritative technical encyclopedia, safety standards, dune geography, and Bedouin cultural heritage.\n";
                 $md .= '- [A-Z Desert Safari Glossary]('.url('/wiki/glossary')."): Definitions of desert terminology, Arabic cultural phrases, and technical dune driving mechanics.\n";
                 foreach ($wikiPillars as $pillar) {
                     $md .= "- [{$pillar->name}](".url('/wiki/'.$pillar->slug).'): '.trim(strip_tags((string) $pillar->description))."\n";
-                    foreach ($pillar->articles as $art) {
+                    $pillarArticles = $pillar->articles
+                        ->reject(fn ($a) => $this->isExcludedFromAiDiscovery($a))
+                        ->take(2);
+                    foreach ($pillarArticles as $art) {
                         $md .= "  - [{$art->title}](".url('/wiki/'.$pillar->slug.'/'.$art->slug).'): '.trim(strip_tags((string) $art->excerpt))."\n";
                     }
                 }
                 $md .= "\n";
             }
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('LlmsController wiki pillar section failed: '.$e->getMessage());
         }
 
         $md .= "## Company Information & Support\n\n";
@@ -348,7 +354,8 @@ class LlmsController extends Controller
                 if ($tour->itineraries->count() > 0) {
                     $md .= "- **Tour Itinerary & Program**:\n";
                     foreach ($tour->itineraries as $step) {
-                        $timeStr = $step->time_slot ? " [{$step->time_slot}]" : '';
+                        $timeVal = $step->time ?: ($step->time_slot ?? null);
+                        $timeStr = $timeVal ? " [{$timeVal}]" : '';
                         $md .= "  - **{$step->title}**{$timeStr}: ".trim(strip_tags($step->description))."\n";
                     }
                 }

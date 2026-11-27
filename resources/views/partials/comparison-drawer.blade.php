@@ -77,7 +77,7 @@
 
 <!-- Comparison Dataset Script -->
 <script id="dunesCompareTourData" type="application/json">
-{!! json_encode($compareToursData) !!}
+{!! json_encode($compareToursData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
 </script>
 
 <!-- Floating Comparison Bar (Sticky Bottom Pill) -->
@@ -88,7 +88,7 @@
      style="display: none;"
      class="fixed bottom-20 sm:bottom-6 inset-x-0 mx-auto z-40 mb-safe max-w-[94%] w-fit transition-all">
     <div class="flex items-center gap-3 px-4 py-2.5 rounded-full shadow-2xl bg-slate-950/95 border border-primary backdrop-blur-md">
-        <div class="flex items-center -space-x-2" id="compareThumbBubbles"></div>
+        <div class="flex items-center -space-x-2 rtl:space-x-reverse" id="compareThumbBubbles"></div>
         <div class="text-white text-xs font-bold pe-2 border-e border-slate-700 hidden sm:block">
             <span id="compareCountLabel" x-text="$store.compare.items ? $store.compare.items.length : 0">0</span>/3
         </div>
@@ -118,6 +118,7 @@
      class="fixed inset-0 z-50 overflow-hidden"
      role="dialog"
      aria-modal="true"
+     aria-labelledby="compareDrawerTitle"
      @keydown.escape.window="$store.modal.close()">
 
     <!-- Backdrop -->
@@ -152,7 +153,7 @@
                     <i class="bi bi-shuffle text-lg"></i>
                 </span>
                 <div>
-                    <h5 class="font-extrabold text-sm sm:text-base text-white leading-tight">{{ __('ui.comparison.title') }}</h5>
+                    <h5 id="compareDrawerTitle" class="font-extrabold text-sm sm:text-base text-white leading-tight">{{ __('ui.comparison.title') }}</h5>
                     <p class="text-slate-300 text-xs hidden sm:block">{{ __('ui.comparison.empty_msg') }}</p>
                 </div>
             </div>

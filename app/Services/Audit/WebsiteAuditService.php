@@ -19,6 +19,7 @@ use App\Services\Audit\Checkers\TechnicalSeoChecker;
 use App\Services\Audit\Checkers\UxChecker;
 use App\Services\Http\InternalHttpProbeService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class WebsiteAuditService
 {
@@ -226,10 +227,8 @@ class WebsiteAuditService
      */
     public function auditSingleUrl(string $path, bool $persistRun = false, ?int $triggeredBy = null): array
     {
+        $startTime = microtime(true);
         $cleanPath = '/'.ltrim((string) parse_url($path, PHP_URL_PATH), '/');
-        if ($cleanPath === '') {
-            $cleanPath = '/';
-        }
 
         $probed = $this->probeInternalUrls([$cleanPath]);
         $probe = $probed[$cleanPath] ?? ['status' => 500, 'html' => ''];
@@ -245,11 +244,13 @@ class WebsiteAuditService
             try {
                 foreach (app($checkerClass)->run(['probed_pages' => [$cleanPath => $probe], 'single_url' => $cleanPath]) as $iss) {
                     $target = (string) ($iss['affected_url'] ?? '');
-                    if ($target === '' || str_ends_with(rtrim($target, '/'), rtrim($cleanPath, '/')) || $cleanPath === '/') {
+                    $targetPath = $target !== '' ? '/'.ltrim((string) parse_url($target, PHP_URL_PATH), '/') : '';
+                    if ($target === '' || rtrim($targetPath, '/') === rtrim($cleanPath, '/')) {
                         $issues[] = $iss;
                     }
                 }
-            } catch (\Throwable) {
+            } catch (\Throwable $e) {
+                Log::warning('WebsiteAuditService single-URL checker failed for '.class_basename($checkerClass).': '.$e->getMessage());
             }
         }
 
@@ -262,17 +263,24 @@ class WebsiteAuditService
                     'check_key' => 'page_missing_title',
                     'title' => 'Rendered Page Missing <title> Tag',
                     'severity' => 'critical',
+                    'affected_url' => url($cleanPath),
                     'evidence' => 'Empty or missing <title> element.',
                     'recommended_action' => 'Configure SEO title on item or Content Type Template.',
                 ];
             }
-            if (! preg_match('/<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']*)["\']/i', $html, $dm) || mb_strlen(trim($dm[1])) < 40) {
+            $descContent = '';
+            if (preg_match('/<meta\b[^>]*\bname=["\']description["\'][^>]*>/i', $html, $metaTag)
+                && preg_match('/\bcontent=["\']([^"\']*)["\']/i', $metaTag[0], $dm)) {
+                $descContent = trim(html_entity_decode($dm[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            }
+            if (mb_strlen($descContent) < 40) {
                 $issues[] = [
                     'category' => 'seo',
                     'check_key' => 'page_short_description',
                     'title' => 'Meta Description Missing or Too Short (< 40 chars)',
                     'severity' => 'medium',
-                    'evidence' => 'Extracted length: '.mb_strlen(trim($dm[1] ?? '')).' chars.',
+                    'affected_url' => url($cleanPath),
+                    'evidence' => 'Extracted length: '.mb_strlen($descContent).' chars.',
                     'recommended_action' => 'Write a compelling 120–155 character meta description.',
                 ];
             }
@@ -282,21 +290,116 @@ class WebsiteAuditService
                     'check_key' => 'page_missing_canonical',
                     'title' => 'Rendered Page Missing <link rel="canonical">',
                     'severity' => 'high',
+                    'affected_url' => url($cleanPath),
                     'evidence' => 'No canonical tag found in rendered HTML head.',
                     'recommended_action' => 'Verify canonical tag output in layout header.',
                 ];
             }
         }
 
-        $penalty = 0;
+        // Deduplicate identical single-page findings
+        $deduped = [];
         foreach ($issues as $iss) {
-            $penalty += self::SEVERITY_PENALTIES[strtolower((string) ($iss['severity'] ?? 'info'))] ?? 0;
+            $sig = ($iss['check_key'] ?? 'check').'|'.($iss['affected_url'] ?? url($cleanPath)).'|'.($iss['title'] ?? '');
+            $deduped[$sig] = $iss;
+        }
+        $issues = array_values($deduped);
+
+        $penalty = 0;
+        $severityCounts = ['critical' => 0, 'high' => 0, 'medium' => 0, 'low' => 0, 'info' => 0];
+        $categoryCounts = [];
+        foreach (array_keys(self::CATEGORY_WEIGHTS) as $cat) {
+            $categoryCounts[$cat] = ['critical' => 0, 'high' => 0, 'medium' => 0, 'low' => 0, 'info' => 0, 'total' => 0];
+        }
+        foreach ($issues as $iss) {
+            $sev = strtolower((string) ($iss['severity'] ?? 'info'));
+            if (! isset($severityCounts[$sev])) {
+                $sev = 'info';
+            }
+            $cat = strtolower((string) ($iss['category'] ?? 'seo'));
+            if (! isset($categoryCounts[$cat])) {
+                $categoryCounts[$cat] = ['critical' => 0, 'high' => 0, 'medium' => 0, 'low' => 0, 'info' => 0, 'total' => 0];
+            }
+            $severityCounts[$sev]++;
+            $categoryCounts[$cat][$sev]++;
+            $categoryCounts[$cat]['total']++;
+            $penalty += self::SEVERITY_PENALTIES[$sev] ?? 0;
         }
         $pageScore = max(0, 100 - $penalty);
 
         $runId = null;
         if ($persistRun) {
-            $run = $this->runAudit('single_url', $triggeredBy, ['target_url' => $cleanPath, 'probed_pages' => [$cleanPath => $probe]]);
+            $durationMs = (int) max(1, round((microtime(true) - $startTime) * 1000));
+            $previousRun = $this->getLatestRun();
+            $categoryScores = [];
+            foreach (self::CATEGORY_WEIGHTS as $cat => $weight) {
+                $catPen = (($categoryCounts[$cat]['critical'] ?? 0) * self::SEVERITY_PENALTIES['critical'])
+                    + (($categoryCounts[$cat]['high'] ?? 0) * self::SEVERITY_PENALTIES['high'])
+                    + (($categoryCounts[$cat]['medium'] ?? 0) * self::SEVERITY_PENALTIES['medium'])
+                    + (($categoryCounts[$cat]['low'] ?? 0) * self::SEVERITY_PENALTIES['low']);
+                $categoryScores[$cat] = [
+                    'label' => $this->getCategoryLabel($cat),
+                    'score' => max(0, 100 - $catPen),
+                    'weight' => round($weight * 100),
+                    'counts' => $categoryCounts[$cat],
+                ];
+            }
+
+            $run = DB::transaction(function () use (
+                $pageScore,
+                $categoryScores,
+                $issues,
+                $severityCounts,
+                $durationMs,
+                $triggeredBy,
+                $previousRun,
+                $cleanPath
+            ) {
+                $run = AuditRun::create([
+                    'scan_type' => 'single_url',
+                    'status' => 'completed',
+                    'health_score' => $pageScore,
+                    'category_scores' => $categoryScores,
+                    'total_issues_count' => count($issues),
+                    'critical_count' => $severityCounts['critical'],
+                    'high_count' => $severityCounts['high'],
+                    'medium_count' => $severityCounts['medium'],
+                    'low_count' => $severityCounts['low'],
+                    'info_count' => $severityCounts['info'],
+                    'scanned_urls_count' => 1,
+                    'duration_ms' => $durationMs,
+                    'triggered_by' => $triggeredBy,
+                    'parent_run_id' => $previousRun?->id,
+                    'target_url' => $cleanPath,
+                ]);
+
+                if ($issues !== []) {
+                    $now = now();
+                    $rows = [];
+                    foreach ($issues as $iss) {
+                        $rows[] = [
+                            'audit_run_id' => $run->id,
+                            'category' => $iss['category'] ?? 'seo',
+                            'check_key' => $iss['check_key'] ?? 'generic_check',
+                            'title' => mb_substr((string) ($iss['title'] ?? 'Audit Notice'), 0, 250),
+                            'description' => $iss['description'] ?? null,
+                            'severity' => $iss['severity'] ?? 'medium',
+                            'status' => 'open',
+                            'verification_type' => $iss['verification_type'] ?? 'automated',
+                            'affected_url' => $iss['affected_url'] ?? url($cleanPath),
+                            'evidence' => $iss['evidence'] ?? null,
+                            'recommended_action' => $iss['recommended_action'] ?? null,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    }
+                    foreach (array_chunk($rows, 100) as $chunk) {
+                        AuditIssue::insert($chunk);
+                    }
+                }
+
+                return $run;
+            });
             $runId = $run->id;
         }
 
@@ -323,7 +426,7 @@ class WebsiteAuditService
         $current->loadMissing('issues');
         $previous->loadMissing('issues');
 
-        $sig = fn (AuditIssue $i): string => $i->check_key.'|'.($i->affected_url ?? 'global');
+        $sig = fn (AuditIssue $i): string => $i->check_key.'|'.($i->affected_url ?? 'global').'|'.($i->title ?? '');
         $currMap = $current->issues->keyBy($sig);
         $prevMap = $previous->issues->keyBy($sig);
 
@@ -395,7 +498,7 @@ class WebsiteAuditService
     private function determineProbePaths(string $scanType, ?string $targetUrl = null): array
     {
         if ($scanType === 'single_url' && $targetUrl) {
-            return ['/'.ltrim((string) parse_url($targetUrl, PHP_URL_PATH), '/') ?: '/'];
+            return ['/'.ltrim((string) parse_url($targetUrl, PHP_URL_PATH), '/')];
         }
 
         $paths = ['/', '/tours', '/about', '/blog', '/wiki'];

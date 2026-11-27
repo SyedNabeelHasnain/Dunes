@@ -79,7 +79,7 @@ class AdminEditorialController extends Controller
 
         $user = $request->user();
         $editorialStatus = $validated['editorial_status'];
-        if ($editorialStatus === 'approved' && $user && method_exists($user, 'hasAnyPermission') && ! $user->hasAnyPermission(['content.publish', 'governance.approve', '*'])) {
+        if (in_array($editorialStatus, ['approved', 'published'], true) && $user && method_exists($user, 'hasAnyPermission') && ! $user->hasAnyPermission(['content.publish', 'governance.approve', '*'])) {
             $editorialStatus = 'in_review';
         }
 
@@ -119,15 +119,15 @@ class AdminEditorialController extends Controller
 
         $meta->save();
 
-        // Sync matching direct columns on BlogPost so legacy queries stay aligned
+        // Sync matching direct columns on BlogPost so legacy queries stay aligned (allow clearing overrides)
         if ($entity instanceof BlogPost) {
             $entity->update([
-                'focus_keyword' => $meta->focus_keyword ?: $entity->focus_keyword,
-                'robots' => $meta->robots_directive ?: $entity->robots,
-                'canonical_url' => $meta->canonical_override ?: $entity->canonical_url,
-                'og_title' => $meta->og_title ?: $entity->og_title,
-                'og_desc' => $meta->og_description ?: $entity->og_desc,
-                'og_image' => $meta->og_image ?: $entity->og_image,
+                'focus_keyword' => $meta->focus_keyword,
+                'robots' => $meta->robots_directive,
+                'canonical_url' => $meta->canonical_override,
+                'og_title' => $meta->og_title,
+                'og_desc' => $meta->og_description,
+                'og_image' => $meta->og_image,
             ]);
         }
 
@@ -177,6 +177,16 @@ class AdminEditorialController extends Controller
                 'include_in_sitemap' => null,
             ]);
 
+            if ($entity instanceof BlogPost) {
+                $entity->update([
+                    'robots' => null,
+                    'canonical_url' => null,
+                    'og_title' => null,
+                    'og_desc' => null,
+                    'og_image' => null,
+                ]);
+            }
+
             $this->audit->log(
                 section: 'editorial',
                 action: 'reset_to_default',
@@ -214,6 +224,16 @@ class AdminEditorialController extends Controller
 
         $fillable = method_exists($entity, 'getFillable') ? $entity->getFillable() : [];
         $restorable = array_intersect_key($attrs, array_flip($fillable));
+
+        // Decode raw JSON strings for array/json-cast attributes so forceFill() does not double-encode them
+        foreach ($restorable as $attrKey => $attrVal) {
+            if (is_string($attrVal) && method_exists($entity, 'hasCast') && $entity->hasCast($attrKey, ['array', 'json', 'object', 'collection'])) {
+                $decoded = json_decode($attrVal, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $restorable[$attrKey] = $decoded;
+                }
+            }
+        }
 
         if ($restorable !== []) {
             $entity->forceFill($restorable)->save();

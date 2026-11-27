@@ -29,9 +29,8 @@ class IpFirewallMiddleware
             return $next($request);
         }
 
-        // Resolve genuine client IP through multi-tier proxy/CDN detection
-        $ipData = $this->tracker->resolveClientIp();
-        $clientIp = $ipData['client_ip'] ?: ($request->ip() ?: '0.0.0.0');
+        // Use Laravel's TrustProxies-verified transport IP for security firewall decisions (never spoofable body fields)
+        $clientIp = $request->ip() ?: '0.0.0.0';
 
         // Always whitelist emergency endpoints so blocked users can appeal and health checks pass
         if ($this->isWhitelistedRoute($request)) {

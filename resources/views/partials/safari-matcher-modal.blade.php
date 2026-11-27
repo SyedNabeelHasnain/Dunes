@@ -181,8 +181,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-water text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.time_buggy_title') }}</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.time_buggy_desc') }}</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.home_categories.cruise_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.home_categories.cruise_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +190,7 @@
                 </div>
 
                 <!-- Step 3: Must-Haves -->
-                <div x-show="step === 3">
+                <div x-show="step === 3" x-cloak>
                     <h5 class="font-extrabold text-base sm:text-lg text-white mb-1">{{ __('ui.safari_quiz.step3_title') }}</h5>
                     <p class="text-slate-300 text-xs mb-4">{{ __('ui.safari_quiz.step3_subtitle') }}</p>
 
@@ -246,14 +246,14 @@
                 </div>
 
                 <!-- Loading State -->
-                <div x-show="loading" class="text-center py-12">
+                <div x-show="loading" x-cloak class="text-center py-12">
                     <div class="inline-block w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-4"></div>
                     <h5 class="text-lg font-bold text-white mb-2">{{ __('ui.safari_quiz.calculating_title') }}</h5>
                     <p class="text-slate-300 text-xs max-w-sm mx-auto">{{ __('ui.safari_quiz.calculating_desc') }}</p>
                 </div>
 
                 <!-- Result Screen -->
-                <div x-show="step === 4 && !loading && result">
+                <div x-show="step === 4 && !loading && result" x-cloak>
                     <div class="text-center mb-4">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold mb-2">
                             <i class="bi bi-patch-check-fill"></i> {{ __('ui.safari_quiz.recommendation_badge') }}
@@ -323,11 +323,10 @@
                          </button>
                          <a :href="waUrl" 
                             target="_blank" 
-                            rel="noopener" 
-                            class="btn-whatsapp sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                           data-action="whatsapp"
+                            rel="noopener noreferrer" 
+                            class="sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                            :data-tour-name="result ? result.name : ''"
-                           @click.prevent="window.openWhatsApp ? window.openWhatsApp(result ? result.name : '', waUrl) : null">
+                           @click.prevent.stop="window.openWhatsApp ? window.openWhatsApp(result ? result.name : '', waUrl) : null">
                              <i class="bi bi-whatsapp"></i>
                              <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                          </a>

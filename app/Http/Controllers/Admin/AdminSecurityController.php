@@ -4,12 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\IpRule;
+use App\Models\SpamEvent;
 use App\Models\UnblockRequest;
+use App\Models\VerifiedEmail;
+use App\Services\Governance\ConfigAuditService;
 use App\Services\IpSecurityService;
 use App\Services\VisitorTrackerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class AdminSecurityController extends Controller
 {
@@ -65,13 +70,29 @@ class AdminSecurityController extends Controller
 
         $unblockRequests = $appealQuery->paginate(15, ['*'], 'appeals_page')->withQueryString();
 
-        // 3. Summary Metrics
+        // 3. Spam Events & Verified Emails (Security CRUD Tabs)
+        $spamEvents = Schema::hasTable('spam_events')
+            ? SpamEvent::latest()->paginate(20, ['*'], 'spam_page')->withQueryString()
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+
+        $verifiedEmailSearch = trim((string) $request->input('verified_search', ''));
+        $verifiedEmails = Schema::hasTable('verified_emails')
+            ? VerifiedEmail::query()
+                ->when($verifiedEmailSearch !== '', fn ($q) => $q->where('email', 'like', "%{$verifiedEmailSearch}%"))
+                ->orderByDesc('verified_at')
+                ->paginate(20, ['*'], 'verified_page')
+                ->withQueryString()
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+
+        // 4. Summary Metrics
         $stats = [
             'total_rules' => IpRule::count(),
             'active_blocks' => IpRule::where('mode', 'block')->where('status', 'active')->count(),
             'active_ignored' => IpRule::where('mode', 'ignore_analytics')->where('status', 'active')->count(),
             'pending_appeals' => UnblockRequest::where('status', 'pending')->count(),
             'total_blocked_hits' => (int) IpRule::where('mode', 'block')->sum('blocked_attempts_count'),
+            'spam_events_count' => Schema::hasTable('spam_events') ? SpamEvent::count() : 0,
+            'verified_emails_count' => Schema::hasTable('verified_emails') ? VerifiedEmail::count() : 0,
         ];
 
         $allSettings = app(\App\Services\SettingsService::class)->all();
@@ -85,6 +106,9 @@ class AdminSecurityController extends Controller
         return view('admin.security.ip-rules', compact(
             'rules',
             'unblockRequests',
+            'spamEvents',
+            'verifiedEmails',
+            'verifiedEmailSearch',
             'stats',
             'currentAdminIp',
             'currentAdminRule',
@@ -172,7 +196,7 @@ class AdminSecurityController extends Controller
     public function storeRule(Request $request)
     {
         $validated = $request->validate([
-            'ip_address' => 'required|string|max:45',
+            'ip_address' => 'required|ip|max:45',
             'ip_mask' => 'nullable|integer|min:1|max:128',
             'mode' => 'nullable|string|in:ignore_analytics,block,monitor',
             'action_mode' => 'nullable|string|in:ignore_analytics,block,monitor',
@@ -206,6 +230,19 @@ class AdminSecurityController extends Controller
         ]);
 
         $this->ipSecurity->clearRulesCache();
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'created',
+                settingKey: "ip_rule:{$ip}",
+                oldValue: null,
+                newValue: ['ip_address' => $ip, 'mode' => $mode, 'status' => $status, 'label' => $rule->label],
+                entityType: IpRule::class,
+                entityId: $rule->id,
+                summary: "Created IP security rule for {$ip} ({$mode})",
+            );
+        } catch (\Throwable) {
+        }
 
         $purgeNotice = '';
         if ($request->boolean('purge_existing_logs') && $mode === 'ignore_analytics') {
@@ -237,6 +274,19 @@ class AdminSecurityController extends Controller
         );
 
         $this->ipSecurity->clearRulesCache();
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'updated',
+                settingKey: "ip_rule:{$currentIp}",
+                oldValue: null,
+                newValue: ['ip_address' => $currentIp, 'mode' => 'ignore_analytics', 'status' => 'active', 'label' => $rule->label],
+                entityType: IpRule::class,
+                entityId: $rule->id,
+                summary: "Quick-ignored admin IP {$currentIp} from analytics",
+            );
+        } catch (\Throwable) {
+        }
 
         $purgedCount = 0;
         if ($request->boolean('purge_logs', true)) {
@@ -266,11 +316,25 @@ class AdminSecurityController extends Controller
     {
         $rule = IpRule::findOrFail($id);
 
-        $newMode = $rule->mode === 'block' ? 'ignore_analytics' : 'block';
+        $oldMode = $rule->mode;
+        $newMode = $oldMode === 'block' ? 'ignore_analytics' : 'block';
         $rule->mode = $newMode;
         $rule->save();
 
         $this->ipSecurity->clearRulesCache();
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'updated',
+                settingKey: "ip_rule:{$rule->ip_address}",
+                oldValue: ['mode' => $oldMode],
+                newValue: ['mode' => $newMode],
+                entityType: IpRule::class,
+                entityId: $rule->id,
+                summary: "Switched IP rule mode for {$rule->ip_address} from {$oldMode} to {$newMode}",
+            );
+        } catch (\Throwable) {
+        }
 
         $modeLabel = $newMode === 'block' ? 'Access Blocked (Firewall Mode)' : 'Ignored from Analytics';
 
@@ -292,11 +356,25 @@ class AdminSecurityController extends Controller
     {
         $rule = IpRule::findOrFail($id);
 
-        $newStatus = $rule->status === 'active' ? 'inactive' : 'active';
+        $oldStatus = $rule->status;
+        $newStatus = $oldStatus === 'active' ? 'inactive' : 'active';
         $rule->status = $newStatus;
         $rule->save();
 
         $this->ipSecurity->clearRulesCache();
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'updated',
+                settingKey: "ip_rule:{$rule->ip_address}",
+                oldValue: ['status' => $oldStatus],
+                newValue: ['status' => $newStatus],
+                entityType: IpRule::class,
+                entityId: $rule->id,
+                summary: "Switched IP rule status for {$rule->ip_address} from {$oldStatus} to {$newStatus}",
+            );
+        } catch (\Throwable) {
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -323,8 +401,22 @@ class AdminSecurityController extends Controller
             'status' => 'required|string|in:active,inactive',
         ]);
 
+        $oldValues = $rule->only(['mode', 'label', 'reason', 'status']);
         $rule->update($validated);
         $this->ipSecurity->clearRulesCache();
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'updated',
+                settingKey: "ip_rule:{$rule->ip_address}",
+                oldValue: $oldValues,
+                newValue: $rule->only(['mode', 'label', 'reason', 'status']),
+                entityType: IpRule::class,
+                entityId: $rule->id,
+                summary: "Updated IP security rule for {$rule->ip_address} ({$rule->mode})",
+            );
+        } catch (\Throwable) {
+        }
 
         return back()->with('success', "Security rule for IP {$rule->ip_address} updated successfully.");
     }
@@ -336,9 +428,24 @@ class AdminSecurityController extends Controller
     {
         $rule = IpRule::findOrFail($id);
         $ip = $rule->ip_address;
+        $ruleId = $rule->id;
+        $oldValues = $rule->only(['ip_address', 'mode', 'status', 'label']);
         $rule->delete();
 
         $this->ipSecurity->clearRulesCache();
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'deleted',
+                settingKey: "ip_rule:{$ip}",
+                oldValue: $oldValues,
+                newValue: null,
+                entityType: IpRule::class,
+                entityId: $ruleId,
+                summary: "Deleted IP security rule for {$ip}",
+            );
+        } catch (\Throwable) {
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -409,6 +516,20 @@ class AdminSecurityController extends Controller
         ]);
 
         $this->ipSecurity->clearRulesCache();
+        Cache::forget('admin_sidebar_counts');
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'approved',
+                settingKey: "unblock_request:{$ip}",
+                oldValue: ['status' => 'pending'],
+                newValue: ['status' => 'approved_unblocked', 'target_action' => $action],
+                entityType: UnblockRequest::class,
+                entityId: $appeal->id,
+                summary: "Approved unblock appeal for {$ip} ({$action})",
+            );
+        } catch (\Throwable) {
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -434,6 +555,20 @@ class AdminSecurityController extends Controller
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
         ]);
+        Cache::forget('admin_sidebar_counts');
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'rejected',
+                settingKey: "unblock_request:{$appeal->ip_address}",
+                oldValue: ['status' => 'pending'],
+                newValue: ['status' => 'rejected_kept_blocked', 'admin_notes' => $adminNotes],
+                entityType: UnblockRequest::class,
+                entityId: $appeal->id,
+                summary: "Rejected unblock appeal for {$appeal->ip_address}",
+            );
+        } catch (\Throwable) {
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -452,6 +587,7 @@ class AdminSecurityController extends Controller
     {
         $appeal = UnblockRequest::findOrFail($id);
         $appeal->delete();
+        Cache::forget('admin_sidebar_counts');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -461,5 +597,97 @@ class AdminSecurityController extends Controller
         }
 
         return back()->with('success', 'Appeal record deleted.');
+    }
+
+    /**
+     * Purge aged or all spam shield event telemetry logs.
+     */
+    public function purgeSpamEvents(Request $request)
+    {
+        $validated = $request->validate([
+            'days' => 'nullable|integer|min:0|max:3650',
+        ]);
+
+        $days = (int) ($validated['days'] ?? 30);
+        $deleted = $days === 0
+            ? SpamEvent::query()->delete()
+            : SpamEvent::where('created_at', '<', now()->subDays($days))->delete();
+
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'purged',
+                settingKey: 'spam_events',
+                oldValue: null,
+                newValue: ['days' => $days, 'deleted' => $deleted],
+                summary: "Purged {$deleted} spam shield event log(s) older than {$days} day(s)",
+            );
+        } catch (\Throwable) {
+        }
+
+        return redirect()->route('admin.security.ip-rules', ['tab' => 'spam'])
+            ->with('success', "Purged {$deleted} spam event log(s).");
+    }
+
+    /**
+     * Manually mark a customer email as OTP-verified.
+     */
+    public function storeVerifiedEmail(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email:filter|max:255',
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $record = VerifiedEmail::updateOrCreate(
+            ['email' => $email],
+            [
+                'verified_at' => now(),
+            ]
+        );
+
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'created',
+                settingKey: "verified_email:{$email}",
+                oldValue: null,
+                newValue: ['email' => $email],
+                entityType: VerifiedEmail::class,
+                entityId: $record->id,
+                summary: "Manually verified customer email {$email}",
+            );
+        } catch (\Throwable) {
+        }
+
+        return redirect()->route('admin.security.ip-rules', ['tab' => 'verified_emails'])
+            ->with('success', "Email {$email} marked as verified.");
+    }
+
+    /**
+     * Revoke a verified customer email so OTP verification is required again.
+     */
+    public function destroyVerifiedEmail(int $id)
+    {
+        $record = VerifiedEmail::findOrFail($id);
+        $email = $record->email;
+        $record->delete();
+
+        try {
+            app(ConfigAuditService::class)->log(
+                section: 'security',
+                action: 'deleted',
+                settingKey: "verified_email:{$email}",
+                oldValue: ['email' => $email],
+                newValue: null,
+                entityType: VerifiedEmail::class,
+                entityId: $id,
+                summary: "Revoked verified status for customer email {$email}",
+            );
+        } catch (\Throwable) {
+        }
+
+        return redirect()->route('admin.security.ip-rules', ['tab' => 'verified_emails'])
+            ->with('success', "Revoked verification for {$email}.");
     }
 }

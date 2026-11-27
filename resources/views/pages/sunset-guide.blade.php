@@ -276,10 +276,7 @@
                 @foreach($sunsetTours as $t)
                 <div class="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
                     <div class="relative aspect-16/10 overflow-hidden bg-slate-100">
-                        @php
-                            $img = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif');
-                        @endphp
-                        <img src="{{ asset('images/' . $img) }}" alt="{{ $t->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        <img src="{{ resolve_tour_image($t->hero_image ?: $t->thumb_image) }}" alt="{{ $t->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
                         <div class="absolute top-3 start-3">
                             <span class="bg-slate-950/80 backdrop-blur-md text-amber-400 border border-white/10 rounded-full px-3 py-1 text-xs font-bold shadow-xs">
                                 <i class="bi bi-sunset-fill"></i> Prime Sunset Tour
@@ -331,7 +328,7 @@
                         <span>What time does the sun set in the Dubai desert?</span>
                         <i class="bi bi-chevron-down transition-transform" :class="{ 'rotate-180': active === 1 }"></i>
                     </button>
-                    <div x-show="active === 1" x-collapse class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                    <div x-show="active === 1" x-collapse x-cloak class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
                         Sunset in the Dubai desert ranges from 5:34 PM during the winter solstice in December to 7:16 PM during the summer solstice in June and July. In peak safari season (October to March), sunset occurs between 5:35 PM and 6:28 PM.
                     </div>
                 </div>
@@ -341,7 +338,7 @@
                         <span>When is the best time for golden hour photography on safari?</span>
                         <i class="bi bi-chevron-down transition-transform" :class="{ 'rotate-180': active === 2 }"></i>
                     </button>
-                    <div x-show="active === 2" x-collapse class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                    <div x-show="active === 2" x-collapse x-cloak class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
                         Golden hour begins approximately 35 to 45 minutes prior to official sunset. This is when the sun dips below a 6-degree angle, casting long shadows across the red dunes and turning the sand from gold to deep crimson.
                     </div>
                 </div>
@@ -351,7 +348,7 @@
                         <span>What time do evening safaris pick up to catch the sunset?</span>
                         <i class="bi bi-chevron-down transition-transform" :class="{ 'rotate-180': active === 3 }"></i>
                     </button>
-                    <div x-show="active === 3" x-collapse class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                    <div x-show="active === 3" x-collapse x-cloak class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
                         Dunes Discovery safari 4x4 Land Cruisers depart from Dubai hotels between 2:30 PM and 3:30 PM depending on the season, arriving at the high Lahbab dunes 45 minutes before sunset for adrenaline dune bashing followed by peaceful sunset photography atop the crests.
                     </div>
                 </div>
@@ -361,7 +358,7 @@
                         <span>Does the temperature drop quickly in the desert after sunset?</span>
                         <i class="bi bi-chevron-down transition-transform" :class="{ 'rotate-180': active === 4 }"></i>
                     </button>
-                    <div x-show="active === 4" x-collapse class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                    <div x-show="active === 4" x-collapse x-cloak class="p-4 sm:p-5 text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
                         Yes. Desert sand does not retain heat after dark. In winter months (November to February), temperatures can drop from 28°C in the afternoon to 16°C after sunset, so light jackets or wraps are recommended for the evening camp BBQ and stargazing.
                     </div>
                 </div>

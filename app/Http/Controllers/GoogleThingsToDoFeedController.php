@@ -91,16 +91,19 @@ class GoogleThingsToDoFeedController extends Controller
         $this->ensureFeedEnabled();
 
         $data = Cache::remember('gttd_feed_json', $this->cacheTtl, function () {
+            $operator = $this->getOperatorData();
+
             return [
                 'metadata' => [
                     'feed_name' => 'Google Things To Do Catalog Feed',
                     'feed_version' => '1.0',
+                    'partner_id' => $operator['partner_id'],
                     'generation_timestamp' => now()->toIso8601String(),
-                    'publisher' => 'Dunes Discovery Tourism L.L.C.',
-                    'license' => 'Dubai DET #1430583',
+                    'publisher' => $operator['name'],
+                    'license' => 'Dubai DET #'.$operator['license_number'],
                 ],
-                'operator' => $this->getOperatorData(),
-                'products' => $this->getProductsData(),
+                'operator' => $operator,
+                'products' => $this->getProductsData($operator),
                 'options' => $this->getOptionsData(),
             ];
         });
@@ -158,15 +161,19 @@ class GoogleThingsToDoFeedController extends Controller
     public function getOperatorData(): array
     {
         $settings = Setting::pluck('setting_value', 'setting_key');
-        $placeId = $settings['google_place_id'] ?? 'ChIJbWsIEIVEdEER4uHEhb2dbcQ';
-        $siteName = $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.';
-        $phone = $settings['site_phone'] ?? '+971 50 245 6056';
-        $address = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
-        $postalCode = $settings['site_postal_code'] ?? '00000';
-        $cid = $settings['google_cid'] ?? '14154142641213989346';
+        $placeId = ($settings['google_place_id'] ?? null) ?: 'ChIJbWsIEIVEdEER4uHEhb2dbcQ';
+        $siteName = ($settings['site_name'] ?? null) ?: 'Dunes Discovery Tourism L.L.C.';
+        $phone = ($settings['site_phone'] ?? null) ?: '+971 50 245 6056';
+        $address = ($settings['site_address'] ?? null) ?: 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
+        $postalCode = ($settings['site_postal_code'] ?? null) ?: '00000';
+        $cid = ($settings['google_cid'] ?? null) ?: '14154142641213989346';
+        $partnerId = ($settings['gttd_partner_id'] ?? null) ?: 'dunes-discovery-tourism';
+        $defaultPoiPlaceId = ($settings['gttd_default_poi_place_id'] ?? null) ?: 'ChIJt7e4-c9xdj4R_hY6W5xrqU8';
 
         return [
             'operator_id' => $placeId,
+            'partner_id' => $partnerId,
+            'default_poi_place_id' => $defaultPoiPlaceId,
             'name' => $siteName,
             'google_business_profile_name' => $placeId,
             'google_cid' => $cid,
@@ -179,25 +186,26 @@ class GoogleThingsToDoFeedController extends Controller
                 'country_code' => 'AE',
                 'postal_code' => $postalCode,
             ],
-            'license_number' => $settings['company_license_number'] ?? '1430583',
+            'license_number' => ($settings['company_license_number'] ?? null) ?: '1430583',
         ];
     }
 
     /**
      * Build Products list.
      */
-    public function getProductsData(): array
+    public function getProductsData(?array $operator = null): array
     {
         $tours = Tour::where('status', 'active')
             ->with(['category', 'tiers', 'contentItems'])
             ->orderBy('priority', 'asc')
             ->get();
 
-        $operator = $this->getOperatorData();
+        $operator ??= $this->getOperatorData();
+        $defaultPoiPlaceId = $operator['default_poi_place_id'] ?? 'ChIJt7e4-c9xdj4R_hY6W5xrqU8';
         $products = [];
 
         foreach ($tours as $tour) {
-            $poi = $this->resolvePoiForTour($tour);
+            $poi = $this->resolvePoiForTour($tour, $defaultPoiPlaceId);
             $landingUrl = url('/'.$tour->slug).'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
             $imageUrl = resolve_tour_image($tour->hero_image ?: $tour->thumb_image);
@@ -373,10 +381,11 @@ class GoogleThingsToDoFeedController extends Controller
             ->get();
 
         $operator = $this->getOperatorData();
+        $defaultPoiPlaceId = $operator['default_poi_place_id'] ?? 'ChIJt7e4-c9xdj4R_hY6W5xrqU8';
         $products = [];
 
         foreach ($tours as $tour) {
-            $poi = $this->resolvePoiForTour($tour);
+            $poi = $this->resolvePoiForTour($tour, $defaultPoiPlaceId);
             $landingUrl = url('/'.$tour->slug).'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
             $imageUrl = resolve_tour_image($tour->hero_image ?: $tour->thumb_image);
@@ -566,10 +575,11 @@ class GoogleThingsToDoFeedController extends Controller
         return [
             'feed_metadata' => [
                 'feed_name' => 'ext.travel.ttd.proto.feeds.v1.ProductFeed',
+                'partner_id' => $operator['partner_id'],
                 'nonce' => uniqid('gttd_prod_', true),
                 'timestamp' => now()->toIso8601String(),
-                'publisher' => 'Dunes Discovery Tourism L.L.C.',
-                'license' => 'Dubai DET #1430583',
+                'publisher' => $operator['name'],
+                'license' => 'Dubai DET #'.$operator['license_number'],
             ],
             'products' => $products,
         ];
@@ -578,10 +588,11 @@ class GoogleThingsToDoFeedController extends Controller
     /**
      * Resolve Point of Interest for a given tour.
      */
-    public function resolvePoiForTour(Tour $tour): array
+    public function resolvePoiForTour(Tour $tour, ?string $defaultPoiPlaceId = null): array
     {
         $slug = strtolower($tour->slug);
         $cat = strtolower($tour->category?->name ?? '');
+        $defaultPlaceId = $defaultPoiPlaceId ?: (Setting::where('setting_key', 'gttd_default_poi_place_id')->value('setting_value') ?: 'ChIJt7e4-c9xdj4R_hY6W5xrqU8');
 
         // 1. Abu Dhabi City Tour
         if (str_contains($slug, 'abu-dhabi')) {
@@ -659,7 +670,7 @@ class GoogleThingsToDoFeedController extends Controller
         if (str_contains($slug, 'overnight')) {
             return [
                 'name' => 'Lahbab Desert Conservation Camp & Stargazing',
-                'place_id' => 'ChIJt7e4-c9xdj4R_hY6W5xrqU8',
+                'place_id' => $defaultPlaceId,
                 'lat' => 24.9754,
                 'lng' => 55.5928,
                 'locality' => 'Dubai',
@@ -670,7 +681,7 @@ class GoogleThingsToDoFeedController extends Controller
         // 8. Default: Lahbab Red Dunes Dubai (Primary Safari Location)
         return [
             'name' => 'Lahbab Red Dunes Desert Dubai',
-            'place_id' => 'ChIJt7e4-c9xdj4R_hY6W5xrqU8',
+            'place_id' => $defaultPlaceId,
             'lat' => 24.9754,
             'lng' => 55.5928,
             'locality' => 'Dubai',
@@ -707,48 +718,58 @@ class GoogleThingsToDoFeedController extends Controller
      */
     protected function buildProductsXml(): string
     {
-        $products = $this->getProductsData();
+        $op = $this->getOperatorData();
+        $products = $this->getProductsData($op);
         $now = now()->toIso8601String();
+        $partnerId = $this->escapeXml($op['partner_id']);
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
         $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
+        $xml .= "    <partner_id>{$partnerId}</partner_id>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
         $xml .= "  </metadata>\n";
         $xml .= "  <products>\n";
 
         foreach ($products as $p) {
+            $productId = $this->escapeXml($p['product_id']);
+            $operatorId = $this->escapeXml($p['operator_id']);
+            $inventoryType = $this->escapeXml($p['inventory_type']);
             $title = $this->escapeXml($p['title']);
             $desc = $this->escapeXml($p['description']);
             $url = $this->escapeXml($p['landing_page_url']);
+            $duration = $this->escapeXml($p['duration']);
+            $placeId = $this->escapeXml($p['location']['poi_place_id']);
+            $locality = $this->escapeXml($p['location']['locality']);
+            $countryCode = $this->escapeXml($p['location']['country_code']);
             $img = $this->escapeXml($p['media']['image_url']);
             $cat = $this->escapeXml($p['category']);
 
             $xml .= "    <product>\n";
-            $xml .= "      <product_id>{$p['product_id']}</product_id>\n";
-            $xml .= "      <operator_id>{$p['operator_id']}</operator_id>\n";
+            $xml .= "      <product_id>{$productId}</product_id>\n";
+            $xml .= "      <operator_id>{$operatorId}</operator_id>\n";
             $xml .= "      <inventory_types>\n";
-            $xml .= "        <inventory_type>{$p['inventory_type']}</inventory_type>\n";
+            $xml .= "        <inventory_type>{$inventoryType}</inventory_type>\n";
             $xml .= "        <inventory_type>OFFICIAL</inventory_type>\n";
             $xml .= "      </inventory_types>\n";
             $xml .= "      <title lang=\"en\">{$title}</title>\n";
             $xml .= "      <description lang=\"en\">{$desc}</description>\n";
             $xml .= "      <category>{$cat}</category>\n";
             $xml .= "      <landing_page_url>{$url}</landing_page_url>\n";
-            $xml .= "      <duration>{$p['duration']}</duration>\n";
+            $xml .= "      <duration>{$duration}</duration>\n";
             $xml .= "      <ratings>\n";
             $xml .= "        <average_rating>{$p['ratings']['average_rating']}</average_rating>\n";
             $xml .= "        <rating_count>{$p['ratings']['rating_count']}</rating_count>\n";
             $xml .= "      </ratings>\n";
             $xml .= "      <location>\n";
-            $xml .= "        <place_id>{$p['location']['poi_place_id']}</place_id>\n";
+            $xml .= "        <place_id>{$placeId}</place_id>\n";
             $xml .= "        <lat_lng>\n";
             $xml .= "          <latitude>{$p['location']['latitude']}</latitude>\n";
             $xml .= "          <longitude>{$p['location']['longitude']}</longitude>\n";
             $xml .= "        </lat_lng>\n";
-            $xml .= "        <locality>{$p['location']['locality']}</locality>\n";
-            $xml .= "        <country_code>{$p['location']['country_code']}</country_code>\n";
+            $xml .= "        <locality>{$locality}</locality>\n";
+            $xml .= "        <country_code>{$countryCode}</country_code>\n";
             $xml .= "      </location>\n";
             $xml .= "      <media>\n";
             $xml .= "        <image>\n";
@@ -783,27 +804,33 @@ class GoogleThingsToDoFeedController extends Controller
      */
     protected function buildOptionsXml(): string
     {
+        $op = $this->getOperatorData();
         $options = $this->getOptionsData();
         $now = now()->toIso8601String();
+        $partnerId = $this->escapeXml($op['partner_id']);
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
         $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
+        $xml .= "    <partner_id>{$partnerId}</partner_id>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
         $xml .= "  </metadata>\n";
         $xml .= "  <options>\n";
 
         foreach ($options as $opt) {
+            $optionId = $this->escapeXml($opt['option_id']);
+            $productId = $this->escapeXml($opt['product_id']);
+            $currency = $this->escapeXml($opt['currency']);
             $title = $this->escapeXml($opt['title']);
             $url = $this->escapeXml($opt['landing_page_url']);
 
             $xml .= "    <option>\n";
-            $xml .= "      <option_id>{$opt['option_id']}</option_id>\n";
-            $xml .= "      <product_id>{$opt['product_id']}</product_id>\n";
+            $xml .= "      <option_id>{$optionId}</option_id>\n";
+            $xml .= "      <product_id>{$productId}</product_id>\n";
             $xml .= "      <title lang=\"en\">{$title}</title>\n";
             $xml .= "      <pricing>\n";
-            $xml .= "        <currency>{$opt['currency']}</currency>\n";
+            $xml .= "        <currency>{$currency}</currency>\n";
             $xml .= "        <price_micros>{$opt['price_micros']}</price_micros>\n";
             $xml .= "        <amount>{$opt['amount']}</amount>\n";
             if (! empty($opt['original_amount'])) {
@@ -845,6 +872,9 @@ class GoogleThingsToDoFeedController extends Controller
         $op = $this->getOperatorData();
         $now = now()->toIso8601String();
 
+        $partnerId = $this->escapeXml($op['partner_id']);
+        $operatorId = $this->escapeXml($op['operator_id']);
+        $gbpName = $this->escapeXml($op['google_business_profile_name']);
         $name = $this->escapeXml($op['name']);
         $phone = $this->escapeXml($op['phone']);
         $url = $this->escapeXml($op['url']);
@@ -858,13 +888,14 @@ class GoogleThingsToDoFeedController extends Controller
         $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
+        $xml .= "    <partner_id>{$partnerId}</partner_id>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
         $xml .= "  </metadata>\n";
         $xml .= "  <operators>\n";
         $xml .= "    <operator>\n";
-        $xml .= "      <operator_id>{$op['operator_id']}</operator_id>\n";
+        $xml .= "      <operator_id>{$operatorId}</operator_id>\n";
         $xml .= "      <name>{$name}</name>\n";
-        $xml .= "      <google_business_profile_name>{$op['google_business_profile_name']}</google_business_profile_name>\n";
+        $xml .= "      <google_business_profile_name>{$gbpName}</google_business_profile_name>\n";
         $xml .= "      <phone>{$phone}</phone>\n";
         $xml .= "      <url>{$url}</url>\n";
         $xml .= "      <address>\n";
@@ -888,9 +919,12 @@ class GoogleThingsToDoFeedController extends Controller
     {
         $now = now()->toIso8601String();
         $op = $this->getOperatorData();
-        $products = $this->getProductsData();
+        $products = $this->getProductsData($op);
         $options = $this->getOptionsData();
 
+        $partnerId = $this->escapeXml($op['partner_id']);
+        $operatorId = $this->escapeXml($op['operator_id']);
+        $gbpName = $this->escapeXml($op['google_business_profile_name']);
         $name = $this->escapeXml($op['name']);
         $phone = $this->escapeXml($op['phone']);
         $url = $this->escapeXml($op['url']);
@@ -904,15 +938,16 @@ class GoogleThingsToDoFeedController extends Controller
         $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
+        $xml .= "    <partner_id>{$partnerId}</partner_id>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
         $xml .= "  </metadata>\n";
 
         // Operators block
         $xml .= "  <operators>\n";
         $xml .= "    <operator>\n";
-        $xml .= "      <operator_id>{$op['operator_id']}</operator_id>\n";
+        $xml .= "      <operator_id>{$operatorId}</operator_id>\n";
         $xml .= "      <name>{$name}</name>\n";
-        $xml .= "      <google_business_profile_name>{$op['google_business_profile_name']}</google_business_profile_name>\n";
+        $xml .= "      <google_business_profile_name>{$gbpName}</google_business_profile_name>\n";
         $xml .= "      <phone>{$phone}</phone>\n";
         $xml .= "      <url>{$url}</url>\n";
         $xml .= "      <address>\n";
@@ -928,36 +963,43 @@ class GoogleThingsToDoFeedController extends Controller
         // Products block
         $xml .= "  <products>\n";
         foreach ($products as $p) {
+            $productId = $this->escapeXml($p['product_id']);
+            $pOperatorId = $this->escapeXml($p['operator_id']);
+            $inventoryType = $this->escapeXml($p['inventory_type']);
             $title = $this->escapeXml($p['title']);
             $desc = $this->escapeXml($p['description']);
             $pUrl = $this->escapeXml($p['landing_page_url']);
+            $duration = $this->escapeXml($p['duration']);
+            $placeId = $this->escapeXml($p['location']['poi_place_id']);
+            $pLocality = $this->escapeXml($p['location']['locality']);
+            $pCountry = $this->escapeXml($p['location']['country_code']);
             $img = $this->escapeXml($p['media']['image_url']);
             $cat = $this->escapeXml($p['category']);
 
             $xml .= "    <product>\n";
-            $xml .= "      <product_id>{$p['product_id']}</product_id>\n";
-            $xml .= "      <operator_id>{$p['operator_id']}</operator_id>\n";
+            $xml .= "      <product_id>{$productId}</product_id>\n";
+            $xml .= "      <operator_id>{$pOperatorId}</operator_id>\n";
             $xml .= "      <inventory_types>\n";
-            $xml .= "        <inventory_type>{$p['inventory_type']}</inventory_type>\n";
+            $xml .= "        <inventory_type>{$inventoryType}</inventory_type>\n";
             $xml .= "        <inventory_type>OFFICIAL</inventory_type>\n";
             $xml .= "      </inventory_types>\n";
             $xml .= "      <title lang=\"en\">{$title}</title>\n";
             $xml .= "      <description lang=\"en\">{$desc}</description>\n";
             $xml .= "      <category>{$cat}</category>\n";
             $xml .= "      <landing_page_url>{$pUrl}</landing_page_url>\n";
-            $xml .= "      <duration>{$p['duration']}</duration>\n";
+            $xml .= "      <duration>{$duration}</duration>\n";
             $xml .= "      <ratings>\n";
             $xml .= "        <average_rating>{$p['ratings']['average_rating']}</average_rating>\n";
             $xml .= "        <rating_count>{$p['ratings']['rating_count']}</rating_count>\n";
             $xml .= "      </ratings>\n";
             $xml .= "      <location>\n";
-            $xml .= "        <place_id>{$p['location']['poi_place_id']}</place_id>\n";
+            $xml .= "        <place_id>{$placeId}</place_id>\n";
             $xml .= "        <lat_lng>\n";
             $xml .= "          <latitude>{$p['location']['latitude']}</latitude>\n";
             $xml .= "          <longitude>{$p['location']['longitude']}</longitude>\n";
             $xml .= "        </lat_lng>\n";
-            $xml .= "        <locality>{$p['location']['locality']}</locality>\n";
-            $xml .= "        <country_code>{$p['location']['country_code']}</country_code>\n";
+            $xml .= "        <locality>{$pLocality}</locality>\n";
+            $xml .= "        <country_code>{$pCountry}</country_code>\n";
             $xml .= "      </location>\n";
             $xml .= "      <media>\n";
             $xml .= "        <image>\n";
@@ -985,15 +1027,18 @@ class GoogleThingsToDoFeedController extends Controller
         // Options block
         $xml .= "  <options>\n";
         foreach ($options as $opt) {
+            $optionId = $this->escapeXml($opt['option_id']);
+            $optProductId = $this->escapeXml($opt['product_id']);
+            $optCurrency = $this->escapeXml($opt['currency']);
             $optTitle = $this->escapeXml($opt['title']);
             $optUrl = $this->escapeXml($opt['landing_page_url']);
 
             $xml .= "    <option>\n";
-            $xml .= "      <option_id>{$opt['option_id']}</option_id>\n";
-            $xml .= "      <product_id>{$opt['product_id']}</product_id>\n";
+            $xml .= "      <option_id>{$optionId}</option_id>\n";
+            $xml .= "      <product_id>{$optProductId}</product_id>\n";
             $xml .= "      <title lang=\"en\">{$optTitle}</title>\n";
             $xml .= "      <pricing>\n";
-            $xml .= "        <currency>{$opt['currency']}</currency>\n";
+            $xml .= "        <currency>{$optCurrency}</currency>\n";
             $xml .= "        <price_micros>{$opt['price_micros']}</price_micros>\n";
             $xml .= "        <amount>{$opt['amount']}</amount>\n";
             if (! empty($opt['original_amount'])) {

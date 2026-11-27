@@ -12,7 +12,7 @@ class SubmitIndexNowCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'seo:indexnow {--all : Submit all catalog URLs (manual full batch)} {--recent : Submit only URLs updated in the last 24 hours (streaming delta)} {--url=* : Specific URLs to submit}';
+    protected $signature = 'seo:indexnow {--all : Submit all catalog URLs (manual full batch)} {--recent : Submit only URLs updated in the last 24 hours (streaming delta)} {--url=* : Specific URLs to submit} {--force : Submit even if IndexNow is disabled in settings}';
 
     /**
      * The console command description.
@@ -28,9 +28,9 @@ class SubmitIndexNowCommand extends Command
     {
         $this->info('Starting IndexNow submission...');
 
-        if (! $indexNow->isEnabled()) {
+        if (! $indexNow->isEnabled() && ! $this->option('force')) {
             $this->warn('IndexNow is currently disabled in site settings.');
-            if (! $this->confirm('Do you wish to proceed anyway?', false)) {
+            if (! $this->input->isInteractive() || ! $this->confirm('Do you wish to proceed anyway?', false)) {
                 return Command::SUCCESS;
             }
         }

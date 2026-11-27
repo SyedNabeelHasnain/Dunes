@@ -122,9 +122,9 @@ trait HasRolesAndPermissions
 
     public function normalizedRole(): string
     {
-        $role = strtolower(trim((string) ($this->role ?? 'super_admin')));
+        $role = strtolower(trim((string) ($this->role ?? '')));
 
-        return array_key_exists($role, static::roleDefinitions()) ? $role : 'super_admin';
+        return array_key_exists($role, static::roleDefinitions()) ? $role : self::ROLE_VIEWER;
     }
 
     public function roleLabel(): string

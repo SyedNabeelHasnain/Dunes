@@ -49,14 +49,13 @@ class VerifiedEmail extends Model
                 return true;
             }
 
-            // 2. Fallback lookup across historical bookings, verified contacts, or registered users
+            // 2. Fallback lookup across historical bookings or verified contacts
             $previouslyVerified = Booking::whereRaw('LOWER(email) = ?', [$email])
                 ->whereNotIn('status', ['draft', 'cancelled'])
                 ->exists()
                 || Contact::whereRaw('LOWER(email) = ?', [$email])
                     ->where('is_verified', true)
-                    ->exists()
-                || User::whereRaw('LOWER(email) = ?', [$email])->exists();
+                    ->exists();
 
             if ($previouslyVerified) {
                 static::markVerified($email);

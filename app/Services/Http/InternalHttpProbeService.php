@@ -7,9 +7,11 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Manager;
 use Illuminate\View\Factory as ViewFactory;
@@ -65,12 +67,27 @@ class InternalHttpProbeService
     public function probePath(string $path, array $extraHeaders = []): array
     {
         $norm = $path === '' ? '/' : '/'.ltrim($path, '/');
+        if (str_starts_with($norm, '/admin')) {
+            return [
+                'status' => 403,
+                'html' => '',
+                'content_type' => '',
+                'location' => '',
+                'headers' => [],
+            ];
+        }
+
         $kernel = app(HttpKernel::class);
 
         $originalRequest = app()->bound('request') ? app('request') : null;
         $originalSessionDriver = config('session.driver');
         $originalLocale = App::getLocale();
         $originalCarbonLocale = Carbon::getLocale();
+
+        /** @var Router $router */
+        $router = app('router');
+        $originalRouterCurrent = $this->snapshotProperty($router, Router::class, 'current');
+        $originalRouterRequest = $this->snapshotProperty($router, Router::class, 'currentRequest');
 
         /** @var SessionManager $sessionManager */
         $sessionManager = app('session');
@@ -139,7 +156,9 @@ class InternalHttpProbeService
                 'location' => $location,
                 'headers' => $flatHeaders,
             ];
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning("InternalHttpProbeService probe failed for {$norm}: ".$e->getMessage());
+
             return [
                 'status' => 500,
                 'html' => '',
@@ -149,6 +168,9 @@ class InternalHttpProbeService
             ];
         } finally {
             self::$probing = $wasProbing;
+
+            $this->restoreProperty($router, Router::class, 'current', $originalRouterCurrent);
+            $this->restoreProperty($router, Router::class, 'currentRequest', $originalRouterRequest);
 
             $cookieJar->flushQueuedCookies();
             foreach ($originalQueuedCookies as $cookie) {

@@ -786,12 +786,18 @@ $(document).ready(function() {
                         btn.attr('data-location', res.lead.location);
                         btn.attr('data-isp', res.lead.isp);
 
-                        // Update table row cells
+                        // Update table row cells (Location is column 7)
                         const tableRow = $(`#whatsapp-row-${id}`);
                         if (tableRow.length) {
-                            tableRow.find('td:nth-child(5) .font-semibold').html(`<i class="bi bi-geo-alt-fill text-rose-500"></i> ${res.lead.location}`);
+                            const locCell = tableRow.find('td:nth-child(7)');
+                            const locSpan = locCell.find('.font-semibold');
+                            if (locSpan.length) {
+                                locSpan.empty()
+                                    .append($('<i>', { class: 'bi bi-geo-alt-fill text-rose-500 me-1' }))
+                                    .append(document.createTextNode(res.lead.location || ''));
+                            }
                             if (res.lead.isp && res.lead.isp !== 'Not Available') {
-                                tableRow.find('td:nth-child(5) .text-\\[10px\\]').text(res.lead.isp);
+                                locCell.find('.text-\\[10px\\]').text(res.lead.isp);
                             }
                         }
                     }

@@ -78,7 +78,7 @@ class AdminSessionRecordingController extends Controller
                 'exception' => $e,
             ]);
 
-            $recordings = VisitorSessionRecording::query()->paginate(25);
+            $recordings = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 25);
             $stats = [
                 'total_recordings' => 0,
                 'starred_recordings' => 0,
@@ -188,6 +188,11 @@ class AdminSessionRecordingController extends Controller
      */
     public function purge(Request $request): RedirectResponse
     {
+        $request->validate([
+            'mode' => 'nullable|in:expired,all',
+            'days' => 'nullable|integer|min:1|max:365',
+        ]);
+
         $mode = $request->input('mode', 'expired');
 
         if ($mode === 'all') {
@@ -200,7 +205,7 @@ class AdminSessionRecordingController extends Controller
         $days = $request->filled('days') ? (int) $request->days : null;
         $res = $this->recordingService->purgeOldRecordings($days);
         $count = $res['deleted_count'];
-        $d = $res['retention_days'];
+        $d = $res['retention_days'] ?? ($days ?? 14);
 
         return back()->with('success', "Purged {$count} recording(s) older than {$d} days.");
     }
@@ -224,6 +229,8 @@ class AdminSessionRecordingController extends Controller
             ['setting_key' => 'session_recordings_enabled'],
             ['setting_value' => $request->boolean('session_recordings_enabled') ? '1' : '0']
         );
+
+        app(\App\Services\SettingsService::class)->clearCache();
 
         return back()->with('success', 'Session recording preferences updated successfully.');
     }

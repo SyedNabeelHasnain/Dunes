@@ -22,6 +22,40 @@ class TrackVisitor
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Persist lightweight session attribution BEFORE StartSession writes the session cookie
+        if (
+            ! app()->runningUnitTests()
+            && ! InternalHttpProbeService::isProbing()
+            && $request->isMethod('GET')
+            && ! $request->ajax()
+            && ! $request->is('admin*', 'api*', 'assets/*', 'build/*', 'storage/*', 'images/*', 'uploads/*')
+            && $request->hasSession()
+        ) {
+            try {
+                $session = $request->session();
+                if (! $session->has('tracking_session_start')) {
+                    $session->put('tracking_session_start', time());
+                    $session->put('tracking_landing', $request->fullUrl());
+                }
+                if ($request->filled('gclid')) {
+                    $session->put('google_ads_gclid', mb_substr((string) $request->query('gclid'), 0, 150));
+                }
+                if ($request->filled('fbclid')) {
+                    $session->put('meta_ads_fbclid', mb_substr((string) $request->query('fbclid'), 0, 150));
+                }
+                $pages = (array) $session->get('tracking_pages', []);
+                $currentUri = $request->getRequestUri();
+                if (empty($pages) || end($pages) !== $currentUri) {
+                    $pages[] = mb_substr($currentUri, 0, 250);
+                    if (count($pages) > 25) {
+                        $pages = array_slice($pages, -25);
+                    }
+                    $session->put('tracking_pages', $pages);
+                }
+            } catch (\Throwable) {
+            }
+        }
+
         return $next($request);
     }
 

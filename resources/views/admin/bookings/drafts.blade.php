@@ -368,7 +368,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-12 text-slate-400">
+                        <td colspan="8" class="text-center py-12 text-slate-400">
                             <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3 text-2xl">
                                 <i class="bi bi-cart-check-fill text-emerald-500"></i>
                             </div>
@@ -577,7 +577,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const cancelBulkBtn = document.getElementById('cancelDraftsBulk');
 
     function updateBulkBar() {
-        const selected = Array.from(rowCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+    const getRowCheckboxes = () => Array.from(document.querySelectorAll('.draft-row-select'));
+
+    function updateBulkBar() {
+        const selected = getRowCheckboxes().filter(cb => cb.checked).map(cb => cb.value);
         if (selected.length > 0) {
             bulkBar.style.display = 'flex';
             selectedCountSpan.textContent = selected.length;
@@ -588,22 +591,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (selectAll) {
         selectAll.addEventListener('change', function() {
-            rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+            getRowCheckboxes().forEach(cb => cb.checked = selectAll.checked);
             updateBulkBar();
         });
     }
 
-    rowCheckboxes.forEach(cb => {
-        cb.addEventListener('change', function() {
-            if (!cb.checked && selectAll) selectAll.checked = false;
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.classList && e.target.classList.contains('draft-row-select')) {
+            if (!e.target.checked && selectAll) selectAll.checked = false;
             updateBulkBar();
-        });
+        }
     });
 
     if (cancelBulkBtn) {
         cancelBulkBtn.addEventListener('click', function() {
             if (selectAll) selectAll.checked = false;
-            rowCheckboxes.forEach(cb => cb.checked = false);
+            getRowCheckboxes().forEach(cb => cb.checked = false);
             updateBulkBar();
         });
     }
@@ -629,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bulk Delete Action
     document.querySelectorAll('.drafts-bulk-action').forEach(btn => {
         btn.addEventListener('click', async function() {
-            const selected = Array.from(rowCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const selected = getRowCheckboxes().filter(cb => cb.checked).map(cb => cb.value);
             if (!selected.length) return;
 
             const executeBulk = async () => {

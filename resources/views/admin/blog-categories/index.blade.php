@@ -83,6 +83,70 @@
             </table>
         </div>
     </div>
+    <!-- Blog Tags Manager -->
+    @if(isset($tags))
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4" x-data="{
+        editTagOpen: false,
+        editTag: { id: null, name: '' },
+        openTagEdit(t) { this.editTag = { ...t }; this.editTagOpen = true; }
+    }">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div>
+                <h2 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-tags-fill text-primary"></i> Blog Tags Manager
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Rename or clean up blog tags across all published articles.</p>
+            </div>
+            <form action="{{ route('admin.blog-tags.store') }}" method="POST" class="flex items-center gap-2">
+                @csrf
+                <input type="text" name="name" required placeholder="New tag name..." class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs text-slate-800 outline-hidden focus:border-primary">
+                <button type="submit" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold cursor-pointer">+ Add Tag</button>
+            </form>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+            @forelse($tags as $tag)
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                <span class="font-bold text-slate-800">#{{ $tag->name }}</span>
+                <span class="text-[10px] font-mono text-slate-400">({{ $tag->posts_count ?? 0 }})</span>
+                <button type="button" @click='openTagEdit(@json(['id' => $tag->id, 'name' => $tag->name]))' class="text-slate-400 hover:text-primary cursor-pointer" title="Rename Tag">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+                <form action="{{ route('admin.blog-tags.destroy', $tag->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete tag &quot;{{ addslashes($tag->name) }}&quot;?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-slate-400 hover:text-rose-600 cursor-pointer" title="Delete Tag">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </form>
+            </div>
+            @empty
+            <span class="text-xs text-slate-400 italic">No blog tags created yet.</span>
+            @endforelse
+        </div>
+
+        <div x-show="editTagOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+            <div @click.outside="editTagOpen = false" class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-sm w-full p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="text-sm font-black text-slate-900">Rename Blog Tag</h3>
+                    <button type="button" @click="editTagOpen = false" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <form :action="`{{ url('/admin/blog-tags') }}/${editTag.id}`" method="POST" class="space-y-3">
+                    @csrf
+                    @method('PUT')
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Tag Name *</label>
+                        <input type="text" name="name" x-model="editTag.name" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="editTagOpen = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 cursor-pointer">Cancel</button>
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer">Save Tag</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <!-- Modal: Create Category (Alpine.js) -->
@@ -175,7 +239,7 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('.edit-cat-btn').on('click', function() {
+    $(document).on('click', '.edit-cat-btn', function() {
         const id = $(this).data('id');
         const name = $(this).data('name');
         const desc = $(this).data('desc');

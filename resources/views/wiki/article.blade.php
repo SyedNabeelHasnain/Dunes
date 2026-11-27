@@ -23,8 +23,8 @@
       "description": {!! json_encode($article->excerpt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
       "image": [{!! json_encode(resolve_tour_image($article->hero_image ?: $pillar->hero_image), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}],
       "inLanguage": {!! json_encode(app()->getLocale(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
-      "datePublished": {!! json_encode($article->created_at->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
-      "dateModified": {!! json_encode($article->updated_at->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "datePublished": {!! json_encode(($article->created_at ?? now())->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "dateModified": {!! json_encode(($article->updated_at ?? $article->created_at ?? now())->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
       "author": {
         "@type": "Organization",
         "name": "Dunes Discovery Tourism LLC",
@@ -59,6 +59,23 @@
 @php
     $toc = $article->parsed_toc;
     $contentHtml = Str::markdown((string) $article->content, ['html_input' => 'strip', 'allow_unsafe_links' => false]);
+    if (!empty($toc) && is_array($toc)) {
+        $tocQueue = array_values($toc);
+        $tocIdx = 0;
+        $contentHtml = preg_replace_callback('/<(h[2-4])(\s[^>]*)?>/i', function (array $m) use (&$tocQueue, &$tocIdx): string {
+            $tag = $m[1];
+            $attrs = $m[2] ?? '';
+            if (stripos($attrs, 'id=') !== false) {
+                return $m[0];
+            }
+            $anchor = $tocQueue[$tocIdx]['anchor'] ?? null;
+            $tocIdx++;
+            if (!$anchor) {
+                return $m[0];
+            }
+            return '<' . $tag . $attrs . ' id="' . e($anchor) . '">';
+        }, $contentHtml) ?? $contentHtml;
+    }
 @endphp
 
 <!-- Article Hero -->
@@ -93,7 +110,7 @@
             <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-4 border-t border-white/10">
                 <span class="flex items-center gap-1.5"><i class="bi bi-clock text-amber-400"></i> {{ $article->reading_time_minutes }} min read</span>
                 <span>•</span>
-                <span class="flex items-center gap-1.5"><i class="bi bi-calendar3 text-slate-400"></i> Published: {{ $article->created_at->format('M d, Y') }}</span>
+                <span class="flex items-center gap-1.5"><i class="bi bi-calendar3 text-slate-400"></i> Published: {{ $article->created_at ? $article->created_at->format('M d, Y') : 'Recent' }}</span>
                 <span>•</span>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-semibold">
                     <i class="bi bi-shield-check text-emerald-400"></i> Vetted by {{ $article->reviewed_by_name }} ({{ $article->last_reviewed_at ? $article->last_reviewed_at->format('M Y') : 'Recent' }})
@@ -118,7 +135,14 @@
                         </div>
                         <nav class="space-y-1.5 text-xs">
                             @foreach($toc as $item)
-                            <a href="#{{ $item['anchor'] }}" class="block text-slate-600 hover:text-primary transition-colors py-1 pl-{{ ($item['level'] - 2) * 3 }} leading-snug">
+                            @php
+                                $tocIndent = match ((int) ($item['level'] ?? 2)) {
+                                    3 => 'ps-3',
+                                    4 => 'ps-6',
+                                    default => 'ps-0',
+                                };
+                            @endphp
+                            <a href="#{{ $item['anchor'] }}" class="block text-slate-600 hover:text-primary transition-colors py-1 {{ $tocIndent }} leading-snug">
                                 {{ $item['title'] }}
                             </a>
                             @endforeach
@@ -155,7 +179,7 @@
             </aside>
 
             <!-- Main Guide Content (8 cols on lg) -->
-            <main class="lg:col-span-8 order-1 lg:order-2">
+            <div class="lg:col-span-8 order-1 lg:order-2">
                 <article class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-10 shadow-xs">
                     <!-- Featured Image -->
                     @if($article->hero_image)
@@ -219,10 +243,10 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-slate-700">Share this guide:</span>
-                            <a href="https://wa.me/?text={{ urlencode($article->title . ' - ' . $canonical) }}" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-colors" title="Share via WhatsApp">
+                            <a href="https://wa.me/?text={{ urlencode($article->title . ' - ' . $canonical) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-colors" title="Share via WhatsApp">
                                 <i class="bi bi-whatsapp"></i>
                             </a>
-                            <a href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode($canonical) }}" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center hover:bg-sky-600 hover:text-white transition-colors" title="Share on Twitter / X">
+                            <a href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode($canonical) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center hover:bg-sky-600 hover:text-white transition-colors" title="Share on Twitter / X">
                                 <i class="bi bi-twitter-x"></i>
                             </a>
                         </div>
@@ -248,7 +272,7 @@
                     </div>
                 </div>
                 @endif
-            </main>
+            </div>
         </div>
     </div>
 </section>

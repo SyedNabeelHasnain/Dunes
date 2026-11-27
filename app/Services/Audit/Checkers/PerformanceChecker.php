@@ -6,6 +6,7 @@ use App\Http\Controllers\RumVitalsController;
 use App\Models\MediaAsset;
 use App\Models\Setting;
 use App\Models\WebVitalsMetric;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class PerformanceChecker implements AuditCheckerInterface
@@ -81,13 +82,16 @@ class PerformanceChecker implements AuditCheckerInterface
         try {
             if (Schema::hasTable('web_vitals_metrics')) {
                 foreach (['LCP', 'INP', 'CLS'] as $metric) {
-                    $vals = WebVitalsMetric::where('metric_name', $metric)
-                        ->where('recorded_at', '>=', now()->subDays(14))
-                        ->orderBy('metric_value')
-                        ->pluck('metric_value')
-                        ->all();
-                    if (count($vals) >= 5) {
-                        $p75 = (float) $vals[(int) floor(0.75 * (count($vals) - 1))];
+                    $baseQuery = WebVitalsMetric::where('metric_name', $metric)
+                        ->where('recorded_at', '>=', now()->subDays(14));
+                    $sampleCount = (clone $baseQuery)->count();
+                    if ($sampleCount >= 5) {
+                        $p75Index = (int) floor(0.75 * ($sampleCount - 1));
+                        $p75 = (float) (clone $baseQuery)
+                            ->orderBy('metric_value')
+                            ->offset($p75Index)
+                            ->limit(1)
+                            ->value('metric_value');
                         $budget = RumVitalsController::BUDGETS[$metric]['good'];
                         if ($p75 > $budget) {
                             $issues[] = [
@@ -98,14 +102,15 @@ class PerformanceChecker implements AuditCheckerInterface
                                 'severity' => $p75 > RumVitalsController::BUDGETS[$metric]['poor'] ? 'high' : 'medium',
                                 'verification_type' => 'automated',
                                 'affected_url' => route('admin.health.index'),
-                                'evidence' => "Observed p75 over ".count($vals)." samples: {$p75} vs budget <= {$budget}",
+                                'evidence' => "Observed p75 over {$sampleCount} samples: {$p75} vs budget <= {$budget}",
                                 'recommended_action' => 'Inspect System Health & CWV Monitor to optimize LCP/CLS/INP on slow pages.',
                             ];
                         }
                     }
                 }
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('PerformanceChecker RUM query failed: '.$e->getMessage());
         }
 
         // 5. DOM Check on Probed Public Routes for Unsized Images (CLS) & Render-Blocking Scripts

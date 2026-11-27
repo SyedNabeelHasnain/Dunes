@@ -61,9 +61,18 @@ class AdminVideoReviewController extends Controller
     protected function saveRecords(array $records): void
     {
         $path = $this->getJsonPath();
-        File::put($path, json_encode(array_values($records), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $encoded = json_encode(array_values($records), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        file_put_contents($path, $encoded !== false ? $encoded : '[]', LOCK_EX);
         $this->galleryService->clearCache();
         \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
+    }
+
+    protected function safeVideoExtension(\Illuminate\Http\UploadedFile $file): string
+    {
+        $allowed = ['mp4', 'mov', 'webm', 'm4v'];
+        $guessed = strtolower((string) ($file->guessExtension() ?: $file->getClientOriginalExtension()));
+
+        return in_array($guessed, $allowed, true) ? $guessed : 'mp4';
     }
 
     /**
@@ -160,8 +169,8 @@ class AdminVideoReviewController extends Controller
                 $videoInput = (string) $request->input('existing_filename');
             }
 
-            $customSlug = $request->filled('custom_slug') ? (string) $request->input('custom_slug') : null;
-            $result = $this->analysisService->analyze($videoInput, $customSlug);
+            $customSlug = $request->filled('custom_slug') ? Str::slug((string) $request->input('custom_slug')) : null;
+            $result = $this->analysisService->analyze($videoInput, $customSlug ?: null);
 
             return response()->json($result);
         } catch (\InvalidArgumentException $e) {
@@ -176,7 +185,7 @@ class AdminVideoReviewController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Video analysis encountered an error: ' . $e->getMessage(),
+                'message' => 'Video analysis encountered an internal error. Please verify the file and try again.',
             ], 500);
         }
     }
@@ -231,7 +240,7 @@ class AdminVideoReviewController extends Controller
             if ($existingMatch) {
                 $filename = $existingMatch;
             } else {
-                $safeName = Str::slug(pathinfo($video->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $video->getClientOriginalExtension();
+                $safeName = Str::slug(pathinfo($video->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $this->safeVideoExtension($video);
                 $video->move($reviewsDir, $safeName);
                 $filename = $safeName;
             }
@@ -256,24 +265,33 @@ class AdminVideoReviewController extends Controller
             if ($existingPosterMatch) {
                 $posterFilename = $existingPosterMatch;
             } else {
-                $safePosterName = Str::slug(pathinfo($poster->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $poster->getClientOriginalExtension();
+                $safePosterName = Str::slug(pathinfo($poster->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . safe_uploaded_image_ext($poster, 'webp');
                 $poster->move($postersDir, $safePosterName);
                 $posterFilename = $safePosterName;
             }
         } elseif (! empty($filename) && empty($posterFilename)) {
-            $posterFilename = str_replace(pathinfo($filename, PATHINFO_EXTENSION), 'webp', $filename);
+            $posterFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
         }
 
-        $id = 'ddt_video_review_' . str_pad((string) (count($records) + 1), 2, '0', STR_PAD_LEFT);
+        $maxSuffix = 0;
+        foreach ($records as $rec) {
+            if (preg_match('/(\d+)$/', (string) ($rec['id'] ?? ''), $m)) {
+                $maxSuffix = max($maxSuffix, (int) $m[1]);
+            }
+        }
+        $nextNum = max($maxSuffix + 1, count($records) + 1);
+        $id = 'ddt_video_review_' . str_pad((string) $nextNum, 2, '0', STR_PAD_LEFT);
 
         $keywords = ! empty($validated['keywords'])
             ? array_values(array_filter(array_map('trim', explode(',', $validated['keywords']))))
             : [];
 
         $placements = [
-            'home' => (bool) $request->input('placement_home', false),
-            'gallery' => (bool) $request->input('placement_gallery', true),
-            'tour' => (bool) $request->input('placement_tour', false),
+            'home' => $request->boolean('placement_home', false),
+            'gallery' => $request->has('placements_submitted')
+                ? $request->boolean('placement_gallery', false)
+                : $request->boolean('placement_gallery', true),
+            'tour' => $request->boolean('placement_tour', false),
         ];
 
         $durationSec = (int) $validated['duration'];
@@ -354,7 +372,7 @@ class AdminVideoReviewController extends Controller
         // Replace video if uploaded or selected from library
         if ($request->hasFile('video_file')) {
             $video = $request->file('video_file');
-            $safeName = Str::slug(pathinfo($video->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $video->getClientOriginalExtension();
+            $safeName = Str::slug(pathinfo($video->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $this->safeVideoExtension($video);
             $video->move(public_path('videos/reviews'), $safeName);
             $entry['filename'] = $safeName;
         } elseif ($request->filled('existing_filename')) {
@@ -364,23 +382,23 @@ class AdminVideoReviewController extends Controller
         // Replace poster if uploaded or selected from library
         if ($request->hasFile('poster_file')) {
             $poster = $request->file('poster_file');
-            $safePosterName = Str::slug(pathinfo($poster->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $poster->getClientOriginalExtension();
+            $safePosterName = Str::slug(pathinfo($poster->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . safe_uploaded_image_ext($poster, 'webp');
             $poster->move(public_path('images/video-posters'), $safePosterName);
             $entry['poster_filename'] = $safePosterName;
         } elseif ($request->filled('existing_poster')) {
             $entry['poster_filename'] = basename($request->input('existing_poster'));
         }
 
-        $keywords = ! empty($validated['keywords'])
-            ? array_values(array_filter(array_map('trim', explode(',', $validated['keywords']))))
+        $keywords = $request->has('keywords')
+            ? array_values(array_filter(array_map('trim', explode(',', (string) ($validated['keywords'] ?? '')))))
             : ($entry['keywords'] ?? []);
 
         $durationSec = (int) $validated['duration'];
 
         $entry['title'] = $validated['title'];
         $entry['reviewer_name'] = $validated['reviewer_name'];
-        $entry['reviewer_country'] = ! empty($validated['reviewer_country']) ? $validated['reviewer_country'] : 'UAE';
-        $entry['reviewer_country_code'] = strtoupper(! empty($validated['reviewer_country_code']) ? $validated['reviewer_country_code'] : 'AE');
+        $entry['reviewer_country'] = ! empty($validated['reviewer_country']) ? $validated['reviewer_country'] : ($entry['reviewer_country'] ?? 'UAE');
+        $entry['reviewer_country_code'] = strtoupper(! empty($validated['reviewer_country_code']) ? $validated['reviewer_country_code'] : ($entry['reviewer_country_code'] ?? 'AE'));
         $entry['tour_slug'] = ! empty($validated['tour_slug']) ? $validated['tour_slug'] : null;
         $entry['tour_name'] = $this->resolveTourName($validated['tour_slug'] ?? null);
         $entry['category'] = $validated['category'];

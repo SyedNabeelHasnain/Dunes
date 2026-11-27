@@ -26,10 +26,10 @@ class SearchConsoleIntegrationService
 
         $gVerify = trim((string) ($settings['google_site_verification'] ?? ''));
         $gscProperty = trim((string) ($settings['gsc_property_url'] ?? ''));
-        $gscToken = trim((string) ($settings['gsc_oauth_access_token'] ?? config('services.google.search_console_token', '')));
+        $gscToken = trim((string) (($settings['gsc_oauth_access_token'] ?? '') ?: config('services.google.search_console_token', '')));
 
         $bVerify = trim((string) ($settings['bing_site_verification'] ?? ''));
-        $bingApiKey = trim((string) ($settings['bing_webmaster_api_key'] ?? config('services.bing.webmaster_api_key', '')));
+        $bingApiKey = trim((string) (($settings['bing_webmaster_api_key'] ?? '') ?: config('services.bing.webmaster_api_key', '')));
 
         return [
             'google_search_console' => [
@@ -58,8 +58,8 @@ class SearchConsoleIntegrationService
     public function fetchGoogleSearchAnalytics(int $days = 28): array
     {
         $settings = $this->settingsService->all();
-        $token = trim((string) ($settings['gsc_oauth_access_token'] ?? config('services.google.search_console_token', '')));
-        $property = trim((string) ($settings['gsc_property_url'] ?? url('/')));
+        $token = trim((string) (($settings['gsc_oauth_access_token'] ?? '') ?: config('services.google.search_console_token', '')));
+        $property = trim((string) (($settings['gsc_property_url'] ?? '') ?: url('/')));
 
         if ($token === '') {
             return [
@@ -119,8 +119,13 @@ class SearchConsoleIntegrationService
     public function fetchBingCrawlStats(): array
     {
         $settings = $this->settingsService->all();
-        $apiKey = trim((string) ($settings['bing_webmaster_api_key'] ?? config('services.bing.webmaster_api_key', '')));
-        $siteUrl = rtrim((string) ($settings['gsc_property_url'] ?? url('/')), '/');
+        $apiKey = trim((string) (($settings['bing_webmaster_api_key'] ?? '') ?: config('services.bing.webmaster_api_key', '')));
+        $rawSiteUrl = trim((string) (($settings['bing_site_url'] ?? '') ?: ($settings['gsc_property_url'] ?? '') ?: url('/')));
+        if (str_starts_with(strtolower($rawSiteUrl), 'sc-domain:')) {
+            $domain = ltrim(substr($rawSiteUrl, strlen('sc-domain:')), '/');
+            $rawSiteUrl = 'https://'.$domain;
+        }
+        $siteUrl = rtrim($rawSiteUrl, '/');
 
         if ($apiKey === '') {
             return [
@@ -157,12 +162,13 @@ class SearchConsoleIntegrationService
                 'stats' => is_array($json['d'] ?? null) ? $json['d'] : [],
             ];
         } catch (\Throwable $e) {
-            Log::warning('SearchConsoleIntegrationService Bing API failure: '.$e->getMessage());
+            $safeMessage = (string) preg_replace('/(apikey=)[^&\s]+/i', '$1[REDACTED]', $e->getMessage());
+            Log::warning('SearchConsoleIntegrationService Bing API failure: '.$safeMessage);
 
             return [
                 'success' => false,
                 'status' => 'connection_error',
-                'message' => 'Unable to reach Bing Webmaster API safely: '.$e->getMessage(),
+                'message' => 'Unable to reach Bing Webmaster API safely: '.$safeMessage,
                 'stats' => [],
             ];
         }

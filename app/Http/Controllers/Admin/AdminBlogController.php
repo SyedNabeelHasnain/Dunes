@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
+use App\Models\BlogPostFaq;
 use App\Models\BlogTag;
 use App\Models\Language;
 use App\Traits\NormalizesLocalizedInputs;
@@ -47,14 +48,14 @@ class AdminBlogController extends Controller
             'title' => 'required',
             'content' => 'required',
             'excerpt' => 'required',
-            'category_id' => 'required|integer',
+            'category_id' => 'required|integer|exists:blog_categories,id',
             'status' => 'required|string|in:draft,published,scheduled',
             'featured_image' => $request->hasFile('featured_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
             'og_image' => $request->hasFile('og_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tags', 'featured_image']),
+            $request->except(['tags', 'featured_image', 'og_image']),
             ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords', 'author_bio', 'ai_summary']
         );
         $baseSlug = Str::slug($this->extractSlugSource($request->title)) ?: 'article';
@@ -73,6 +74,15 @@ class AdminBlogController extends Controller
             } catch (\Throwable $e) {}
         } elseif ($request->filled('featured_image')) {
             $data['featured_image'] = ltrim(trim($request->input('featured_image')), '/');
+        }
+
+        if ($request->hasFile('og_image')) {
+            $data['og_image'] = $request->file('og_image')->store('blogs', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['og_image']), 'blogs');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('og_image')) {
+            $data['og_image'] = ltrim(trim($request->input('og_image')), '/');
         }
 
         if ($request->input('status') === 'published' && empty($request->input('published_at'))) {
@@ -112,7 +122,7 @@ class AdminBlogController extends Controller
      */
     public function edit(string $id)
     {
-        $post = BlogPost::with('tags')->findOrFail($id);
+        $post = BlogPost::with(['tags', 'faqs' => fn ($q) => $q->orderBy('priority')->orderBy('id')])->findOrFail($id);
         $categories = BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tags = BlogTag::all();
         $languages = Language::getActive();
@@ -131,15 +141,16 @@ class AdminBlogController extends Controller
             'title' => 'required',
             'content' => 'required',
             'excerpt' => 'required',
-            'category_id' => 'required|integer',
+            'category_id' => 'required|integer|exists:blog_categories,id',
             'status' => 'required|string|in:draft,published,scheduled',
             'featured_image' => $request->hasFile('featured_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
             'og_image' => $request->hasFile('og_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tags', 'featured_image']),
-            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords', 'author_bio', 'ai_summary']
+            $request->except(['tags', 'featured_image', 'og_image']),
+            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords', 'author_bio', 'ai_summary'],
+            $post
         );
         if ($request->filled('slug') || empty($post->slug)) {
             $slugSource = $request->filled('slug') ? $request->input('slug') : $this->extractSlugSource($request->title);
@@ -162,6 +173,15 @@ class AdminBlogController extends Controller
             } catch (\Throwable $e) {}
         } elseif ($request->filled('featured_image')) {
             $data['featured_image'] = ltrim(trim($request->input('featured_image')), '/');
+        }
+
+        if ($request->hasFile('og_image')) {
+            $data['og_image'] = $request->file('og_image')->store('blogs', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['og_image']), 'blogs');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('og_image')) {
+            $data['og_image'] = ltrim(trim($request->input('og_image')), '/');
         }
 
         if ($request->input('status') === 'published' && empty($post->published_at)) {
@@ -240,5 +260,58 @@ class AdminBlogController extends Controller
             'status' => $post->status,
             'message' => 'Article status updated to '.ucfirst($post->status).'.',
         ]);
+    }
+
+    /**
+     * Store a new FAQ item for a blog post.
+     */
+    public function storeFaq(Request $request, string $id)
+    {
+        $post = BlogPost::findOrFail($id);
+        $request->validate([
+            'question' => 'required',
+            'answer' => 'required',
+            'priority' => 'nullable|integer|min:0',
+        ]);
+
+        $data = $this->normalizeLocalizedData($request->only(['question', 'answer']), ['question', 'answer']);
+        $data['post_id'] = $post->id;
+        $data['priority'] = (int) $request->input('priority', 0);
+
+        BlogPostFaq::create($data);
+
+        return redirect()->route('admin.blogs.edit', $post->id)->with('success', 'Blog FAQ added successfully.');
+    }
+
+    /**
+     * Update an existing blog post FAQ item.
+     */
+    public function updateFaq(Request $request, string $faqId)
+    {
+        $faq = BlogPostFaq::findOrFail($faqId);
+        $request->validate([
+            'question' => 'required',
+            'answer' => 'required',
+            'priority' => 'nullable|integer|min:0',
+        ]);
+
+        $data = $this->normalizeLocalizedData($request->only(['question', 'answer']), ['question', 'answer'], $faq);
+        $data['priority'] = (int) $request->input('priority', $faq->priority);
+
+        $faq->update($data);
+
+        return redirect()->route('admin.blogs.edit', $faq->post_id)->with('success', 'Blog FAQ updated successfully.');
+    }
+
+    /**
+     * Delete a blog post FAQ item.
+     */
+    public function destroyFaq(string $faqId)
+    {
+        $faq = BlogPostFaq::findOrFail($faqId);
+        $postId = $faq->post_id;
+        $faq->delete();
+
+        return redirect()->route('admin.blogs.edit', $postId)->with('success', 'Blog FAQ deleted successfully.');
     }
 }

@@ -108,7 +108,20 @@
                     Estimated Pickup
                 </td>
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    {{ $booking->pickup_time ?: 'Between 2:45 PM – 3:30 PM (Confirmed on tour day)' }}
+                    @php
+                        $fallbackPickup = $booking->tour?->pickup_time;
+                        if (empty($fallbackPickup)) {
+                            $tSlug = strtolower((string) ($booking->tour?->slug ?? $booking->tour_name ?? ''));
+                            $fallbackPickup = str_contains($tSlug, 'morning')
+                                ? 'Between 7:30 AM – 8:30 AM (Confirmed on tour day)'
+                                : (str_contains($tSlug, 'city')
+                                    ? 'Between 8:30 AM – 9:30 AM (Confirmed on tour day)'
+                                    : (str_contains($tSlug, 'cruise') || str_contains($tSlug, 'dhow')
+                                        ? 'Between 7:00 PM – 7:45 PM (Confirmed on tour day)'
+                                        : 'Between 2:45 PM – 3:30 PM (Confirmed on tour day)'));
+                        }
+                    @endphp
+                    {{ $booking->pickup_time ?: $fallbackPickup }}
                 </td>
             </tr>
             <tr>
@@ -213,7 +226,7 @@
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 30px 0 24px 0;">
         <tr>
             <td align="center">
-                <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" style="display: inline-block; background-color: #F58F43; color: #ffffff; text-decoration: none; padding: 15px 36px; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; box-shadow: 0 4px 14px rgba(245, 143, 67, 0.4); text-align: center;">
+                <a href="{{ route('booking.voucher', ['reference' => $booking->reference]) }}" target="_blank" style="display: inline-block; background-color: #F58F43; color: #ffffff; text-decoration: none; padding: 15px 36px; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; box-shadow: 0 4px 14px rgba(245, 143, 67, 0.4); text-align: center;">
                     View Digital Boarding Pass & Live Voucher &rarr;
                 </a>
             </td>
@@ -237,7 +250,7 @@
                         Your official boarding voucher with check-in QR code is attached to this email as a PDF document. You can save it directly to your smartphone (Apple Wallet / Files) or print it out. No cellular data or roaming required upon landing in Dubai!
                     </div>
                     <div style="margin-top: 8px;">
-                        <a href="{{ route('booking.ticket.pdf', $booking->reference) }}" target="_blank" style="color: #b45309; font-size: 11px; font-weight: 700; text-decoration: underline;">
+                        <a href="{{ route('booking.ticket.pdf', ['reference' => $booking->reference]) }}" target="_blank" style="color: #b45309; font-size: 11px; font-weight: 700; text-decoration: underline;">
                             Download PDF Ticket Voucher Direct Link &rarr;
                         </a>
                     </div>

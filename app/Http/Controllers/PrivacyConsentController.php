@@ -6,7 +6,6 @@ use App\Models\PrivacyConsent;
 use App\Services\SettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +24,10 @@ class PrivacyConsentController extends Controller
 
         $settings = $settingsService->all();
         $consentVersion = trim((string) ($settings['privacy_consent_version'] ?? '1.0')) ?: '1.0';
-        $consentId = trim((string) ($validated['consent_id'] ?? '')) ?: (string) Str::uuid();
+        $rawConsentId = trim((string) ($validated['consent_id'] ?? ''));
+        $consentId = ($rawConsentId !== '' && preg_match('/^[a-zA-Z0-9_-]{8,64}$/', $rawConsentId))
+            ? $rawConsentId
+            : (string) Str::uuid();
 
         $analytics = $validated['action'] === 'reject_all' || $validated['action'] === 'withdraw' ? false : (bool) $validated['analytics'];
         $marketing = $validated['action'] === 'reject_all' || $validated['action'] === 'withdraw' ? false : (bool) $validated['marketing'];
@@ -50,7 +52,7 @@ class PrivacyConsentController extends Controller
             'functional' => $functional,
             'consent_version' => $consentVersion,
             'action' => $validated['action'],
-            'page_url' => $validated['page_url'] ?? $request->headers->get('Referer'),
+            'page_url' => Str::limit((string) ($validated['page_url'] ?? $request->headers->get('Referer') ?? ''), 500, '') ?: null,
             'user_agent' => Str::limit((string) $request->userAgent(), 490),
             'consented_at' => now(),
         ]);

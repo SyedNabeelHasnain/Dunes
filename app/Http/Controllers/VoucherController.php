@@ -63,15 +63,16 @@ class VoucherController extends Controller
     /**
      * Display the web-based luxury voucher / boarding pass.
      */
-    public function show(string $reference)
+    public function show(...$params)
     {
+        $reference = (string) end($params);
         $booking = $this->resolveBooking($reference, ['addons', 'tier', 'tour']);
 
         if (! $booking) {
             abort(404);
         }
 
-        $verificationUrl = route('booking.voucher', $booking->reference);
+        $verificationUrl = route('booking.voucher', ['reference' => $booking->reference]);
         try {
             $qrSvg = (string) QrCode::size(150)->margin(1)->generate($verificationUrl);
             $qrCodeUrl = 'data:image/svg+xml;base64,'.base64_encode($qrSvg);
@@ -87,8 +88,9 @@ class VoucherController extends Controller
     /**
      * Generate and stream the official A4 PDF Ticket Voucher.
      */
-    public function downloadPdf(string $reference)
+    public function downloadPdf(...$params)
     {
+        $reference = (string) end($params);
         $booking = $this->resolveBooking($reference, ['addons', 'tier', 'tour']);
 
         if (! $booking) {
@@ -96,10 +98,14 @@ class VoucherController extends Controller
         }
 
         $fileName = 'Dunes-Discovery-Voucher-' . $booking->reference . '.pdf';
+        $isSyntheticDemo = ((int) ($booking->id ?? 0) === 0)
+            || str_starts_with($booking->reference, 'DT-TEST-')
+            || str_starts_with($booking->reference, 'DT-ADMIN-')
+            || str_starts_with($booking->reference, 'DT-VERIFY-');
 
-        // 1. Check if pre-cached PDF exists on disk from notification service
+        // 1. Check if pre-cached PDF exists on disk from notification service (real bookings only)
         $cachedPath = storage_path('app/vouchers/' . $booking->reference . '.pdf');
-        if (file_exists($cachedPath) && filesize($cachedPath) > 500) {
+        if (! $isSyntheticDemo && file_exists($cachedPath) && filesize($cachedPath) > 500) {
             return response()->download($cachedPath, $fileName, [
                 'Content-Type' => 'application/pdf',
                 'X-Robots-Tag' => 'noindex, nofollow',
@@ -127,7 +133,7 @@ class VoucherController extends Controller
                 @mkdir($fontsDir, 0775, true);
             }
 
-            $verificationUrl = route('booking.voucher', $booking->reference);
+            $verificationUrl = route('booking.voucher', ['reference' => $booking->reference]);
             $qrSvg = null;
             $qrCodeUrl = null;
 
@@ -162,7 +168,7 @@ class VoucherController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return redirect()->route('booking.voucher', $reference)
+            return redirect()->route('booking.voucher', ['reference' => $reference])
                 ->with('info', 'Viewing digital boarding pass voucher. You can print directly or save as PDF.');
         }
     }

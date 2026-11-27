@@ -66,9 +66,10 @@ return new class extends Migration
         if (! Schema::hasTable('wiki_article_tours')) {
             Schema::create('wiki_article_tours', function (Blueprint $table) {
                 $table->foreignId('wiki_article_id')->constrained('wiki_articles')->cascadeOnDelete();
-                $table->foreignId('tour_id')->constrained('tours')->cascadeOnDelete();
+                $table->unsignedInteger('tour_id');
                 $table->integer('sort_order')->default(0);
                 $table->primary(['wiki_article_id', 'tour_id']);
+                $table->foreign('tour_id')->references('id')->on('tours')->cascadeOnDelete();
             });
         }
     }

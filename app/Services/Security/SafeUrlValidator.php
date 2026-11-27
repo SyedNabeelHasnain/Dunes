@@ -89,8 +89,16 @@ class SafeUrlValidator
             return $trimmed;
         }
 
+        // Reject shorthand, decimal, octal, and hex IPv4 encodings (e.g. 127.1, 2130706433, 0177.0.0.1, 0x7f000001)
+        if (preg_match('/^(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+)){0,3}$/i', $host)) {
+            throw new InvalidArgumentException('Non-standard numeric IP host notations are not permitted.');
+        }
+
         if ($resolveDns) {
             $ips = self::resolveHostIps($host);
+            if ($ips === []) {
+                throw new InvalidArgumentException('Target hostname could not be resolved via DNS.');
+            }
             foreach ($ips as $ip) {
                 if (! self::isPublicIp($ip)) {
                     throw new InvalidArgumentException('Target hostname resolves to a non-public IP address.');

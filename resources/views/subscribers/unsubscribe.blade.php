@@ -76,14 +76,14 @@
                     </div>
 
                     <div class="mb-6">
-                        <input type="text" name="other_reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-base sm:text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="{{ __('ui.review_submit.feedback_placeholder') }}" maxlength="200">
+                        <input type="text" name="other_reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-base sm:text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="Additional comments (optional)..." maxlength="200">
                     </div>
 
                     <div class="space-y-2.5">
                         <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-full py-3.5 text-sm shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2 min-h-[48px]">
                             <i class="bi bi-x-circle"></i> Confirm Unsubscribe
                         </button>
-                        <a href="{{ localized_route('home') }}" class="block w-full border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold rounded-full py-3 text-xs sm:text-sm text-center transition-colors min-h-[44px] inline-flex items-center justify-center">
+                        <a href="{{ localized_route('home') }}" class="w-full border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold rounded-full py-3 text-xs sm:text-sm text-center transition-colors min-h-[44px] inline-flex items-center justify-center">
                             Nevermind, Keep Me Subscribed
                         </a>
                     </div>

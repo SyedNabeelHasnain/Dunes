@@ -292,6 +292,107 @@
         </div>
     </div>
 
+    <!-- Article FAQs Manager (Structured FAQPage Schema) -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4" x-data="{
+        editFaqOpen: false,
+        editFaq: { id: null, question: '', answer: '', priority: 0 },
+        openFaqEdit(f) { this.editFaq = { ...f }; this.editFaqOpen = true; }
+    }">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+                <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-question-circle-fill text-primary"></i> Article FAQs (SEO FAQPage Schema)
+                </h2>
+                <p class="text-[11px] text-slate-500 mt-0.5">Manage Q&amp;A items embedded inside this blog article and emitted as FAQPage JSON-LD.</p>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">{{ $post->faqs->count() }} FAQs</span>
+        </div>
+
+        <div class="space-y-2.5">
+            @forelse($post->faqs as $faq)
+            @php
+                $faqPayload = [
+                    'id' => $faq->id,
+                    'question' => $faq->getTranslation('question', 'en', true) ?: $faq->question,
+                    'answer' => $faq->getTranslation('answer', 'en', true) ?: $faq->answer,
+                    'priority' => (int) $faq->priority,
+                ];
+            @endphp
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-start justify-between gap-3">
+                <div class="space-y-1 flex-1">
+                    <div class="text-xs font-extrabold text-slate-900 flex items-center gap-2">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-200 text-[10px] font-bold text-slate-700">#{{ $faq->priority }}</span>
+                        <span>{{ $faqPayload['question'] }}</span>
+                    </div>
+                    <div class="text-xs text-slate-600">{{ $faqPayload['answer'] }}</div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" @click='openFaqEdit(@json($faqPayload))' class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-primary hover:border-primary flex items-center justify-center cursor-pointer" title="Edit FAQ">
+                        <i class="bi bi-pencil-square text-xs"></i>
+                    </button>
+                    <form method="POST" action="{{ route('admin.blogs.faqs.destroy', $faq->id) }}" onsubmit="return confirm('Delete this article FAQ?');" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-8 h-8 rounded-lg border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 flex items-center justify-center cursor-pointer" title="Delete FAQ">
+                            <i class="bi bi-trash text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            @empty
+            <div class="text-xs text-slate-400 italic py-2">No article-specific FAQs added yet.</div>
+            @endforelse
+        </div>
+
+        <form method="POST" action="{{ route('admin.blogs.faqs.store', $post->id) }}" class="pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+            @csrf
+            <div class="md:col-span-4">
+                <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Question *</label>
+                <input type="text" name="question" required placeholder="e.g. What is the best time to visit Lahbab?" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+            </div>
+            <div class="md:col-span-5">
+                <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Answer *</label>
+                <input type="text" name="answer" required placeholder="Concise, authoritative answer..." class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+            </div>
+            <div class="md:col-span-1">
+                <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Order</label>
+                <input type="number" name="priority" value="0" min="0" class="w-full rounded-xl border border-slate-200 px-2.5 py-2 text-xs text-center">
+            </div>
+            <div class="md:col-span-2">
+                <button type="submit" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold cursor-pointer">+ Add FAQ</button>
+            </div>
+        </form>
+
+        <div x-show="editFaqOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+            <div @click.outside="editFaqOpen = false" class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="text-sm font-black text-slate-900">Edit Article FAQ</h3>
+                    <button type="button" @click="editFaqOpen = false" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <form :action="`{{ url('/admin/blogs/faqs') }}/${editFaq.id}`" method="POST" class="space-y-3">
+                    @csrf
+                    @method('PUT')
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Question *</label>
+                        <input type="text" name="question" x-model="editFaq.question" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Answer *</label>
+                        <textarea name="answer" x-model="editFaq.answer" rows="3" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Order</label>
+                        <input type="number" name="priority" x-model="editFaq.priority" min="0" class="w-28 rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="editFaqOpen = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 cursor-pointer">Cancel</button>
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer">Save FAQ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     @include('admin.partials.seo-editorial-panel', ['entity' => $post, 'entityType' => 'blog_post'])
 </div>
 @endsection

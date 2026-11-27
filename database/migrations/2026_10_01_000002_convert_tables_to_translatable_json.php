@@ -76,11 +76,33 @@ return new class extends Migration
         $convertRowsToJson('content_items', ['title', 'description']);
         $convertRowsToJson('itineraries', ['title', 'description']);
         $convertRowsToJson('faqs', ['question', 'answer']);
-        $convertRowsToJson('blog_posts', ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords']);
+        $convertRowsToJson('blog_posts', ['title', 'subtitle', 'excerpt', 'content', 'author_bio', 'ai_summary', 'meta_title', 'meta_desc', 'meta_keywords']);
         $convertRowsToJson('blog_categories', ['name', 'description', 'meta_title', 'meta_desc']);
         $convertRowsToJson('blog_tags', ['name']);
         $convertRowsToJson('blog_post_faqs', ['question', 'answer']);
-        $convertRowsToJson('email_templates', ['subject', 'body_html']);
+        $convertRowsToJson('email_templates', ['subject', 'preview_text', 'content_html', 'content_plain']);
+
+        $mergeEnAr = static function (?string $enVal, ?string $arVal): ?string {
+            $dict = [];
+            if ($enVal !== null && $enVal !== '') {
+                $trimmed = trim($enVal);
+                if (str_starts_with($trimmed, '{') && str_ends_with($trimmed, '}')) {
+                    $decoded = json_decode($trimmed, true);
+                    if (is_array($decoded)) {
+                        $dict = $decoded;
+                    } else {
+                        $dict['en'] = $enVal;
+                    }
+                } else {
+                    $dict['en'] = $enVal;
+                }
+            }
+            if ($arVal !== null && $arVal !== '' && empty($dict['ar'])) {
+                $dict['ar'] = $arVal;
+            }
+
+            return ! empty($dict) ? json_encode($dict, JSON_UNESCAPED_UNICODE) : null;
+        };
 
         // 3. Migrate legacy Legal Tables with _ar columns into unified JSON
         if (Schema::hasTable('legal_pages')) {
@@ -88,41 +110,19 @@ return new class extends Migration
             foreach ($pages as $p) {
                 $updates = [];
 
-                // Title
-                $titleEn = $p->title ?? '';
-                $titleAr = $p->title_ar ?? null;
-                $titleDict = ['en' => $titleEn];
-                if (! empty($titleAr)) {
-                    $titleDict['ar'] = $titleAr;
-                }
-                $updates['title'] = json_encode($titleDict, JSON_UNESCAPED_UNICODE);
-
-                // Subtitle
-                $subEn = $p->subtitle ?? '';
-                $subAr = $p->subtitle_ar ?? null;
-                if (! empty($subEn) || ! empty($subAr)) {
-                    $subDict = [];
-                    if (! empty($subEn)) {
-                        $subDict['en'] = $subEn;
-                    }
-                    if (! empty($subAr)) {
-                        $subDict['ar'] = $subAr;
-                    }
-                    $updates['subtitle'] = json_encode($subDict, JSON_UNESCAPED_UNICODE);
+                $titleJson = $mergeEnAr($p->title ?? null, $p->title_ar ?? null);
+                if ($titleJson !== null) {
+                    $updates['title'] = $titleJson;
                 }
 
-                // Description
-                $descEn = $p->description ?? '';
-                $descAr = $p->description_ar ?? null;
-                if (! empty($descEn) || ! empty($descAr)) {
-                    $descDict = [];
-                    if (! empty($descEn)) {
-                        $descDict['en'] = $descEn;
-                    }
-                    if (! empty($descAr)) {
-                        $descDict['ar'] = $descAr;
-                    }
-                    $updates['description'] = json_encode($descDict, JSON_UNESCAPED_UNICODE);
+                $subJson = $mergeEnAr($p->subtitle ?? null, $p->subtitle_ar ?? null);
+                if ($subJson !== null) {
+                    $updates['subtitle'] = $subJson;
+                }
+
+                $descJson = $mergeEnAr($p->description ?? null, $p->description_ar ?? null);
+                if ($descJson !== null) {
+                    $updates['description'] = $descJson;
                 }
 
                 if (! empty($updates)) {
@@ -135,30 +135,14 @@ return new class extends Migration
             $sections = DB::table('legal_sections')->get();
             foreach ($sections as $s) {
                 $updates = [];
-                $hEn = $s->heading ?? '';
-                $hAr = $s->heading_ar ?? null;
-                if (! empty($hEn) || ! empty($hAr)) {
-                    $hDict = [];
-                    if (! empty($hEn)) {
-                        $hDict['en'] = $hEn;
-                    }
-                    if (! empty($hAr)) {
-                        $hDict['ar'] = $hAr;
-                    }
-                    $updates['heading'] = json_encode($hDict, JSON_UNESCAPED_UNICODE);
+                $headingJson = $mergeEnAr($s->heading ?? null, $s->heading_ar ?? null);
+                if ($headingJson !== null) {
+                    $updates['heading'] = $headingJson;
                 }
 
-                $shEn = $s->subheading ?? '';
-                $shAr = $s->subheading_ar ?? null;
-                if (! empty($shEn) || ! empty($shAr)) {
-                    $shDict = [];
-                    if (! empty($shEn)) {
-                        $shDict['en'] = $shEn;
-                    }
-                    if (! empty($shAr)) {
-                        $shDict['ar'] = $shAr;
-                    }
-                    $updates['subheading'] = json_encode($shDict, JSON_UNESCAPED_UNICODE);
+                $subheadingJson = $mergeEnAr($s->subheading ?? null, $s->subheading_ar ?? null);
+                if ($subheadingJson !== null) {
+                    $updates['subheading'] = $subheadingJson;
                 }
 
                 if (! empty($updates)) {
@@ -170,15 +154,12 @@ return new class extends Migration
         if (Schema::hasTable('legal_items')) {
             $items = DB::table('legal_items')->get();
             foreach ($items as $item) {
-                $cEn = $item->content ?? '';
-                $cAr = $item->content_ar ?? null;
-                $cDict = ['en' => $cEn];
-                if (! empty($cAr)) {
-                    $cDict['ar'] = $cAr;
+                $contentJson = $mergeEnAr($item->content ?? null, $item->content_ar ?? null);
+                if ($contentJson !== null) {
+                    DB::table('legal_items')->where('id', $item->id)->update([
+                        'content' => $contentJson,
+                    ]);
                 }
-                DB::table('legal_items')->where('id', $item->id)->update([
-                    'content' => json_encode($cDict, JSON_UNESCAPED_UNICODE),
-                ]);
             }
         }
     }

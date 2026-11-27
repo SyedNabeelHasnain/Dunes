@@ -30,7 +30,7 @@
             <a href="{{ route('admin.bookings.ticket', $booking->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-bold shadow-2xs transition-all" title="Download Official A4 PDF Voucher">
                 <i class="bi bi-file-earmark-pdf"></i> E-Ticket PDF
             </a>
-            <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all" title="Open Digital Boarding Pass">
+            <a href="{{ route('booking.voucher', ['reference' => $booking->reference]) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all" title="Open Digital Boarding Pass">
                 <i class="bi bi-box-arrow-up-right"></i> View Voucher
             </a>
             @if(!empty($booking->email))
@@ -168,6 +168,9 @@
                             <div class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                 <i class="bi bi-people text-primary"></i>
                                 {{ $booking->adults }} Adults, {{ $booking->children }} Children
+                                @if(($booking->infants ?? 0) > 0)
+                                    , {{ $booking->infants }} Infants
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -216,17 +219,22 @@
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-xs font-bold uppercase text-slate-400">Booked Addons</span>
                             <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                                +AED {{ number_format($booking->addons_total ?? $booking->addons->sum('price'), 2) }}
+                                +AED {{ number_format($booking->addons_total ?? $booking->addons->sum(fn ($a) => $a->price * max(1, (int) ($a->quantity ?? 1))), 2) }}
                             </span>
                         </div>
                         <div class="space-y-1.5">
                             @foreach($booking->addons as $addon)
+                                @php $addonQty = max(1, (int) ($addon->quantity ?? 1)); @endphp
                                 <div class="flex items-center justify-between bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl text-xs">
                                     <span class="font-bold text-slate-800 flex items-center gap-2">
-                                        <i class="bi bi-plus-circle text-emerald-500"></i> {{ $addon->addon_name }}
+                                        <i class="bi bi-plus-circle text-emerald-500"></i>
+                                        <span>{{ $addon->addon_name }}</span>
+                                        @if($addonQty > 1)
+                                            <span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-mono text-[10px]">&times;{{ $addonQty }}</span>
+                                        @endif
                                     </span>
                                     <span class="font-black text-primary bg-white border border-slate-200 px-2 py-0.5 rounded-lg shadow-2xs">
-                                        +AED {{ number_format($addon->price, 2) }}
+                                        +AED {{ number_format($addon->price * $addonQty, 2) }}
                                     </span>
                                 </div>
                             @endforeach

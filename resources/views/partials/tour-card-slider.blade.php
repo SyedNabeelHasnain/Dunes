@@ -19,7 +19,8 @@
          go(idx, e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.hasInteracted = true; this.activeIdx = idx; },
          touchStart(e) { this.hasInteracted = true; this.startX = e.changedTouches[0].screenX; },
          touchEnd(e) {
-             const diff = e.changedTouches[0].screenX - this.startX;
+             const rawDiff = e.changedTouches[0].screenX - this.startX;
+             const diff = document.documentElement.dir === 'rtl' ? -rawDiff : rawDiff;
              if (diff > 40) { this.prev(e); }
              else if (diff < -40) { this.next(e); }
          }

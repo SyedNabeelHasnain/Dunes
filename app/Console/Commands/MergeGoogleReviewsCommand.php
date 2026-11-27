@@ -126,7 +126,7 @@ class MergeGoogleReviewsCommand extends Command
                         $changed = true;
                     }
 
-                    if (! empty($ext['reviewer_avatar_url']) && (str_contains($existing['reviewer_avatar_url'] ?? '', 'ui-avatars.com') || empty($existing['reviewer_avatar_url']) || ! empty($ext['reviewer_avatar_url']))) {
+                    if (! empty($ext['reviewer_avatar_url']) && (empty($existing['reviewer_avatar_url']) || str_contains($existing['reviewer_avatar_url'], 'ui-avatars.com'))) {
                         $existing['reviewer_avatar_url'] = $ext['reviewer_avatar_url'];
                         $changed = true;
                     }
@@ -182,8 +182,10 @@ class MergeGoogleReviewsCommand extends Command
                         $changed = true;
                     }
 
-                    $existing['updated_at'] = now()->format('Y-m-d H:i:s');
-                    $updatedCount++;
+                    if ($changed) {
+                        $existing['updated_at'] = now()->format('Y-m-d H:i:s');
+                        $updatedCount++;
+                    }
                 } else {
                     // Add as brand new review
                     $maxId++;
@@ -238,6 +240,10 @@ class MergeGoogleReviewsCommand extends Command
             $this->info('Upserting into database `reviews` table...');
             $dbSynced = 0;
             foreach ($masterReviews as $r) {
+                $pubTs = ! empty($r['published_date']) ? strtotime((string) $r['published_date']) : false;
+                $ownerTs = ! empty($r['owner_response_date']) ? strtotime((string) $r['owner_response_date']) : false;
+                $impTs = ! empty($r['imported_at']) ? strtotime((string) $r['imported_at']) : false;
+
                 Review::updateOrCreate(
                     [
                         'source' => $r['source'],
@@ -245,7 +251,7 @@ class MergeGoogleReviewsCommand extends Command
                     ],
                     [
                         'review_url' => $r['review_url'] ?? null,
-                        'published_date' => ! empty($r['published_date']) ? date('Y-m-d', strtotime($r['published_date'])) : null,
+                        'published_date' => $pubTs !== false ? date('Y-m-d', $pubTs) : null,
                         'reviewer_name' => $r['reviewer_name'] ?? 'Google Customer',
                         'reviewer_avatar_url' => $r['reviewer_avatar_url'] ?? null,
                         'reviewer_profile_url' => $r['reviewer_profile_url'] ?? null,
@@ -259,13 +265,19 @@ class MergeGoogleReviewsCommand extends Command
                         'reviewer_reviews_count' => isset($r['reviewer_reviews_count']) ? (int) $r['reviewer_reviews_count'] : null,
                         'likes_count' => isset($r['likes_count']) ? (int) $r['likes_count'] : 0,
                         'owner_response_text' => $r['owner_response_text'] ?? null,
-                        'owner_response_date' => ! empty($r['owner_response_date']) ? date('Y-m-d H:i:s', strtotime($r['owner_response_date'])) : null,
+                        'owner_response_date' => $ownerTs !== false ? date('Y-m-d H:i:s', $ownerTs) : null,
                         'language' => $r['language'] ?? null,
                         'visited_in' => $r['visited_in'] ?? null,
-                        'imported_at' => ! empty($r['imported_at']) ? date('Y-m-d H:i:s', strtotime($r['imported_at'])) : now(),
+                        'imported_at' => $impTs !== false ? date('Y-m-d H:i:s', $impTs) : now(),
                     ]
                 );
                 $dbSynced++;
+            }
+            try {
+                app(\App\Services\ReviewMediaGalleryService::class)->clearCache();
+                \Illuminate\Support\Facades\Cache::forget('site_social_proof_feed');
+                \Illuminate\Support\Facades\Cache::forget('home_reviews_cache');
+            } catch (\Throwable) {
             }
             $this->info("Database sync complete: {$dbSynced} records synchronized.");
         }

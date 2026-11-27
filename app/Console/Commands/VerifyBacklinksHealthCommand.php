@@ -37,17 +37,21 @@ class VerifyBacklinksHealthCommand extends Command
         }
 
         if ($domain) {
-            $query->where('referring_domain', 'like', "%{$domain}%");
+            $escapedDomain = addcslashes((string) $domain, '%_!');
+            $query->whereRaw("referring_domain LIKE ? ESCAPE '!'", ["%{$escapedDomain}%"]);
         }
 
         if (! $force && ! $id) {
-            // Verify links that haven't been checked in the last 24 hours, or are broken/pending
+            // Verify links that haven't been checked in the last 24 hours (prevents broken links from starving healthy ones)
             $query->where(function ($q) {
                 $q->whereNull('last_checked_at')
-                    ->orWhere('last_checked_at', '<', now()->subHours(24))
-                    ->orWhere('status', '!=', 'active');
+                    ->orWhere('last_checked_at', '<', now()->subHours(24));
             });
         }
+
+        // Prioritize never-checked links first, then oldest-checked
+        $query->orderByRaw('CASE WHEN last_checked_at IS NULL THEN 0 ELSE 1 END')
+            ->orderBy('last_checked_at', 'asc');
 
         $limit = (int) $this->option('limit');
         if ($limit > 0) {

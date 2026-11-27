@@ -33,12 +33,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
                     <!-- Name Input -->
                     <div class="md:col-span-4 relative">
+                        <label for="newsletterName" class="sr-only">{{ __('ui.newsletter.name_placeholder') }}</label>
                         <i class="bi bi-person absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                         <input type="text" name="name" id="newsletterName" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-base sm:text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.name_placeholder') }}" maxlength="100">
                     </div>
 
                     <!-- Email Input -->
                     <div class="md:col-span-5 relative">
+                        <label for="newsletterEmail" class="sr-only">{{ __('ui.newsletter.email_placeholder') }}</label>
                         <i class="bi bi-envelope absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                         <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-base sm:text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.email_placeholder') }}" required maxlength="255">
                     </div>
@@ -175,13 +177,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showAlert(msg, type) {
         statusBox.classList.remove('hidden');
+        alertBox.textContent = '';
+        const icon = document.createElement('i');
+        const span = document.createElement('span');
+        span.textContent = String(msg ?? '');
         if (type === 'success') {
             alertBox.className = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl py-2.5 px-3.5 text-xs flex items-center gap-2';
-            alertBox.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-400 text-sm"></i> <span>${msg}</span>`;
+            icon.className = 'bi bi-check-circle-fill text-emerald-400 text-sm';
         } else {
             alertBox.className = 'bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl py-2.5 px-3.5 text-xs flex items-center gap-2';
-            alertBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-rose-400 text-sm"></i> <span>${msg}</span>`;
+            icon.className = 'bi bi-exclamation-triangle-fill text-rose-400 text-sm';
         }
+        alertBox.appendChild(icon);
+        alertBox.appendChild(span);
     }
 });
 </script>

@@ -41,7 +41,16 @@
     let stopRecordingFn = null;
     let flushTimer = null;
     let maxScrollPercent = 0;
+    let lastFlushedScrollPercent = 0;
     let lastClickTime = 0;
+
+    function isRecordingEnabled() {
+        return !window.DunesConfig || window.DunesConfig.recordings_enabled !== false;
+    }
+
+    function isHeatmapEnabled() {
+        return !window.DunesConfig || window.DunesConfig.heatmaps_enabled !== false;
+    }
 
     const BATCH_INTERVAL_MS = 6000;
     const MAX_BUFFER_SIZE = 40;
@@ -62,7 +71,7 @@
         if (window.DunesConsent && typeof window.DunesConsent.has === 'function') {
             return window.DunesConsent.has('analytics');
         }
-        return true;
+        return false;
     }
 
     async function gzipJsonBase64(jsonString) {
@@ -272,7 +281,8 @@
     }
 
     function flushScrollDepth() {
-        if (maxScrollPercent <= 0) return;
+        if (!isHeatmapEnabled() || maxScrollPercent <= 0 || maxScrollPercent <= lastFlushedScrollPercent) return;
+        lastFlushedScrollPercent = maxScrollPercent;
 
         transmitTelemetry(ENDPOINT_HEATMAP_SCROLL, {
             session_id: sessionId,
@@ -353,7 +363,7 @@
     }
 
     function ensureRecorderLoadedAndStart() {
-        if (isRecordingActive || !hasAnalyticsConsent()) {
+        if (isRecordingActive || !isRecordingEnabled() || !hasAnalyticsConsent()) {
             return;
         }
 
@@ -394,7 +404,7 @@
     }
 
     // Preload rrweb-record on idle when consent is already granted so first human gesture starts instantly
-    if (hasAnalyticsConsent()) {
+    if (isRecordingEnabled() && hasAnalyticsConsent()) {
         const preloader = document.createElement('link');
         preloader.rel = 'preload';
         preloader.as = 'script';
@@ -412,20 +422,22 @@
         window.addEventListener(ev, onFirstHumanInteraction, { once: true, passive: true });
     });
 
-    window.addEventListener('click', handleHeatmapClick, { passive: true });
-    window.addEventListener('scroll', function () {
-        updateMaxScroll();
-    }, { passive: true });
+    if (isHeatmapEnabled()) {
+        window.addEventListener('click', handleHeatmapClick, { passive: true });
+        window.addEventListener('scroll', function () {
+            updateMaxScroll();
+        }, { passive: true });
+    }
 
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'hidden') {
-            flushBuffer(true);
+            flushBuffer(false);
             flushScrollDepth();
         }
     });
 
-    window.addEventListener('pagehide', function () {
-        flushBuffer(true);
+    window.addEventListener('pagehide', function (e) {
+        flushBuffer(!e || !e.persisted);
         flushScrollDepth();
     });
 

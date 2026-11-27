@@ -1288,15 +1288,15 @@ body {
    RTL Directional Transformation Rules
    Flips directional icons automatically in Arabic / RTL mode
    ========================================================================== */
-[dir="rtl"] .bi-chevron-right,
-[dir="rtl"] .bi-arrow-right,
-[dir="rtl"] .bi-arrow-right-short {
+[dir="rtl"] .bi-chevron-right:not(.rtl\:rotate-180),
+[dir="rtl"] .bi-arrow-right:not(.rtl\:rotate-180),
+[dir="rtl"] .bi-arrow-right-short:not(.rtl\:rotate-180) {
   transform: scaleX(-1);
   display: inline-block;
 }
 
-[dir="rtl"] .bi-chevron-left,
-[dir="rtl"] .bi-arrow-left {
+[dir="rtl"] .bi-chevron-left:not(.rtl\:rotate-180),
+[dir="rtl"] .bi-arrow-left:not(.rtl\:rotate-180) {
   transform: scaleX(-1);
   display: inline-block;
 }

@@ -2,6 +2,7 @@
     $bannerEnabled = ($settings['privacy_consent_banner_enabled'] ?? '1') !== '0';
     $bannerHeadline = $settings['privacy_banner_headline'] ?? 'Your Privacy & Cookie Choices';
     $bannerSummary = $settings['privacy_banner_summary'] ?? 'We use essential cookies to keep bookings working securely, and optional analytics & marketing cookies only with your consent.';
+    $privacyEmail = $settings['privacy_contact_email'] ?? ($settings['site_email'] ?? 'info@dunesdiscoverytourism.com');
 @endphp
 
 @if($bannerEnabled)
@@ -52,7 +53,7 @@
             }
 
             try {
-                await fetch('/api/v1/privacy/consent', {
+                const res = await fetch('/api/v1/privacy/consent', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -61,6 +62,12 @@
                     },
                     body: JSON.stringify(payload)
                 });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.consent && data.consent.id && window.DunesConsent && typeof window.DunesConsent.update === 'function') {
+                        window.DunesConsent.update(Object.assign({}, payload, { id: data.consent.id, version: data.consent.version || window.DunesConsent.version }));
+                    }
+                }
             } catch (e) {}
 
             this.saving = false;
@@ -164,6 +171,9 @@
                     </button>
                 </div>
             </div>
+            <p class="text-[11px] text-slate-500 text-center">
+                Data protection inquiries: <a href="mailto:{{ $privacyEmail }}" class="font-semibold text-primary hover:underline">{{ $privacyEmail }}</a>
+            </p>
         </div>
     </div>
 </div>

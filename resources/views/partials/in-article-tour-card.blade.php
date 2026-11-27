@@ -314,15 +314,14 @@
                 @foreach ($recommendedTours as $recTour)
                 @php
                     $recMinPrice = $recTour->tiers->min('pivot.price') ?? 99;
-                    $recImg = $recTour->thumb_image ?: $recTour->hero_image;
-                    $recImgUrl = $recImg ? asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $recImg)) : asset('images/desert-safari-poster.avif');
+                    $recImgUrl = resolve_tour_image($recTour->thumb_image ?: $recTour->hero_image);
                 @endphp
                 <div class="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between gap-3 hover:bg-white/10 transition-colors">
                     <div class="flex items-center gap-3 min-w-0">
                         <img src="{{ $recImgUrl }}" alt="{{ $recTour->name }}" class="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy">
                         <div class="min-w-0">
                             <div class="text-xs font-bold text-white truncate leading-snug">{{ $recTour->name }}</div>
-                            <div class="text-[11px] text-primary font-black mt-0.5" data-aed="{{ $recMinPrice }}">From AED {{ number_format($recMinPrice) }}</div>
+                            <div class="text-[11px] text-primary font-black mt-0.5">From <span data-aed="{{ $recMinPrice }}">AED {{ number_format($recMinPrice) }}</span></div>
                         </div>
                     </div>
                     <button type="button" 

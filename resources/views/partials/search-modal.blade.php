@@ -25,7 +25,7 @@
                         'is_featured' => (bool) $t->is_featured,
                         'badge' => $t->is_bestseller ? 'Bestseller' : ($t->is_featured ? 'Popular' : ($t->category ? (string) $t->category->name : 'Safari')),
                         'highlights' => $t->short_desc ? \Illuminate\Support\Str::limit(strip_tags($t->short_desc), 85) : 'Luxury 4x4 Transfers, Red Dunes & BBQ Dinner',
-                        'keywords' => strtolower($t->name . ' ' . ($t->meta_keywords ?? '') . ' ' . ($t->category ? (string) $t->category->name : '') . ' ' . ($t->short_desc ?? '')),
+                        'keywords' => mb_strtolower($t->name . ' ' . ($t->meta_keywords ?? '') . ' ' . ($t->category ? (string) $t->category->name : '') . ' ' . ($t->short_desc ?? ''), 'UTF-8'),
                     ];
                 })->values()->all();
         });
@@ -86,7 +86,7 @@
             <!-- Header -->
             <div class="flex items-center justify-between p-4 sm:p-5 pb-3">
                 <div class="flex items-center gap-2 sm:gap-2.5">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-primary/10 text-primary border border-primary/20">
+                    <span id="globalSearchModalLabel" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-primary/10 text-primary border border-primary/20">
                         <i class="bi bi-search"></i> {{ __('ui.nav.search') }}
                     </span>
                     <span class="hidden sm:inline-block text-[11px] font-semibold text-slate-400">{{ __('ui.reviews_section.det_license', ['license' => '1430583']) }}</span>
@@ -189,7 +189,7 @@
                                 class="px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 inline-flex items-center gap-1"
                                 :class="categoryFilter === 'all' ? 'bg-primary text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                             <span>All</span>
-                            <span class="text-[10px] px-1.5 py-0.2 rounded-full" 
+                            <span class="text-[10px] px-1.5 py-0.5 rounded-full" 
                                   :class="categoryFilter === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" 
                                   x-text="totalMatchCount"></span>
                         </button>
@@ -199,7 +199,7 @@
                                     class="px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 inline-flex items-center gap-1"
                                     :class="categoryFilter === cat.slug ? 'bg-primary text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                                 <span x-text="cat.name"></span>
-                                <span class="text-[10px] px-1.5 py-0.2 rounded-full" 
+                                <span class="text-[10px] px-1.5 py-0.5 rounded-full" 
                                       :class="categoryFilter === cat.slug ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" 
                                       x-text="cat.count"></span>
                             </button>
@@ -275,10 +275,9 @@
                             </p>
                             <div class="inline-flex items-center gap-2">
                                 <button type="button" 
-                                        class="btn-whatsapp px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
-                                        data-action="whatsapp"
+                                        class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                                         :data-tour-name="query || 'Desert Safari Search'"
-                                        @click="if(window.openWhatsApp){ window.openWhatsApp(query || 'Desert Safari'); } else if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(query || 'Desert Safari'); }">
+                                        @click.prevent.stop="if(window.openWhatsApp){ window.openWhatsApp(query || 'Desert Safari'); } else if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(query || 'Desert Safari'); }">
                                     <i class="bi bi-whatsapp"></i>
                                     <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                                 </button>
@@ -315,7 +314,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', function(e) {
         if ((e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) && 
-            !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+            !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '') &&
+            !document.activeElement?.isContentEditable) {
             e.preventDefault();
             if (window.Alpine && Alpine.store('modal')) {
                 Alpine.store('modal').open('search');

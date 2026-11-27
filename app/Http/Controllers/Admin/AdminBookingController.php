@@ -157,7 +157,9 @@ class AdminBookingController extends Controller
             ->where('status', 'draft');
 
         if (! empty($ignoredIps)) {
-            $query->whereNotIn('ip_address', $ignoredIps);
+            $query->where(function ($q) use ($ignoredIps) {
+                $q->whereNull('ip_address')->orWhereNotIn('ip_address', $ignoredIps);
+            });
         }
 
         if ($trafficChannel) {
@@ -487,8 +489,18 @@ class AdminBookingController extends Controller
         $action = $request->input('action');
 
         if ($action === 'delete') {
-            BookingAddon::whereIn('booking_id', $ids)->delete();
-            $deleted = Booking::whereIn('id', $ids)->where('status', 'draft')->forceDelete();
+            $deleted = DB::transaction(function () use ($ids) {
+                $draftIds = Booking::whereIn('id', $ids)->where('status', 'draft')->pluck('id');
+                if ($draftIds->isEmpty()) {
+                    return 0;
+                }
+                BookingAddon::whereIn('booking_id', $draftIds)->delete();
+
+                return Booking::whereIn('id', $draftIds)->where('status', 'draft')->forceDelete();
+            });
+
+            Cache::forget('admin_dashboard_kpis');
+            Cache::forget('admin_sidebar_counts');
 
             return response()->json([
                 'success' => true,
@@ -506,8 +518,14 @@ class AdminBookingController extends Controller
     {
         $fileName = 'dunes-abandoned-drafts-'.date('Y-m-d-His').'.csv';
 
+        $ignoredIps = app(\App\Services\IpSecurityService::class)->getIgnoredIpsList();
         $query = Booking::with(['tour', 'tier'])
             ->where('status', 'draft');
+        if (! empty($ignoredIps)) {
+            $query->where(function ($q) use ($ignoredIps) {
+                $q->whereNull('ip_address')->orWhereNotIn('ip_address', $ignoredIps);
+            });
+        }
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -621,7 +639,7 @@ class AdminBookingController extends Controller
                         'id' => (int) $tier->id,
                         'name' => (string) ($tier->display_name ?: $tier->name),
                         'code' => (string) ($tier->slug ?: $tier->code),
-                        'price' => (float) ($tier->pivot->price ?? $tour->min_price ?? 0),
+                        'price' => (float) ($tier->pivot->price ?? $tour->starting_price ?? 0),
                         'child_price' => (float) ($tier->pivot->child_price ?? 0),
                         'price_type' => $normalizedType,
                         'capacity' => Tier::isUnitPriceType($normalizedType, $tour)
@@ -636,7 +654,7 @@ class AdminBookingController extends Controller
                         'id' => (int) $tier->id,
                         'name' => (string) ($tier->display_name ?: $tier->name),
                         'code' => (string) ($tier->slug ?: $tier->code),
-                        'price' => (float) ($tour->min_price ?? 0),
+                        'price' => (float) ($tour->starting_price ?? 0),
                         'child_price' => 0.0,
                         'price_type' => $normalizedType,
                         'capacity' => Tier::isUnitPriceType($normalizedType, $tour)
@@ -661,7 +679,7 @@ class AdminBookingController extends Controller
             return [
                 'id' => (int) $tour->id,
                 'name' => (string) $tour->name,
-                'price' => (float) $tour->price,
+                'price' => (float) ($tour->starting_price ?? 0),
                 'tiers' => $tierItems,
                 'addons' => $addonItems,
             ];
@@ -751,7 +769,7 @@ class AdminBookingController extends Controller
             ->where('tier_id', $tier->id)
             ->first();
 
-        $price = $tourTier ? (float) $tourTier->price : (float) ($tour->min_price ?? 0);
+        $price = $tourTier ? (float) $tourTier->price : (float) ($tour->starting_price ?? 0);
         $priceType = Tier::normalizePriceType($tourTier ? $tourTier->price_type : 'per person', $tour);
 
         $adults = max(1, (int) $request->input('adults', 1));
@@ -772,27 +790,31 @@ class AdminBookingController extends Controller
 
         $addonsTotal = 0.0;
         $addonRecords = [];
-        $selectedAddonIds = array_unique(array_map('intval', $request->input('addons', [])));
+        $selectedAddonIds = array_values(array_unique(array_map('intval', $request->input('addons', []))));
 
-        foreach ($selectedAddonIds as $addonId) {
-            $addon = Addon::find($addonId);
-            if (! $addon) {
-                continue;
-            }
-            $tourAddon = DB::table('tour_addons')
+        if (! empty($selectedAddonIds)) {
+            $addonsById = Addon::whereIn('id', $selectedAddonIds)->get()->keyBy('id');
+            $tourAddonPrices = DB::table('tour_addons')
                 ->where('tour_id', $tour->id)
-                ->where('addon_id', $addonId)
-                ->first();
+                ->whereIn('addon_id', $selectedAddonIds)
+                ->pluck('price', 'addon_id');
 
-            $aPrice = $tourAddon ? (float) $tourAddon->price : (float) $addon->price;
-            $qty = ($addon->price_type === 'per_group') ? 1 : max(1, $adults + $children);
-            $addonsTotal += ($aPrice * $qty);
-            $addonRecords[] = [
-                'addon_id' => $addon->id,
-                'addon_name' => $addon->name,
-                'price' => $aPrice,
-                'quantity' => $qty,
-            ];
+            foreach ($selectedAddonIds as $addonId) {
+                $addon = $addonsById->get($addonId);
+                if (! $addon) {
+                    continue;
+                }
+
+                $aPrice = $tourAddonPrices->has($addonId) ? (float) $tourAddonPrices->get($addonId) : (float) $addon->price;
+                $qty = ($addon->price_type === 'per_group') ? 1 : max(1, $adults + $children);
+                $addonsTotal += ($aPrice * $qty);
+                $addonRecords[] = [
+                    'addon_id' => $addon->id,
+                    'addon_name' => $addon->name,
+                    'price' => $aPrice,
+                    'quantity' => $qty,
+                ];
+            }
         }
 
         $subtotal = round($subtotal, 2);
@@ -1227,6 +1249,8 @@ class AdminBookingController extends Controller
             $updateData['driver_id'] = $request->input('driver_id') ?: null;
             if ($request->filled('driver_id') && empty($booking->driver_assigned_at)) {
                 $updateData['driver_assigned_at'] = now();
+            } elseif (! $request->filled('driver_id')) {
+                $updateData['driver_assigned_at'] = null;
             }
         }
         if ($request->has('vehicle_id')) {
@@ -1237,8 +1261,8 @@ class AdminBookingController extends Controller
                 $updateData['vehicle_id'] = $assignedDriver->default_vehicle_id;
             }
         }
-        if ($request->filled('pickup_time_slot')) {
-            $updateData['pickup_time_slot'] = $request->input('pickup_time_slot');
+        if ($request->has('pickup_time_slot')) {
+            $updateData['pickup_time_slot'] = $request->input('pickup_time_slot') ?: null;
         }
         if ($request->filled('pickup_status')) {
             $updateData['pickup_status'] = $request->input('pickup_status');
@@ -1247,11 +1271,11 @@ class AdminBookingController extends Controller
             $updateData['driver_notes'] = $request->input('driver_notes');
         }
 
-        // Keep [DISPATCH: ...] synchronized if driver is assigned
+        // Keep [DISPATCH: ...] synchronized (and strip stale dispatch metadata when driver is unassigned)
         $effectiveDriverId = array_key_exists('driver_id', $updateData) ? $updateData['driver_id'] : $booking->driver_id;
         $effectiveVehicleId = array_key_exists('vehicle_id', $updateData) ? $updateData['vehicle_id'] : $booking->vehicle_id;
         $effectivePickupTime = array_key_exists('pickup_time_slot', $updateData) ? $updateData['pickup_time_slot'] : ($booking->pickup_time_slot ?: $booking->pickup_time);
-        
+
         if ($effectiveDriverId) {
             $drv = Driver::find($effectiveDriverId);
             $veh = $effectiveVehicleId ? Vehicle::find($effectiveVehicleId) : null;
@@ -1264,10 +1288,16 @@ class AdminBookingController extends Controller
             $baseNotes = array_key_exists('special_requests', $updateData) ? ($updateData['special_requests'] ?? '') : ($booking->special_requests ?? '');
             $cleanNotes = preg_replace('/\[DISPATCH:.*?\]/s', '', $baseNotes);
             $updateData['special_requests'] = trim($cleanNotes . "\n[DISPATCH: " . implode(' | ', $dispInfo) . ']');
+        } elseif ($request->has('driver_id')) {
+            $baseNotes = array_key_exists('special_requests', $updateData) ? ($updateData['special_requests'] ?? '') : ($booking->special_requests ?? '');
+            $cleanNotes = trim((string) preg_replace('/\[DISPATCH:.*?\]/s', '', $baseNotes));
+            $updateData['special_requests'] = $cleanNotes !== '' ? $cleanNotes : null;
         }
 
         $booking->update($updateData);
         Cache::forget('admin_dashboard_kpis');
+        Cache::forget('admin_sidebar_counts');
+        flush_review_and_social_proof_caches();
 
         // If status changed to confirmed or cancelled, trigger notifications
         if ($oldStatus !== $booking->status) {
@@ -1674,7 +1704,7 @@ class AdminBookingController extends Controller
                 @mkdir($fontsDir, 0775, true);
             }
 
-            $verificationUrl = route('booking.voucher', $booking->reference);
+            $verificationUrl = route('booking.voucher', ['reference' => $booking->reference]);
             $qrSvg = null;
             $qrCodeUrl = null;
 
@@ -1707,7 +1737,7 @@ class AdminBookingController extends Controller
 
             $booking = Booking::find($id);
             if ($booking) {
-                return redirect()->route('booking.voucher', $booking->reference)
+                return redirect()->route('booking.voucher', ['reference' => $booking->reference])
                     ->with('info', 'Viewing digital boarding pass voucher. You can print directly or save as PDF.');
             }
 

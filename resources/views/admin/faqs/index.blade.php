@@ -225,7 +225,12 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('.edit-faq-btn').on('click', function() {
+    const syncFaqTourReq = () => {
+        $('#e_tour_id').prop('required', $('#e_assignment_type').val() === 'tour');
+    };
+    $('#e_assignment_type').on('change', syncFaqTourReq);
+
+    $(document).on('click', '.edit-faq-btn', function() {
         const id = $(this).data('id');
         const question = $(this).data('question');
         const answer = $(this).data('answer');
@@ -246,6 +251,7 @@ $(document).ready(function() {
         } else {
             $('#e_tour_id').val('');
         }
+        syncFaqTourReq();
 
         // Set action url
         $('#editFaqForm').attr('action', action);

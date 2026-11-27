@@ -38,12 +38,13 @@ class AdminFaqController extends Controller
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
             'assignment_type' => 'required|string|in:general,tour',
-            'tour_id' => 'nullable|integer',
+            'tour_id' => 'nullable|required_if:assignment_type,tour|integer|exists:tours,id',
         ]);
 
         $data = $this->normalizeLocalizedData(
             $request->all(),
-            ['question', 'answer']
+            ['question', 'answer'],
+            $faq
         );
         $data['category'] = $request->assignment_type === 'general' ? 'general' : 'tour';
         $data['priority'] = (int) $request->input('priority', 0);
@@ -77,12 +78,13 @@ class AdminFaqController extends Controller
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
             'assignment_type' => 'required|string|in:general,tour',
-            'tour_id' => 'nullable|integer',
+            'tour_id' => 'nullable|required_if:assignment_type,tour|integer|exists:tours,id',
         ]);
 
         $data = $this->normalizeLocalizedData(
             $request->all(),
-            ['question', 'answer']
+            ['question', 'answer'],
+            $faq
         );
         $data['category'] = $request->assignment_type === 'general' ? 'general' : 'tour';
         $data['priority'] = (int) $request->input('priority', 0);

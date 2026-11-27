@@ -144,8 +144,8 @@ class ReviewMediaGalleryService
      */
     public function getHomepageItems(int $limit = 12): array
     {
-        return Cache::remember(self::CACHE_KEY_HOMEPAGE, self::CACHE_TTL_SECONDS, function () use ($limit) {
-            $all = $this->getGalleryItems(['limit' => 30]);
+        $pool = Cache::remember(self::CACHE_KEY_HOMEPAGE, self::CACHE_TTL_SECONDS, function () {
+            $all = $this->getGalleryItems();
 
             if (empty($all)) {
                 return [];
@@ -154,21 +154,28 @@ class ReviewMediaGalleryService
             // Strive for balanced category and source diversity on the homepage
             $categories = ['red_dunes', 'buggy_quad', 'camp_bbq', 'sunset_camels'];
             $selected = collect();
+            $allCol = collect($all);
 
-            // Pick top 2 from each category first
+            // Pick up to 2 DDT moments + 1 review/video per category first so reviews are never starved
             foreach ($categories as $cat) {
-                $catItems = collect($all)->where('category', $cat)->take(3);
-                $selected = $selected->concat($catItems);
+                $catAll = $allCol->where('category', $cat);
+                $reviewsFirst = $catAll->filter(fn ($i) => ($i['source'] ?? '') !== 'ddt_moments')->take(2);
+                $momentsFill = $catAll->filter(fn ($i) => ($i['source'] ?? '') === 'ddt_moments')->take(2);
+                $selected = $selected->concat($reviewsFirst)->concat($momentsFill);
             }
 
-            // Fill remaining quota with other top reviews
-            if ($selected->count() < $limit) {
-                $remaining = collect($all)->reject(fn ($i) => $selected->contains('id', $i['id']))->take($limit - $selected->count());
+            $selected = $selected->unique('id');
+
+            // Fill remaining quota up to 24 cached homepage items
+            if ($selected->count() < 24) {
+                $remaining = $allCol->reject(fn ($i) => $selected->contains('id', $i['id']))->take(24 - $selected->count());
                 $selected = $selected->concat($remaining);
             }
 
-            return array_values($selected->take($limit)->all());
+            return array_values($selected->take(24)->all());
         });
+
+        return array_slice(is_array($pool) ? $pool : [], 0, max(1, $limit));
     }
 
     /**
@@ -195,6 +202,12 @@ class ReviewMediaGalleryService
         if ($tour instanceof Tour) {
             $tourName = strtolower($tour->name ?? '');
             $tourSlug = strtolower($tour->slug ?? '');
+        } elseif (is_int($tour)) {
+            $tourModel = Tour::find($tour);
+            if ($tourModel) {
+                $tourName = strtolower($tourModel->name ?? '');
+                $tourSlug = strtolower($tourModel->slug ?? '');
+            }
         } elseif (is_string($tour)) {
             $tourSlug = strtolower($tour);
         }
@@ -536,7 +549,7 @@ class ReviewMediaGalleryService
                     'id' => 'media_'.md5($url),
                     'url' => $url,
                     'type' => $type, // 'image' or 'video'
-                    'thumbnail_url' => $type === 'video' ? ($mediaEntry['thumbnail'] ?? $url) : $url,
+                    'thumbnail_url' => $type === 'video' ? (is_array($mediaEntry) ? ($mediaEntry['thumbnail'] ?? $url) : $url) : $url,
                     'category' => $category,
                     'category_label' => self::CATEGORIES[$category]['name'] ?? 'Desert Adventure',
                     'reviewer_name' => $review->reviewer_name ?: 'Verified Traveler',
@@ -590,13 +603,21 @@ class ReviewMediaGalleryService
             return false;
         }
 
-        // Fast probe for local public files: check disk directly
-        $path = parse_url($url, PHP_URL_PATH);
-        if ($path) {
-            $localFile = public_path(ltrim($path, '/'));
-            if (file_exists($localFile) && is_file($localFile)) {
+        // Fast probe for local public files ONLY when URL host matches this application's host (and jailed to public_path)
+        $parsedHost = strtolower((string) parse_url($url, PHP_URL_HOST));
+        $appHost = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
+        $path = (string) parse_url($url, PHP_URL_PATH);
+        if ($path !== '' && $parsedHost !== '' && ($parsedHost === $appHost || $parsedHost === 'dunesdiscoverytourism.com' || $parsedHost === 'www.dunesdiscoverytourism.com')) {
+            $publicRoot = realpath(public_path());
+            $localFile = realpath(public_path(ltrim($path, '/')));
+            if ($publicRoot && $localFile && is_file($localFile) && str_starts_with($localFile, $publicRoot . DIRECTORY_SEPARATOR)) {
                 return true;
             }
+        }
+
+        // SSRF protection for all outbound media URL probes (skip live DNS in unit tests where Http::fake() uses example.com)
+        if (! \App\Services\Security\SafeUrlValidator::isSafeUrl($url, ! app()->environment('testing'))) {
+            return false;
         }
 
         $cacheKey = 'gallery_media_status_'.md5($url);
@@ -605,9 +626,9 @@ class ReviewMediaGalleryService
             return (bool) Cache::get($cacheKey);
         }
 
-        // Fast probe: HEAD request with 2.5s timeout
+        // Fast probe: HEAD request with SSRF redirect protection
         try {
-            $response = Http::timeout(2.5)
+            $response = \App\Services\Security\SafeUrlValidator::httpClient(3, 2)
                 ->withHeaders([
                     'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                     'Accept' => 'image/*,video/*,*/*',
@@ -618,7 +639,7 @@ class ReviewMediaGalleryService
 
             // If HEAD is not allowed (e.g. 405 Method Not Allowed), retry with small GET
             if ($status === 405) {
-                $response = Http::timeout(2.5)
+                $response = \App\Services\Security\SafeUrlValidator::httpClient(3, 2)
                     ->withHeaders([
                         'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                         'Range' => 'bytes=0-1024',

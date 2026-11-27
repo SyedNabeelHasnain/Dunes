@@ -7,7 +7,6 @@ use App\Models\Review;
 use App\Services\GoogleReviewSyncService;
 use App\Services\TripAdvisorReviewSyncService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AdminReviewController extends Controller
@@ -101,7 +100,10 @@ class AdminReviewController extends Controller
             'reviewer_name' => 'required|string|max:255',
             'rating' => 'required|numeric|min:1|max:5',
             'review_text' => 'required|string',
+            'review_title' => 'nullable|string|max:255',
             'status' => 'required|string|in:approved,pending,rejected',
+            'source' => 'nullable|string|in:manual,google,tripadvisor,website,direct,direct_ugc',
+            'published_date' => 'nullable|date',
         ]);
 
         Review::create([
@@ -132,8 +134,10 @@ class AdminReviewController extends Controller
             'reviewer_name' => 'required|string|max:255',
             'rating' => 'required|numeric|min:1|max:5',
             'review_text' => 'required|string',
+            'review_title' => 'nullable|string|max:255',
             'status' => 'required|string|in:approved,pending,rejected',
-            'source' => 'nullable|string|max:50',
+            'source' => 'nullable|string|in:manual,google,tripadvisor,website,direct,direct_ugc',
+            'published_date' => 'nullable|date',
         ]);
 
         $review->update([

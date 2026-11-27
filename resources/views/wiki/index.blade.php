@@ -6,8 +6,8 @@
   "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type":"ListItem","position":1,"name":{!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}},
-    {"@type":"ListItem","position":2,"name":{!! json_encode('Knowledge Portal', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('wiki.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}}
+    {"@type":"ListItem","position":1,"name":{!! json_encode(__('ui.nav.home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},"item":{!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}},
+    {"@type":"ListItem","position":2,"name":{!! json_encode('Knowledge Portal', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},"item":{!! json_encode(localized_route('wiki.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}}
   ]
 }
 </script>
@@ -16,10 +16,10 @@
 {
   "@@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-  "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-  "inLanguage": {!! json_encode(app()->getLocale(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-  "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+  "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+  "inLanguage": {!! json_encode(app()->getLocale(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+  "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
   "publisher": {
     "@type": "TravelAgency",
     "name": "Dunes Discovery Tourism LLC",
@@ -66,7 +66,7 @@
                         type="text" 
                         x-model="query"
                         aria-label="Search topics and knowledge base"
-                        @input.debounce.300ms="if(query.length >= 2) { loading = true; fetch('{{ localized_route('wiki.search') }}?q=' + encodeURIComponent(query)).then(r => r.json()).then(d => { results = d; loading = false; }); } else { results = null; }"
+                        @input.debounce.300ms="if(query.length >= 2) { loading = true; fetch('{{ localized_route('wiki.search') }}?q=' + encodeURIComponent(query)).then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(d => { results = d; }).catch(() => { results = null; }).finally(() => { loading = false; }); } else { results = null; loading = false; }"
                         placeholder="Search topics (e.g. Lahbab sand, tire pressure, pregnancy, gahwa, buggy)..." 
                         class="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                     >
@@ -161,6 +161,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             @foreach($featuredArticles as $article)
+            @continue(!$article->pillar)
             <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col group">
                 <a href="{{ localized_route('wiki.article', ['pillarSlug' => $article->pillar->slug, 'articleSlug' => $article->slug]) }}" class="block aspect-video overflow-hidden relative bg-slate-100">
                     <img src="{{ resolve_tour_image($article->hero_image) }}" alt="{{ $article->title }}" width="800" height="450" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -218,7 +219,7 @@
             <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-400/40 transition-colors">
                 <div class="font-bold text-sm text-amber-300 mb-1">{{ $term->term }}</div>
                 <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">{{ $term->definition }}</p>
-                @if($term->article)
+                @if($term->article && $term->article->pillar)
                 <a href="{{ localized_route('wiki.article', ['pillarSlug' => $term->article->pillar->slug, 'articleSlug' => $term->article->slug]) }}" class="inline-block mt-2 text-[11px] text-primary hover:underline">
                     Read guide &rarr;
                 </a>

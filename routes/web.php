@@ -167,8 +167,9 @@ $resolveLegacyTourRedirect = function (Request $request, string $slug, ?string $
         $slug = $canonicalMap[$slug];
     }
 
-    $prefix = $locale ? '/'.$locale : '';
-    $path = $slug === 'tours' ? $prefix.'/tours' : $prefix.'/'.$slug;
+    $safeSlug = ltrim(str_replace('\\', '', $slug), '/');
+    $prefix = $locale ? '/'.ltrim(str_replace('\\', '', $locale), '/') : '';
+    $path = $safeSlug === 'tours' ? $prefix.'/tours' : $prefix.'/'.$safeSlug;
     $queryString = $request->getQueryString();
 
     return redirect($path.($queryString ? '?'.$queryString : ''), 301);
@@ -240,13 +241,16 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/itinerary/{id}/update', [AdminTourController::class, 'updateItinerary'])->name('tours.itinerary.update');
     Route::post('/itinerary/{id}/delete', [AdminTourController::class, 'deleteItinerary'])->name('tours.itinerary.delete');
     Route::post('/content-items/create', [AdminTourController::class, 'addContentItem'])->name('tours.content-items.create');
+    Route::put('/content-items/{id}', [AdminTourController::class, 'updateContentItem'])->name('tours.content-items.update');
+    Route::delete('/content-items/{id}', [AdminTourController::class, 'deleteContentItem'])->name('tours.content-items.destroy');
     Route::post('/tours/{id}/content', [AdminTourController::class, 'setTourContent'])->name('tours.content.set');
     Route::post('/categories/create', [AdminTourController::class, 'addCategory'])->name('categories.create');
     Route::post('/categories/rename', [AdminTourController::class, 'renameCategory'])->name('categories.rename');
+    Route::put('/categories/{id}', [AdminTourController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{id}', [AdminTourController::class, 'deleteCategory'])->name('categories.destroy');
     Route::get('/tiers', [AdminTourController::class, 'tiers'])->name('tiers.index');
     Route::post('/tiers', [AdminTourController::class, 'storeTier'])->name('tiers.store');
     Route::match(['post', 'put'], '/tiers/{id}/update', [AdminTourController::class, 'updateTier'])->name('tiers.update');
-    Route::put('/tiers/{id}', [AdminTourController::class, 'updateTier']);
     Route::delete('/tiers/{id}', [AdminTourController::class, 'deleteTier'])->name('tiers.destroy');
 
     Route::get('/addons', [AdminTourController::class, 'addons'])->name('addons.index');
@@ -352,7 +356,13 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     // Blog CMS
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
     Route::post('/blogs/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('blogs.toggle-status');
+    Route::post('/blogs/{id}/faqs', [AdminBlogController::class, 'storeFaq'])->name('blogs.faqs.store');
+    Route::put('/blogs/faqs/{faqId}', [AdminBlogController::class, 'updateFaq'])->name('blogs.faqs.update');
+    Route::delete('/blogs/faqs/{faqId}', [AdminBlogController::class, 'destroyFaq'])->name('blogs.faqs.destroy');
     Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
+    Route::post('/blog-tags', [AdminBlogCategoryController::class, 'storeTag'])->name('blog-tags.store');
+    Route::put('/blog-tags/{id}', [AdminBlogCategoryController::class, 'updateTag'])->name('blog-tags.update');
+    Route::delete('/blog-tags/{id}', [AdminBlogCategoryController::class, 'destroyTag'])->name('blog-tags.destroy');
 
     // Wiki & Knowledge Portal CMS
     Route::get('/wiki', [AdminWikiController::class, 'index'])->name('wiki.index');
@@ -387,7 +397,9 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/legal-pages/{id}/edit', [AdminLegalController::class, 'edit'])->name('legal.edit');
     Route::post('/legal-pages/{id}/update', [AdminLegalController::class, 'update'])->name('legal.update');
     Route::post('/legal-pages/{id}/section/add', [AdminLegalController::class, 'addSection'])->name('legal.section.add');
+    Route::put('/legal-pages/section/{id}', [AdminLegalController::class, 'updateSection'])->name('legal.section.update');
     Route::post('/legal-pages/section/{sectionId}/item/add', [AdminLegalController::class, 'addItem'])->name('legal.item.add');
+    Route::put('/legal-pages/item/{id}', [AdminLegalController::class, 'updateItem'])->name('legal.item.update');
     Route::delete('/legal-pages/section/{id}', [AdminLegalController::class, 'deleteSection'])->name('legal.section.delete');
     Route::delete('/legal-pages/item/{id}', [AdminLegalController::class, 'deleteItem'])->name('legal.item.delete');
 
@@ -450,6 +462,9 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/security/unblock-requests/{id}/approve', [AdminSecurityController::class, 'approveUnblockRequest'])->name('security.unblock-requests.approve');
     Route::post('/security/unblock-requests/{id}/reject', [AdminSecurityController::class, 'rejectUnblockRequest'])->name('security.unblock-requests.reject');
     Route::delete('/security/unblock-requests/{id}', [AdminSecurityController::class, 'destroyUnblockRequest'])->name('security.unblock-requests.destroy');
+    Route::post('/security/spam-events/purge', [AdminSecurityController::class, 'purgeSpamEvents'])->name('security.spam-events.purge');
+    Route::post('/security/verified-emails', [AdminSecurityController::class, 'storeVerifiedEmail'])->name('security.verified-emails.store');
+    Route::delete('/security/verified-emails/{id}', [AdminSecurityController::class, 'destroyVerifiedEmail'])->name('security.verified-emails.destroy');
 
     // ── Multi-Language & Locales Management ──────────────────────────────────
     Route::get('/settings/languages', [AdminLanguageController::class, 'index'])->name('settings.languages');
@@ -487,6 +502,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::resource('email-templates', AdminEmailTemplateController::class);
 
     // ── Email Marketing: Campaigns & Analytics ──────────────────────────────
+    Route::post('/campaigns/send-test', [AdminEmailCampaignController::class, 'sendDraftTest'])->name('campaigns.send-draft-test');
     Route::post('/campaigns/{id}/send', [AdminEmailCampaignController::class, 'send'])->name('campaigns.send');
     Route::post('/campaigns/{id}/send-test', [AdminEmailCampaignController::class, 'sendTest'])->name('campaigns.send-test');
     Route::resource('campaigns', AdminEmailCampaignController::class);

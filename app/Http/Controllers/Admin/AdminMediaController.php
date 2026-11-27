@@ -9,6 +9,7 @@ use App\Services\ImageOptimizationService;
 use App\Services\MediaManagerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -29,13 +30,6 @@ class AdminMediaController extends Controller
      */
     public function index(Request $request): View
     {
-        // Auto-deduplicate format variants (e.g. webp + jpg) into single canonical cards
-        try {
-            $this->mediaService->deduplicateFormatVariants();
-        } catch (\Throwable $e) {
-            // Silently continue if DB lock
-        }
-
         $query = MediaAsset::query();
 
         // 1. Filter by Search
@@ -157,6 +151,7 @@ class AdminMediaController extends Controller
                 'original_name' => $asset->original_name ?: $asset->filename,
                 'file_path' => $asset->file_path,
                 'public_url' => $asset->clean_public_url,
+                'clean_public_url' => $asset->clean_public_url,
                 'full_url' => $asset->url,
                 'poster_url' => $asset->poster_url,
                 'media_type' => $asset->media_type,
@@ -342,8 +337,12 @@ class AdminMediaController extends Controller
                 ], 409);
             } catch (\Throwable $e) {
                 Log::error('Media Upload Error: ' . $e->getMessage());
-                $errors[] = $file->getClientOriginalName() . ': ' . $e->getMessage();
+                $errors[] = $file->getClientOriginalName() . ': Upload failed due to a server error.';
             }
+        }
+
+        if (count($createdAssets) > 0) {
+            Cache::forget('sitemap_images_xml');
         }
 
         $message = count($createdAssets) . ' file(s) successfully uploaded.';
@@ -493,6 +492,7 @@ class AdminMediaController extends Controller
         ]);
 
         $asset->update($validated);
+        Cache::forget('sitemap_images_xml');
 
         return response()->json([
             'success' => true,
@@ -508,12 +508,17 @@ class AdminMediaController extends Controller
     {
         $asset = MediaAsset::findOrFail($id);
 
+        $allowedMimes = $asset->media_type === 'video'
+            ? 'mp4,webm,mov,m4v'
+            : 'jpeg,png,jpg,webp,avif,gif,svg';
+
         $request->validate([
-            'file' => 'required|file|max:51200',
+            'file' => "required|file|mimes:{$allowedMimes}|max:51200",
         ]);
 
         try {
             $updated = $this->mediaService->replace($asset, $request->file('file'));
+            Cache::forget('sitemap_images_xml');
 
             return response()->json([
                 'success' => true,
@@ -531,7 +536,7 @@ class AdminMediaController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to replace file: ' . $e->getMessage(),
+                'message' => 'Failed to replace media file. Please verify file format and permissions.',
             ], 500);
         }
     }
@@ -550,6 +555,8 @@ class AdminMediaController extends Controller
             return response()->json($result, 422);
         }
 
+        Cache::forget('sitemap_images_xml');
+
         return response()->json($result);
     }
 
@@ -560,6 +567,7 @@ class AdminMediaController extends Controller
     {
         try {
             $stats = $this->mediaService->scanAndSyncExistingMedia();
+            Cache::forget('sitemap_images_xml');
 
             return response()->json([
                 'success' => true,
@@ -571,7 +579,7 @@ class AdminMediaController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Sync failed: ' . $e->getMessage(),
+                'message' => 'Media synchronization failed. Please check server logs.',
             ], 500);
         }
     }

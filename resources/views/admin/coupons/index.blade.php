@@ -130,7 +130,7 @@
 
         <!-- Table View -->
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm text-slate-700" id="couponsTable">
+            <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="couponsTable">
                 <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
                         <th class="py-3 px-4">Promo Code</th>

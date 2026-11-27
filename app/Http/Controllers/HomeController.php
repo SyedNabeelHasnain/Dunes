@@ -68,7 +68,7 @@ class HomeController extends Controller
         }
 
         try {
-            $reviews = Cache::remember('site_home_reviews_feed', 3600, function () {
+            $cachedReviews = Cache::remember('site_home_reviews_feed', 3600, function () {
                 $featured = collect();
 
                 try {
@@ -82,20 +82,21 @@ class HomeController extends Controller
                         ->orderByRaw('is_featured DESC, rating DESC, published_date DESC')
                         ->limit(40)
                         ->get()
-                        ->map(fn ($r) => (object) [
+                        ->map(fn ($r) => [
                             'rating' => (float) $r->rating,
                             'source' => (string) $r->source,
                             'review_url' => (string) $r->review_url,
                             'reviewer_name' => (string) $r->reviewer_name,
                             'reviewer_avatar_url' => (string) $r->reviewer_avatar_url,
                             'published_date' => $r->published_date ? (string) $r->published_date : null,
-                            'photos' => $r->photos,
+                            'photos' => is_array($r->photos) ? $r->photos : [],
                             'review_title' => (string) $r->review_title,
                             'review_text' => (string) $r->review_text,
                         ]);
 
                     $featured = collect($dbReviews);
                 } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('HomeController review DB query failed: '.$e->getMessage());
                     $featured = collect();
                 }
 
@@ -107,11 +108,8 @@ class HomeController extends Controller
                     $jsonPath = database_path('seeders/data/reviews.json');
                     if (file_exists($jsonPath)) {
                         $rawJson = json_decode(file_get_contents($jsonPath), true) ?: [];
-                        $jsonReviews = collect($rawJson)->map(function ($item) {
-                            return (object) $item;
-                        })->filter(function ($r) {
-                            return ! empty($r->review_text) && ! empty($r->reviewer_name) && (float) ($r->rating ?? 0) >= 4.0;
-                        });
+                        $jsonReviews = collect($rawJson)
+                            ->filter(fn ($r) => is_array($r) && ! empty($r['review_text']) && ! empty($r['reviewer_name']) && (float) ($r['rating'] ?? 0) >= 4.0);
 
                         if ($googleCount < 15) {
                             $neededGoogle = 15 - $googleCount;
@@ -129,8 +127,15 @@ class HomeController extends Controller
 
                 return $featured->unique('review_text')->values();
             });
-            $reviews = collect($reviews);
+
+            if (! ($cachedReviews instanceof \Illuminate\Support\Collection) && ! is_array($cachedReviews)) {
+                Cache::forget('site_home_reviews_feed');
+                $cachedReviews = [];
+            }
+
+            $reviews = collect($cachedReviews)->map(fn ($item) => is_array($item) ? (object) $item : $item);
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('HomeController reviews cache hydrate failed: '.$e->getMessage());
             $reviews = collect();
         }
 

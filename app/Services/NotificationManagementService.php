@@ -14,7 +14,6 @@ use App\Models\Review;
 use App\Models\Tour;
 use App\Models\WhatsappInquiry;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -109,7 +108,7 @@ class NotificationManagementService
                 @mkdir($vouchersDir, 0775, true);
             }
 
-            $verificationUrl = route('booking.voucher', $booking->reference);
+            $verificationUrl = route('booking.voucher', ['reference' => $booking->reference]);
             $qrSvg = null;
             $qrCodeUrl = null;
 
@@ -139,8 +138,15 @@ class NotificationManagementService
                 throw new \RuntimeException("DomPDF produced empty or corrupted binary for #{$booking->reference}");
             }
 
-            // Write to disk cache for instantaneous streaming via download link
-            @file_put_contents($vouchersDir . '/' . $booking->reference . '.pdf', $output);
+            // Never pollute disk cache with synthetic demo/test booking vouchers
+            $isSyntheticDemo = ((int) ($booking->id ?? 0) === 0)
+                || str_starts_with((string) $booking->reference, 'DT-TEST-')
+                || str_starts_with((string) $booking->reference, 'DT-ADMIN-')
+                || str_starts_with((string) $booking->reference, 'DT-VERIFY-');
+
+            if (! $isSyntheticDemo) {
+                @file_put_contents($vouchersDir . '/' . $booking->reference . '.pdf', $output);
+            }
 
             return $output;
         } catch (\Throwable $e) {
@@ -189,10 +195,6 @@ class NotificationManagementService
 
                 if ($customerPdfEnabled && $pdfBinary) {
                     $customerMail->withPdfAttachment($pdfBinary, $pdfFileName);
-                    $diskPath = storage_path('app/vouchers/' . $booking->reference . '.pdf');
-                    if (file_exists($diskPath)) {
-                        $customerMail->withPdfFile($diskPath, $pdfFileName);
-                    }
                 }
 
                 Mail::to($booking->email)->send($customerMail);
@@ -215,10 +217,6 @@ class NotificationManagementService
 
                 if ($adminPdfEnabled && $pdfBinary) {
                     $adminMail->withPdfAttachment($pdfBinary, $pdfFileName);
-                    $diskPath = storage_path('app/vouchers/' . $booking->reference . '.pdf');
-                    if (file_exists($diskPath)) {
-                        $adminMail->withPdfFile($diskPath, $pdfFileName);
-                    }
                 }
 
                 $ccList = array_merge($recipients, $this->settings->getCcEmails());
@@ -507,7 +505,8 @@ class NotificationManagementService
 
             \App\Services\Security\SafeUrlValidator::httpClient(5, 3)
                 ->withHeaders($headers)
-                ->post($url, $body);
+                ->withBody((string) $jsonBody, 'application/json')
+                ->post($url);
         } catch (\Throwable $e) {
             Log::warning("Failed to dispatch outgoing notification webhook ({$event}): " . $e->getMessage());
         }
@@ -522,9 +521,9 @@ class NotificationManagementService
         $this->prepareMailEnvironment();
         $sender = $this->getSenderIdentity();
 
-        // Target real delivery transport directly to prevent failover to log
+        // Target real delivery transport directly (honoring configured SMTP failover chain, never falling back to log)
         $targetMailer = config('mail.default', 'smtp');
-        if ($targetMailer === 'failover' || empty($targetMailer)) {
+        if (empty($targetMailer) || $targetMailer === 'log') {
             $targetMailer = 'smtp';
         }
 
@@ -556,7 +555,7 @@ class NotificationManagementService
                         'payment_status' => 'paid',
                         'payment_method' => 'card',
                         'status' => 'confirmed',
-                        'notes' => 'Vegetarian dinner requested. VIP seating near stage.',
+                        'special_requests' => 'Vegetarian dinner requested. VIP seating near stage.',
                     ]);
                     $testBooking->setRelation('addons', collect());
                     if ($firstTour) {
@@ -580,11 +579,6 @@ class NotificationManagementService
                         ->from($sender['email'], $sender['name'])
                         ->replyTo($sender['reply_to'], $sender['name'])
                         ->withPdfAttachment($pdfBinary, $pdfFileName);
-
-                    $diskPath = storage_path('app/vouchers/' . $testBooking->reference . '.pdf');
-                    if (file_exists($diskPath)) {
-                        $mail->withPdfFile($diskPath, $pdfFileName);
-                    }
 
                     Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
 
@@ -620,7 +614,7 @@ class NotificationManagementService
                         'payment_status' => 'paid',
                         'payment_method' => 'card',
                         'status' => 'confirmed',
-                        'notes' => 'Corporate VIP Guest - Premium Falconry Experience',
+                        'special_requests' => 'Corporate VIP Guest - Premium Falconry Experience',
                     ]);
                     $testBooking->setRelation('addons', collect());
                     if ($firstTour) {
@@ -644,11 +638,6 @@ class NotificationManagementService
                         ->from($sender['email'], $sender['name'])
                         ->replyTo($sender['reply_to'], $sender['name'])
                         ->withPdfAttachment($pdfBinary, $pdfFileName);
-
-                    $diskPath = storage_path('app/vouchers/' . $testBooking->reference . '.pdf');
-                    if (file_exists($diskPath)) {
-                        $mail->withPdfFile($diskPath, $pdfFileName);
-                    }
 
                     Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
 

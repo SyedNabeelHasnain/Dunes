@@ -42,17 +42,22 @@ class SendReviewRequestsCommand extends Command
             }
         }
 
-        $yesterday = now()->subDay()->format('Y-m-d');
+        $yesterday = now('Asia/Dubai')->subDay()->format('Y-m-d');
         $this->info("Scanning completed tour bookings for date: {$yesterday}");
 
         $bookings = Booking::whereDate('tour_date', $yesterday)
             ->whereIn('status', ['confirmed', 'completed'])
             ->whereNotNull('email')
             ->where('email', '!=', '')
+            ->where('email', 'not like', '%@guest.local')
             ->get();
 
         $count = 0;
         foreach ($bookings as $booking) {
+            if (! filter_var($booking->email, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+
             // Check if review already requested via special_requests tag
             if ($booking->special_requests && str_contains($booking->special_requests, '[REVIEW_REQUESTED')) {
                 continue;

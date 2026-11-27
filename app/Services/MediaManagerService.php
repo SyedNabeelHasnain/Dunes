@@ -491,87 +491,87 @@ class MediaManagerService
                 }
             }
 
-            // 3. Reviews
-            $reviews = Review::select('id', 'guest_name', 'media_url', 'thumbnail_url', 'photos')->get();
-            foreach ($reviews as $rev) {
-                if ($this->stringMatchesAsset($rev->media_url, $filename, $path, $url) || $this->stringMatchesAsset($rev->thumbnail_url, $filename, $path, $url)) {
-                    $usages[] = [
-                        'type' => 'Review',
-                        'id' => $rev->id,
-                        'name' => 'Review from ' . ($rev->guest_name ?? 'Guest'),
-                        'field' => 'Review Media',
-                        'edit_url' => route('admin.reviews.index'),
-                    ];
-                }
-                if (! empty($rev->photos)) {
-                    $photos = is_array($rev->photos) ? $rev->photos : json_decode($rev->photos, true);
-                    if (is_array($photos)) {
-                        foreach ($photos as $photo) {
-                            if ($this->stringMatchesAsset($photo, $filename, $path, $url)) {
-                                $usages[] = [
-                                    'type' => 'Review',
-                                    'id' => $rev->id,
-                                    'name' => 'Review from ' . ($rev->guest_name ?? 'Guest'),
-                                    'field' => 'Review Photo',
-                                    'edit_url' => route('admin.reviews.index'),
-                                ];
-                                break;
+            // 3. Reviews (isolated so schema variations never block Settings/Drivers/Reels)
+            try {
+                $reviews = Review::select('id', 'reviewer_name', 'reviewer_avatar_url', 'photos')->get();
+                foreach ($reviews as $rev) {
+                    if ($this->stringMatchesAsset($rev->reviewer_avatar_url, $filename, $path, $url)) {
+                        $usages[] = [
+                            'type' => 'Review',
+                            'id' => $rev->id,
+                            'name' => 'Review from ' . ($rev->reviewer_name ?? 'Guest'),
+                            'field' => 'Reviewer Avatar',
+                            'edit_url' => route('admin.reviews.index'),
+                        ];
+                    }
+                    if (! empty($rev->photos)) {
+                        $photos = is_array($rev->photos) ? $rev->photos : json_decode((string) $rev->photos, true);
+                        if (is_array($photos)) {
+                            foreach ($photos as $photo) {
+                                if ($this->stringMatchesAsset(is_string($photo) ? $photo : ($photo['url'] ?? null), $filename, $path, $url)) {
+                                    $usages[] = [
+                                        'type' => 'Review',
+                                        'id' => $rev->id,
+                                        'name' => 'Review from ' . ($rev->reviewer_name ?? 'Guest'),
+                                        'field' => 'Review Photo',
+                                        'edit_url' => route('admin.reviews.index'),
+                                    ];
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+            } catch (\Throwable $e) {
+                Log::warning("MediaManagerService: review usage scan failed for {$asset->id}: " . $e->getMessage());
             }
 
             // 4. Settings
-            $settings = Setting::select('id', 'setting_key', 'setting_value')->get();
-            $settingLabels = [
-                'site_logo' => 'Primary Brand Logo (Navbar/Schema)',
-                'site_logo_white' => 'White Brand Logo (Footer/Email)',
-                'site_favicon' => 'Browser Favicon',
-                'site_hero_video' => 'Homepage Hero Video Background',
-                'site_hero_poster' => 'Homepage Hero Video Poster',
-                'seo_default_og_image' => 'Global Social Share (OG) Card',
-                'about_story_image' => 'About Us Page Story Image',
-            ];
-            foreach ($settings as $setting) {
-                if (! empty($setting->setting_value) && ($this->stringMatchesAsset($setting->setting_value, $filename, $path, $url) || str_contains($setting->setting_value, $filename) || str_contains($setting->setting_value, $path))) {
-                    $key = $setting->setting_key;
-                    $fieldLabel = $settingLabels[$key] ?? ('Setting: ' . $key);
-                    $usages[] = [
-                        'type' => 'Site Setting',
-                        'id' => $setting->id,
-                        'name' => $fieldLabel,
-                        'field' => 'General Settings & Branding',
-                        'edit_url' => route('admin.settings.index'),
-                    ];
+            try {
+                $settings = Setting::select('id', 'setting_key', 'setting_value')->get();
+                $settingLabels = [
+                    'site_logo' => 'Primary Brand Logo (Navbar/Schema)',
+                    'site_logo_white' => 'White Brand Logo (Footer/Email)',
+                    'site_favicon' => 'Browser Favicon',
+                    'site_hero_video' => 'Homepage Hero Video Background',
+                    'site_hero_poster' => 'Homepage Hero Video Poster',
+                    'seo_default_og_image' => 'Global Social Share (OG) Card',
+                    'seo_sunset_og_image' => 'Sunset Guide OG Card',
+                    'about_story_image' => 'About Us Page Story Image',
+                ];
+                foreach ($settings as $setting) {
+                    if (! empty($setting->setting_value) && ($this->stringMatchesAsset($setting->setting_value, $filename, $path, $url) || str_contains($setting->setting_value, $filename) || str_contains($setting->setting_value, $path))) {
+                        $key = $setting->setting_key;
+                        $fieldLabel = $settingLabels[$key] ?? ('Setting: ' . $key);
+                        $usages[] = [
+                            'type' => 'Site Setting',
+                            'id' => $setting->id,
+                            'name' => $fieldLabel,
+                            'field' => 'General Settings & Branding',
+                            'edit_url' => route('admin.settings.index'),
+                        ];
+                    }
                 }
+            } catch (\Throwable $e) {
+                Log::warning("MediaManagerService: settings usage scan failed for {$asset->id}: " . $e->getMessage());
             }
 
-            // 5. Vehicles & Drivers
-            $vehicles = Vehicle::select('id', 'name', 'image')->get();
-            foreach ($vehicles as $v) {
-                if ($this->stringMatchesAsset($v->image, $filename, $path, $url)) {
-                    $usages[] = [
-                        'type' => 'Fleet Vehicle',
-                        'id' => $v->id,
-                        'name' => $v->name,
-                        'field' => 'Vehicle Image',
-                        'edit_url' => route('admin.vehicles.edit', $v->id),
-                    ];
+            // 5. Drivers (uses `photo` column)
+            try {
+                $drivers = Driver::select('id', 'name', 'photo')->get();
+                foreach ($drivers as $d) {
+                    if ($this->stringMatchesAsset($d->photo, $filename, $path, $url)) {
+                        $usages[] = [
+                            'type' => 'Safari Driver',
+                            'id' => $d->id,
+                            'name' => $d->name,
+                            'field' => 'Driver Photo',
+                            'edit_url' => route('admin.drivers.edit', $d->id),
+                        ];
+                    }
                 }
-            }
-
-            $drivers = Driver::select('id', 'name', 'avatar')->get();
-            foreach ($drivers as $d) {
-                if ($this->stringMatchesAsset($d->avatar, $filename, $path, $url)) {
-                    $usages[] = [
-                        'type' => 'Safari Driver',
-                        'id' => $d->id,
-                        'name' => $d->name,
-                        'field' => 'Driver Avatar',
-                        'edit_url' => route('admin.drivers.edit', $d->id),
-                    ];
-                }
+            } catch (\Throwable $e) {
+                Log::warning("MediaManagerService: driver usage scan failed for {$asset->id}: " . $e->getMessage());
             }
 
             // 6. Curated Customer Video Reviews (Reels & Tour Highlights)
@@ -662,7 +662,7 @@ class MediaManagerService
         if (! empty($fieldBase) && ! empty($assetBase) && strcasecmp($fieldBase, $assetBase) === 0) {
             $fieldDir = str_replace('\\', '/', trim(dirname($cleanField), '/. '));
             $assetDir = str_replace('\\', '/', trim(dirname($cleanPath), '/. '));
-            if ($fieldDir === '.' || $assetDir === '.' || $fieldDir === $assetDir || str_contains($cleanField, $assetBase)) {
+            if ($fieldDir === '' || $assetDir === '' || $fieldDir === '.' || $assetDir === '.' || $fieldDir === $assetDir) {
                 return true;
             }
         }
@@ -712,6 +712,8 @@ class MediaManagerService
      */
     public function upload(UploadedFile $file, array $attributes = [], ?int $userId = null, bool $force = false): MediaAsset
     {
+        $convertedTempPath = null;
+
         if (! empty($attributes['convert_to']) && in_array(strtolower($attributes['convert_to']), ['webp', 'avif'], true)) {
             $optService = app(ImageOptimizationService::class);
             if ($optService->needsConversion($file)) {
@@ -719,21 +721,34 @@ class MediaManagerService
                     'quality' => $attributes['convert_quality'] ?? 'lossless',
                 ]);
                 $file = $convResult['file'];
+                $convertedTempPath = $file->getRealPath() ?: null;
             }
         }
 
-        if (! $force) {
-            $duplicate = $this->findDuplicate($file);
-            if ($duplicate) {
-                throw new DuplicateMediaException(
-                    "Duplicate media detected: '" . $file->getClientOriginalName() . "' already exists as '" . $duplicate->filename . "' in the Media Library.",
-                    $duplicate
-                );
+        try {
+            if (! $force) {
+                $duplicate = $this->findDuplicate($file);
+                if ($duplicate) {
+                    throw new DuplicateMediaException(
+                        "Duplicate media detected: '" . $file->getClientOriginalName() . "' already exists as '" . $duplicate->filename . "' in the Media Library.",
+                        $duplicate
+                    );
+                }
             }
+
+            $origName = $file->getClientOriginalName();
+            $ext = strtolower($file->getClientOriginalExtension());
+            $allowedExtensions = array_merge($this->imageExtensions, $this->videoExtensions);
+            if ($ext === '' || ! in_array($ext, $allowedExtensions, true)) {
+                throw new \InvalidArgumentException("Unsupported media file extension: '.{$ext}'.");
+            }
+        } catch (\Throwable $e) {
+            if ($convertedTempPath && file_exists($convertedTempPath)) {
+                @unlink($convertedTempPath);
+            }
+            throw $e;
         }
 
-        $origName = $file->getClientOriginalName();
-        $ext = strtolower($file->getClientOriginalExtension());
         $cleanBase = Str::slug(pathinfo($origName, PATHINFO_FILENAME));
         if (empty($cleanBase)) {
             $cleanBase = 'media-asset';
@@ -847,6 +862,7 @@ class MediaManagerService
 
             // Update asset metadata
             $sizeBytes = filesize($targetFullPath);
+            $fileHash = @hash_file('sha256', $targetFullPath) ?: $asset->file_hash;
             $mimeType = File::mimeType($targetFullPath) ?: $asset->mime_type;
 
             $width = null;
@@ -861,10 +877,17 @@ class MediaManagerService
 
             $asset->update([
                 'file_size_bytes' => $sizeBytes,
+                'file_hash' => $fileHash,
                 'mime_type' => $mimeType,
                 'width' => $width ?: $asset->width,
                 'height' => $height ?: $asset->height,
             ]);
+
+            // Mirror replaced file to Hostinger ../public_html if present
+            $hostingerMirror = base_path('../public_html/' . ltrim($asset->file_path, '/'));
+            if (is_dir(base_path('../public_html')) && is_dir(dirname($hostingerMirror))) {
+                @copy($targetFullPath, $hostingerMirror);
+            }
 
             // Remove backup on success
             if (File::exists($backupPath)) {
@@ -930,14 +953,16 @@ class MediaManagerService
             }
         }
 
-        // Also clean up any matching base_name file in the same directory
-        $cleanDir = dirname(public_path($asset->file_path));
-        $baseName = pathinfo($asset->filename, PATHINFO_FILENAME);
-        if (File::isDirectory($cleanDir)) {
-            foreach ($this->imageExtensions as $sibExt) {
-                $sibFile = $cleanDir . DIRECTORY_SEPARATOR . $baseName . '.' . $sibExt;
-                if (File::exists($sibFile)) {
-                    @unlink($sibFile);
+        // Also clean up any matching base_name image variants in the same directory (images only — never unlink poster images when deleting a video)
+        if ($asset->media_type === 'image') {
+            $cleanDir = dirname(public_path($asset->file_path));
+            $baseName = pathinfo($asset->filename, PATHINFO_FILENAME);
+            if (File::isDirectory($cleanDir)) {
+                foreach ($this->imageExtensions as $sibExt) {
+                    $sibFile = $cleanDir . DIRECTORY_SEPARATOR . $baseName . '.' . $sibExt;
+                    if (File::exists($sibFile)) {
+                        @unlink($sibFile);
+                    }
                 }
             }
         }
@@ -1042,8 +1067,10 @@ class MediaManagerService
             }
         }
 
-        // 3. Deduplicate by exact filename for any rows without hash
-        $groupedByName = MediaAsset::all()->groupBy('filename');
+        // 3. Deduplicate by (folder, exact filename) ONLY for rows without file_hash so distinct cross-folder files are preserved
+        $groupedByName = MediaAsset::whereNull('file_hash')
+            ->get()
+            ->groupBy(fn (MediaAsset $a) => strtolower(trim((string) $a->folder, '/')) . '/' . strtolower((string) $a->filename));
         foreach ($groupedByName as $filename => $records) {
             if ($records->count() <= 1) {
                 continue;
@@ -1100,11 +1127,12 @@ class MediaManagerService
 
         $assets = MediaAsset::where('media_type', 'image')->get();
 
-        // Group by lowercase canonical base name to consolidate format variants (.webp, .jpg, .png, .avif)
+        // Group by (folder, lowercase canonical base name) to consolidate format variants ONLY within the same folder
         $grouped = [];
         foreach ($assets as $asset) {
+            $folderKey = strtolower(trim((string) ($asset->folder ?: dirname((string) $asset->file_path)), '/'));
             $baseName = strtolower(pathinfo($asset->filename, PATHINFO_FILENAME));
-            $grouped[$baseName][] = $asset;
+            $grouped[$folderKey . '::' . $baseName][] = $asset;
         }
 
         foreach ($grouped as $baseName => $records) {
@@ -1206,23 +1234,26 @@ class MediaManagerService
         $cleanName = pathinfo($filename, PATHINFO_FILENAME);
         $humanTitle = Str::headline(str_replace(['-', '_'], ' ', $cleanName));
 
+        $folder = trim(str_replace('\\', '/', dirname($relativePath)), './');
+
         $existing = null;
         if ($fileHash) {
             $existing = MediaAsset::where('file_hash', $fileHash)->first();
         }
         if (! $existing) {
-            $existing = MediaAsset::where('filename', $filename)
-                ->orWhere('file_path', $relativePath)
+            $existing = MediaAsset::where('file_path', $relativePath)
                 ->orWhere('public_url', $publicUrl)
                 ->first();
         }
 
-        // Format-variant check for images: prevent creating duplicate records for .webp and .jpg siblings
+        // Format-variant check for images: prevent creating duplicate records for .webp and .jpg siblings in the SAME folder
         if (! $existing && $mediaType === 'image') {
             $baseLower = strtolower($cleanName);
+            $escapedBase = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $baseLower);
             $sibling = MediaAsset::where('media_type', 'image')
-                ->where(function ($q) use ($baseLower) {
-                    $q->whereRaw('LOWER(filename) LIKE ?', [$baseLower . '.%']);
+                ->where('folder', $folder)
+                ->where(function ($q) use ($escapedBase) {
+                    $q->whereRaw("LOWER(filename) LIKE ? ESCAPE '!'", [$escapedBase . '.%']);
                 })
                 ->first();
 

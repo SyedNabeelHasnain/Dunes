@@ -12,13 +12,65 @@
             // Dashboard
             'admin.dashboard' => [],
 
-            // Analytics
+            // Analytics, Telemetry & Optimization Platform
             'admin.analytics.index' => [
                 ['label' => 'Analytics & Intelligence'],
             ],
             'admin.analytics.live-visitors' => [
                 ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
                 ['label' => 'Live Visitors & Telemetry Hub'],
+            ],
+            'admin.analytics.recordings.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'Session Replays'],
+            ],
+            'admin.analytics.heatmaps.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'Heatmaps & Scroll Depth'],
+            ],
+            'admin.audit.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'Website Optimization & Audit Engine'],
+            ],
+            'admin.audit.show' => [
+                ['label' => 'Website Optimization & Audit', 'url' => route('admin.audit.index')],
+                ['label' => 'Audit Run Details'],
+            ],
+            'admin.governance.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'Governance, RBAC & Approvals'],
+            ],
+            'admin.health.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'CWV & System Health'],
+            ],
+            'admin.ai-visibility.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'AI Visibility & Crawlers'],
+            ],
+            'admin.seo.crawl-analytics' => [
+                ['label' => 'AI Visibility & Crawlers', 'url' => route('admin.ai-visibility.index')],
+                ['label' => 'Search Crawler Analytics'],
+            ],
+            'admin.settings.privacy.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'Privacy & Consent v2'],
+            ],
+            'admin.settings.redirects.index' => [
+                ['label' => 'Settings', 'url' => route('admin.settings.general')],
+                ['label' => 'Dynamic Redirects'],
+            ],
+            'admin.settings.seo-templates.index' => [
+                ['label' => 'Settings', 'url' => route('admin.settings.general')],
+                ['label' => 'SEO Inheritance Templates'],
+            ],
+            'admin.settings.robots.index' => [
+                ['label' => 'Settings', 'url' => route('admin.settings.general')],
+                ['label' => 'robots.txt & AI Bots'],
+            ],
+            'admin.settings.keywords.index' => [
+                ['label' => 'Settings', 'url' => route('admin.settings.general')],
+                ['label' => 'Keyword Matrix & Internal Links'],
             ],
 
             // Bookings & Reservations
@@ -198,13 +250,12 @@
                 ['label' => 'Content & Portal', 'url' => route('admin.pages.index')],
                 ['label' => 'Pages & Content'],
             ],
-            'admin.pages.create' => [
-                ['label' => 'Content & Portal', 'url' => route('admin.pages.index')],
-                ['label' => 'New Page'],
-            ],
             'admin.pages.edit' => [
                 ['label' => 'Content & Portal', 'url' => route('admin.pages.index')],
                 ['label' => 'Edit Page'],
+            ],
+            'admin.media.index' => [
+                ['label' => 'Media Library'],
             ],
             'admin.menus.index' => [
                 ['label' => 'Content & Portal', 'url' => route('admin.menus.index')],

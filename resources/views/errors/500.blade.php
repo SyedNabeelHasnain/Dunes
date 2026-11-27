@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @php
+    $isErrorPage = true;
     $pageTitle = 'Server Error (500) | Dunes Discovery Tourism';
     $pageDesc = 'Something unexpected occurred on our server. Please try again or contact our support team.';
     $pageRobots = 'noindex, nofollow';
@@ -18,15 +19,15 @@
             Our system encountered a brief hiccup while processing your request. Please refresh the page or try again in a few moments.
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-3">
-            <a href="javascript:location.reload()" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
+            <button type="button" onclick="window.location.reload()" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px] cursor-pointer">
                 <i class="bi bi-arrow-clockwise"></i> Reload Page
-            </a>
+            </button>
             <a href="{{ localized_route('home') }}" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
                 <i class="bi bi-house-door-fill"></i> Return Home
             </a>
         </div>
         <div class="mt-6 pt-4 border-t border-slate-200 text-slate-500 text-xs">
-            If the issue persists, feel free to contact us via <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20encountered%20a%20500%20server%20error" target="_blank" rel="noopener" class="btn-whatsapp text-primary font-bold hover:underline inline-flex items-center gap-1 cursor-pointer" data-action="whatsapp" data-tour-name="500 Support Request"><i class="bi bi-whatsapp"></i> WhatsApp Support</a>
+            If the issue persists, feel free to contact us via <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20encountered%20a%20500%20server%20error" target="_blank" rel="noopener noreferrer" class="btn-whatsapp text-primary font-bold hover:underline inline-flex items-center gap-1 cursor-pointer" data-action="whatsapp" data-tour-name="500 Support Request"><i class="bi bi-whatsapp"></i> WhatsApp Support</a>
         </div>
     </div>
 </div>

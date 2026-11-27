@@ -797,7 +797,7 @@
                             <label class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs cursor-pointer shrink-0 transition flex items-center gap-1">
                                 <i class="bi bi-arrow-repeat"></i>
                                 <span>Replace</span>
-                                <input type="file" @change="replaceAssetFile($event)" class="hidden">
+                                <input type="file" :accept="activeAsset?.media_type === 'video' ? 'video/mp4,video/webm,video/quicktime,video/x-m4v' : 'image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml'" @change="replaceAssetFile($event)" class="hidden">
                             </label>
                         </div>
                     </div>
@@ -1633,8 +1633,8 @@ function mediaManager() {
 
         async confirmBulkDelete() {
             if (this.selectedIds.length === 0) return;
-            const force = confirm(`Are you sure you want to delete ${this.selectedIds.length} assets?\n\nIf any assets are in-use, click OK to force delete, or Cancel to abort.`);
-            if (!force) return;
+            const confirmed = confirm(`Are you sure you want to delete ${this.selectedIds.length} selected asset(s)?\n\nIn-use assets will be automatically protected and skipped.`);
+            if (!confirmed) return;
 
             try {
                 const res = await fetch('{{ route('admin.media.bulk-action') }}', {
@@ -1647,7 +1647,7 @@ function mediaManager() {
                     body: JSON.stringify({
                         action: 'delete',
                         ids: this.selectedIds,
-                        force: true
+                        force: false
                     })
                 });
                 const data = await res.json();

@@ -116,8 +116,8 @@ class AdminSubscriberController extends Controller
             'unsubscribed_at' => $statusChanged && $validated['status'] === 'unsubscribed' ? now() : $subscriber->unsubscribed_at,
         ]);
 
-        if (isset($validated['groups'])) {
-            $subscriber->groups()->sync($validated['groups']);
+        if ($request->has('groups') || $request->boolean('groups_submitted')) {
+            $subscriber->groups()->sync($validated['groups'] ?? []);
         }
 
         return redirect()->route('admin.subscribers.index')

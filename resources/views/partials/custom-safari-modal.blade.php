@@ -81,11 +81,11 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Standard Evening</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">Dune bashing & BBQ show</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="79">{{ __('ui.common.aed') }} 79/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2"><span data-aed="79">{{ __('ui.common.aed') }} 79</span>/guest</div>
                                 </div>
 
                                 <!-- Base 2 -->
-                                <div @click="base = { name: 'VIP Luxury Evening Safari', price: 130, tourId: 2 }" 
+                                <div @click="base = { name: 'VIP Luxury Evening Safari', price: 130, tourId: 1 }" 
                                      class="p-3 rounded-2xl cursor-pointer transition-all border text-start"
                                      :class="base.name === 'VIP Luxury Evening Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
@@ -94,11 +94,11 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">VIP Luxury Safari</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">VIP table & waiter service</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="130">{{ __('ui.common.aed') }} 130/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2"><span data-aed="130">{{ __('ui.common.aed') }} 130</span>/guest</div>
                                 </div>
 
                                 <!-- Base 3 -->
-                                <div @click="base = { name: 'Morning Desert Safari', price: 140, tourId: 4 }" 
+                                <div @click="base = { name: 'Morning Desert Safari', price: 140, tourId: 2 }" 
                                      class="p-3 rounded-2xl cursor-pointer transition-all border text-start"
                                      :class="base.name === 'Morning Desert Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
@@ -107,11 +107,11 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Morning Safari</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">Cool air & sunrise photos</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="140">{{ __('ui.common.aed') }} 140/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2"><span data-aed="140">{{ __('ui.common.aed') }} 140</span>/guest</div>
                                 </div>
 
                                 <!-- Base 4 -->
-                                <div @click="base = { name: 'Overnight Stargazing Safari', price: 399, tourId: 5 }" 
+                                <div @click="base = { name: 'Overnight Stargazing Safari', price: 399, tourId: 3 }" 
                                      class="p-3 rounded-2xl cursor-pointer transition-all border text-start"
                                      :class="base.name === 'Overnight Stargazing Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
@@ -120,7 +120,7 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Overnight Safari</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">Bedouin tent & breakfast</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="399">{{ __('ui.common.aed') }} 399/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2"><span data-aed="399">{{ __('ui.common.aed') }} 399</span>/guest</div>
                                 </div>
                             </div>
                         </div>
@@ -141,13 +141,13 @@
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="transfer.name === 'Private 7-Seater 4x4' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">Private 4x4</div>
-                                    <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="350">+AED 350 flat</div>
+                                    <div class="text-amber-400 font-bold text-[10px] mt-1"><span data-aed="350" data-is-addon="true">+AED 350</span> flat</div>
                                 </div>
                                 <div @click="transfer = { name: 'VIP Range Rover', price: 750, type: 'flat' }"
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="transfer.name === 'VIP Range Rover' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">VIP SUV</div>
-                                    <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="750">+AED 750 flat</div>
+                                    <div class="text-amber-400 font-bold text-[10px] mt-1"><span data-aed="750" data-is-addon="true">+AED 750</span> flat</div>
                                 </div>
                             </div>
                         </div>
@@ -276,11 +276,10 @@
                                     </button>
                                     <a :href="waUrl" 
                                        target="_blank" 
-                                       rel="noopener" 
-                                       class="btn-whatsapp w-full py-3 min-h-[44px] rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                                       data-action="whatsapp"
+                                       rel="noopener noreferrer" 
+                                       class="w-full py-3 min-h-[44px] rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                                        :data-tour-name="base ? base.name : 'Custom Desert Safari'"
-                                       @click.prevent="window.openWhatsApp ? window.openWhatsApp(base ? base.name : 'Custom Desert Safari', waUrl) : null">
+                                       @click.prevent.stop="window.openWhatsApp ? window.openWhatsApp(base ? base.name : 'Custom Desert Safari', waUrl) : null">
                                         <i class="bi bi-whatsapp"></i>
                                         <span>{{ __('ui.customizer.whatsapp_help') }}</span>
                                     </a>

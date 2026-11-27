@@ -16,13 +16,13 @@
     <div style="background-color: #fff8f0; border-left: 4px solid #F58F43; padding: 16px 20px; border-radius: 4px; margin: 20px 0;">
         <h3 style="margin: 0 0 10px 0; color: #333333; font-size: 18px;">Reservation Summary:</h3>
         <p style="margin: 4px 0;"><strong>Booking Reference:</strong> #{{ $booking->reference }}</p>
-        <p style="margin: 4px 0;"><strong>Experience:</strong> {{ $booking->tour_name ?? ($booking->tour->name ?? 'Desert Safari Tour') }}</p>
+        <p style="margin: 4px 0;"><strong>Experience:</strong> {{ $booking->tour_name ?? ($booking->tour?->name ?? 'Desert Safari Tour') }}</p>
         @if($booking->tier_name)
         <p style="margin: 4px 0;"><strong>Selected Package:</strong> {{ $booking->tier_name }}</p>
         @endif
-        <p style="margin: 4px 0;"><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->tour_date)->format('M d, Y') }}</p>
-        <p style="margin: 4px 0;"><strong>Guests:</strong> {{ $booking->adults }} Adult(s) @if($booking->children > 0), {{ $booking->children }} Child(ren) @endif</p>
-        <p style="margin: 4px 0; font-size: 18px; color: #F58F43;"><strong>Total Amount:</strong> AED {{ number_format($booking->total, 2) }}</p>
+        <p style="margin: 4px 0;"><strong>Date:</strong> {{ $booking->tour_date ? \Carbon\Carbon::parse($booking->tour_date)->format('M d, Y') : 'To be confirmed' }}</p>
+        <p style="margin: 4px 0;"><strong>Guests:</strong> {{ (int) ($booking->adults ?? 1) }} Adult(s) @if(($booking->children ?? 0) > 0), {{ (int) $booking->children }} Child(ren) @endif</p>
+        <p style="margin: 4px 0; font-size: 18px; color: #F58F43;"><strong>Total Amount:</strong> AED {{ number_format((float) ($booking->total ?? 0), 2) }}</p>
     </div>
 
     <p>We have placed a temporary courtesy hold on your spots so you don't miss out on your preferred safari date.</p>

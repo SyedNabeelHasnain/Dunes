@@ -35,7 +35,40 @@ class AjaxGatewayController extends Controller
 
     public function handle(Request $request)
     {
-        $action = $request->input('action');
+        $action = (string) $request->input('action', '');
+
+        // Enforce POST-only on all state-changing actions & apply per-action rate limits
+        $mutatingActions = [
+            'booking' => 20,
+            'contact' => 6,
+            'logWhatsApp' => 20,
+            'log_whatsapp' => 20,
+            'send_otp' => 5,
+            'verify_otp' => 10,
+            'subscribe_newsletter' => 10,
+            'subscribe' => 10,
+        ];
+
+        if (array_key_exists($action, $mutatingActions)) {
+            if (! $request->isMethod('POST')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Method not allowed for this action.',
+                ], 405);
+            }
+
+            if (! app()->runningUnitTests()) {
+                $rateKey = 'ajax_action:' . $action . ':' . ($request->ip() ?: '0.0.0.0');
+                $maxAttempts = $mutatingActions[$action];
+                if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($rateKey, $maxAttempts)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Too many requests. Please wait a moment and try again.',
+                    ], 429);
+                }
+                \Illuminate\Support\Facades\RateLimiter::hit($rateKey, 60);
+            }
+        }
 
         switch ($action) {
             case 'getTiers':
@@ -213,8 +246,9 @@ class AjaxGatewayController extends Controller
             }
 
             $source = (string) ($settings->get('social_proof_source', 'all'));
+            $localeKey = app()->getLocale() ?: 'en';
 
-            $proofs = Cache::remember('site_social_proof_feed_' . $source, 600, function () use ($source) {
+            $proofs = Cache::remember('site_social_proof_feed_' . $source . '_' . $localeKey, 600, function () use ($source) {
                 $list = [];
 
                 if ($source !== 'custom_only') {
@@ -247,13 +281,11 @@ class AjaxGatewayController extends Controller
                                 $timeAgo = "{$days} ".($days == 1 ? 'day' : 'days').' ago';
                             }
 
-                            $cleanImage = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $heroImage);
-
                             $list[] = [
                                 'name' => $displayName,
                                 'tour' => $tourName,
-                                'url' => url('/'.$tourSlug),
-                                'image' => asset('images/'.$cleanImage),
+                                'url' => localized_route('tours.show', ['slug' => $tourSlug]),
+                                'image' => resolve_tour_image($heroImage),
                                 'time_ago' => $timeAgo,
                                 'location' => 'Dubai',
                             ];
@@ -277,8 +309,8 @@ class AjaxGatewayController extends Controller
                         $list[] = [
                             'name' => $f['name'],
                             'tour' => $f['tour'],
-                            'url' => url('/'.$f['slug']),
-                            'image' => asset('images/'.$f['img']),
+                            'url' => localized_route('tours.show', ['slug' => $f['slug']]),
+                            'image' => resolve_tour_image($f['img']),
                             'time_ago' => $f['time'],
                             'location' => 'Dubai',
                         ];
@@ -299,8 +331,8 @@ class AjaxGatewayController extends Controller
                     [
                         'name' => 'Michael R.',
                         'tour' => 'Premium Evening Desert Safari Dubai',
-                        'url' => url('/tours'),
-                        'image' => asset('images/evening-desert-safari-dubai-hero.avif'),
+                        'url' => localized_route('tours.index'),
+                        'image' => resolve_tour_image('evening-desert-safari-dubai-hero.avif'),
                         'time_ago' => '14 minutes ago',
                         'location' => 'Dubai',
                     ],

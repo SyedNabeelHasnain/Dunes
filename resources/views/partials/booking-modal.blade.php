@@ -272,10 +272,10 @@
                                         <span id="emailStatusBadge" class="hidden items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide transition-all"></span>
                                     </div>
                                     <div class="relative flex items-center rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="bookingEmailContainer">
-                                        <input type="email" class="w-full pl-4 pr-28 py-3 rounded-2xl bg-transparent text-base sm:text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="{{ __('ui.booking.email_placeholder') }}" autocomplete="email" required data-form="booking" data-field="email">
+                                        <input type="email" class="w-full ps-4 pe-28 py-3 rounded-2xl bg-transparent text-base sm:text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="{{ __('ui.booking.email_placeholder') }}" autocomplete="email" required data-form="booking" data-field="email">
                                         
                                         <!-- Inline Action / Spinner / Verified Indicator -->
-                                        <div class="absolute right-1.5 inset-y-1.5 flex items-center" id="bookingEmailActionSlot">
+                                        <div class="absolute end-1.5 inset-y-1.5 flex items-center" id="bookingEmailActionSlot">
                                             <span id="emailCheckSpinner" class="hidden px-3 text-primary items-center">
                                                 <span class="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
                                             </span>

@@ -61,9 +61,10 @@ class VerifyGalleryMediaCommand extends Command
         $this->table(
             ['Metric', 'Count'],
             [
-                ['Total Media Scanned', $totalCount],
-                ['Verified Healthy (Served to Frontend)', count($verified)],
-                ['Broken / Inaccessible (Excluded)', $brokenCount],
+                ['Review Media Links Scanned', $totalCount],
+                ['Review Media Verified Healthy', $healthyCount],
+                ['Review Media Broken (Excluded)', $brokenCount],
+                ['Total Active Gallery Items (All Sources)', count($verified)],
                 ['Red Dunes & Safari Moments', $stats['red_dunes'] ?? 0],
                 ['Buggy & Quad Bike Action', $stats['buggy_quad'] ?? 0],
                 ['Desert Camp & BBQ Entertainment', $stats['camp_bbq'] ?? 0],

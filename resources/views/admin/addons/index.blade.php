@@ -287,7 +287,7 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('.edit-addon-btn').on('click', function() {
+    $(document).on('click', '.edit-addon-btn', function() {
         const btn = $(this);
         $('#editAddonName').val(btn.data('name'));
         $('#editAddonSlug').val(btn.data('slug'));

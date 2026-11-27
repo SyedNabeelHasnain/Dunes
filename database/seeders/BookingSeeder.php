@@ -33,7 +33,7 @@ class BookingSeeder extends Seeder
                     $log['form_submit_timestamp'] = $log['form_submit_timestamp'] ? date('Y-m-d H:i:s', strtotime($log['form_submit_timestamp'])) : null;
                     $log['created_at'] = $log['created_at'] ? date('Y-m-d H:i:s', strtotime($log['created_at'])) : now();
                 }
-                DB::table('request_logs')->insert($chunk);
+                DB::table('request_logs')->insertOrIgnore($chunk);
             }
         }
 
@@ -134,7 +134,7 @@ class BookingSeeder extends Seeder
                     $inq['request_log_id'] = $inq['request_log_id'] ? (int) $inq['request_log_id'] : null;
                     $inq['created_at'] = $inq['created_at'] ? date('Y-m-d H:i:s', strtotime($inq['created_at'])) : now();
                 }
-                DB::table('whatsapp_inquiries')->insert($chunk);
+                DB::table('whatsapp_inquiries')->insertOrIgnore($chunk);
             }
         }
 
@@ -154,16 +154,21 @@ class BookingSeeder extends Seeder
         $otpsPath = database_path('seeders/data/email_otps.json');
         if (File::exists($otpsPath)) {
             $otps = json_decode(File::get($otpsPath), true);
-            foreach ($otps as $otp) {
-                EmailOtp::updateOrCreate(
-                    ['id' => $otp['id']],
-                    [
-                        'email' => $otp['email'],
-                        'otp' => $otp['otp'],
-                        'expires_at' => date('Y-m-d H:i:s', strtotime($otp['expires_at'])),
-                        'created_at' => date('Y-m-d H:i:s', strtotime($otp['created_at'])),
-                    ]
-                );
+            EmailOtp::unguard();
+            try {
+                foreach ($otps as $otp) {
+                    EmailOtp::updateOrCreate(
+                        ['id' => $otp['id']],
+                        [
+                            'email' => $otp['email'],
+                            'otp' => $otp['otp'],
+                            'expires_at' => date('Y-m-d H:i:s', strtotime($otp['expires_at'])),
+                            'created_at' => date('Y-m-d H:i:s', strtotime($otp['created_at'])),
+                        ]
+                    );
+                }
+            } finally {
+                EmailOtp::reguard();
             }
         }
     }

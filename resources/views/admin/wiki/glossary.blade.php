@@ -3,7 +3,14 @@
 @section('page_title', 'Manage Glossary Terms')
 
 @section('content')
-<div class="space-y-6 max-w-5xl">
+<div class="space-y-6 max-w-5xl" x-data="{
+    editOpen: false,
+    editing: { id: null, term: '', term_key: '', definition: '', wiki_article_id: '' },
+    openEdit(t) {
+        this.editing = { ...t };
+        this.editOpen = true;
+    }
+}">
     <div class="flex items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
@@ -77,15 +84,29 @@
                             {{ $term->definition }}
                         </td>
                         <td class="py-3 px-4 text-xs whitespace-nowrap">
-                            @if($term->article)
+                            @if($term->article && $term->article->pillar)
                                 <a href="{{ localized_route('wiki.article', ['pillarSlug' => $term->article->pillar->slug, 'articleSlug' => $term->article->slug]) }}" target="_blank" class="text-primary hover:underline font-medium">
                                     {{ Str::limit($term->article->title, 35) }}
                                 </a>
+                            @elseif($term->article)
+                                <span class="text-slate-600 font-medium">{{ Str::limit($term->article->title, 35) }}</span>
                             @else
                                 <span class="text-slate-400 italic">None</span>
                             @endif
                         </td>
                         <td class="py-3 px-4 text-right pe-4 whitespace-nowrap">
+                            @php
+                                $termPayload = [
+                                    'id' => $term->id,
+                                    'term' => $term->getTranslation('term', 'en', true) ?: $term->term,
+                                    'term_key' => $term->term_key,
+                                    'definition' => $term->getTranslation('definition', 'en', true) ?: $term->definition,
+                                    'wiki_article_id' => $term->wiki_article_id ? (string) $term->wiki_article_id : '',
+                                ];
+                            @endphp
+                            <button type="button" @click='openEdit(@json($termPayload))' class="p-1.5 text-slate-400 hover:text-amber-600 transition cursor-pointer" title="Edit Term">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
                             <form method="POST" action="{{ route('admin.wiki.glossary.delete', $term->id) }}" onsubmit="return confirm('Delete this glossary term?')" class="inline">
                                 @csrf
                                 @method('DELETE')
@@ -111,6 +132,47 @@
             {{ $terms->links() }}
         </div>
         @endif
+    </div>
+
+    <!-- Edit Glossary Term Modal -->
+    <div x-show="editOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+        <div @click.outside="editOpen = false" class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-black text-slate-900">Edit Glossary Term</h3>
+                <button type="button" @click="editOpen = false" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form :action="`{{ url('/admin/wiki/glossary') }}/${editing.id}`" method="POST" class="space-y-3">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Term Display Name *</label>
+                        <input type="text" name="term" x-model="editing.term" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Term Key</label>
+                        <input type="text" name="term_key" x-model="editing.term_key" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Linked Deep-Dive Guide</label>
+                    <select name="wiki_article_id" x-model="editing.wiki_article_id" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                        <option value="">None / Standalone Definition</option>
+                        @foreach($articles as $a)
+                            <option value="{{ $a->id }}">{{ $a->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Definition *</label>
+                    <textarea name="definition" x-model="editing.definition" rows="3" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" @click="editOpen = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 cursor-pointer">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer">Save Changes</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

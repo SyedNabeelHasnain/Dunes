@@ -198,9 +198,42 @@
                     </div>
                 </div>
                 @else
-                <div class="text-center py-12 text-slate-400">
-                    <i class="bi bi-geo-alt text-3xl block mb-2 opacity-40"></i>
-                    <p class="text-xs">No detailed analytics metadata available for this inquiry.</p>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">IP Address</div>
+                            <span class="font-mono text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 px-2 py-1 rounded-md">{{ $inquiry->ip_address ?: 'Not recorded' }}</span>
+                        </div>
+                        <div>
+                            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Traffic Channel</div>
+                            <span class="text-sm font-bold text-slate-900">{{ $inquiry->traffic_channel ?: ($inquiry->utm_source ?: 'Direct') }}</span>
+                        </div>
+                    </div>
+                    @if($inquiry->utm_source || $inquiry->utm_campaign || $inquiry->gclid || $inquiry->fbclid)
+                    <div class="pt-3 border-t border-slate-100 text-xs space-y-1">
+                        <div class="font-semibold text-slate-400 uppercase tracking-wider mb-1">Campaign Attribution</div>
+                        @if($inquiry->utm_source)<div><strong>Source:</strong> {{ $inquiry->utm_source }} @if($inquiry->utm_medium)/ {{ $inquiry->utm_medium }}@endif</div>@endif
+                        @if($inquiry->utm_campaign)<div><strong>Campaign:</strong> {{ $inquiry->utm_campaign }}</div>@endif
+                        @if($inquiry->gclid)<div class="font-mono text-amber-700 truncate"><strong>GCLID:</strong> {{ $inquiry->gclid }}</div>@endif
+                        @if($inquiry->fbclid)<div class="font-mono text-blue-700 truncate"><strong>FBCLID:</strong> {{ $inquiry->fbclid }}</div>@endif
+                    </div>
+                    @endif
+                    @if($inquiry->landing_page || $inquiry->initial_referrer)
+                    <div class="pt-3 border-t border-slate-100 text-xs space-y-1">
+                        @if($inquiry->landing_page)<div class="truncate" title="{{ $inquiry->landing_page }}"><strong>Landing:</strong> <span class="font-mono text-[11px]">{{ $inquiry->landing_page }}</span></div>@endif
+                        @if($inquiry->initial_referrer)<div class="truncate" title="{{ $inquiry->initial_referrer }}"><strong>Referrer:</strong> <span class="font-mono text-[11px]">{{ $inquiry->initial_referrer }}</span></div>@endif
+                    </div>
+                    @endif
+                    @if(is_array($inquiry->spam_reasons) && count($inquiry->spam_reasons) > 0)
+                    <div class="pt-3 border-t border-slate-100">
+                        <div class="text-xs font-semibold text-rose-500 uppercase tracking-wider mb-1.5">Spam Shield Signals</div>
+                        <div class="flex flex-wrap gap-1">
+                            @foreach($inquiry->spam_reasons as $reason)
+                                <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-mono text-[10px]">{{ $reason }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                 </div>
                 @endif
             </div>

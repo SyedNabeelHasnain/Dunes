@@ -169,6 +169,12 @@ class AdminRedirectController extends Controller
         $statusCode = (int) $request->input('status_code');
         $targetPath = (string) $request->input('target_path', '');
 
+        if ($statusCode !== 410 && (str_starts_with($targetPath, 'http://') || str_starts_with($targetPath, 'https://'))) {
+            if (! filter_var($targetPath, FILTER_VALIDATE_URL)) {
+                return back()->withInput()->with('error', 'External target URL is malformed.');
+            }
+        }
+
         $loopCheck = $this->redirectService->detectLoopOrChain(
             $request->input('source_path'),
             $targetPath,
@@ -285,7 +291,7 @@ class AdminRedirectController extends Controller
             return response()->json(['success' => false, 'message' => 'Path parameter is required.'], 400);
         }
 
-        $resolved = $this->redirectService->resolve($path);
+        $resolved = $this->redirectService->resolve($path, false);
 
         if (!$resolved) {
             return response()->json([

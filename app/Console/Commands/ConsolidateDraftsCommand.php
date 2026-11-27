@@ -80,24 +80,6 @@ class ConsolidateDraftsCommand extends Command
                         }
                     }
 
-                    // Match by IP + tour within 4 hours
-                    if (! empty($draft->ip_address) && $draft->tour_id) {
-                        $ipCond = function ($sq) use ($draft) {
-                            $sq->where('ip_address', $draft->ip_address)
-                                ->where('tour_id', $draft->tour_id)
-                                ->whereBetween('created_at', [
-                                    $draft->created_at->copy()->subHours(4),
-                                    $draft->created_at->copy()->addHours(4),
-                                ]);
-                        };
-                        if ($hasCondition) {
-                            $q->orWhere($ipCond);
-                        } else {
-                            $ipCond($q);
-                            $hasCondition = true;
-                        }
-                    }
-
                     if (! $hasCondition) {
                         $q->whereRaw('0 = 1');
                     }
@@ -127,6 +109,7 @@ class ConsolidateDraftsCommand extends Command
 
             // Merge details from group into master
             $changed = false;
+            $groupDupIds = [];
             foreach ($group as $item) {
                 if ($item->id === $master->id) {
                     continue;
@@ -185,24 +168,29 @@ class ConsolidateDraftsCommand extends Command
                     $changed = true;
                 }
 
+                $groupDupIds[] = $item->id;
                 $duplicatesToDelete[] = $item->id;
             }
 
-            if (! $dryRun && $changed) {
-                $master->save();
+            if (! $dryRun && ($changed || ! empty($groupDupIds))) {
+                DB::transaction(function () use ($master, $changed, $groupDupIds) {
+                    if ($changed) {
+                        $master->save();
+                    }
+                    if (! empty($groupDupIds)) {
+                        Booking::where('status', 'draft')
+                            ->whereIn('id', $groupDupIds)
+                            ->delete();
+                    }
+                });
             }
 
             $mergedCount++;
             $processedIds[] = $master->id;
         }
 
-        // Remove confirmed duplicates
-        $duplicateIds = array_unique($duplicatesToDelete);
-        $removedCount = count($duplicateIds);
-
-        if (! $dryRun && $removedCount > 0) {
-            Booking::whereIn('id', $duplicateIds)->delete();
-        }
+        // Summary of confirmed duplicates removed atomically per group
+        $removedCount = count(array_unique($duplicatesToDelete));
 
         $this->info("Consolidation summary: {$mergedCount} groups consolidated, {$removedCount} duplicate draft shells removed.");
 

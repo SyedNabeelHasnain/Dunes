@@ -236,7 +236,8 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Direction <span class="text-rose-500">*</span></label>
-                            <select name="direction" x-model="editLang.direction" :disabled="editLang.code === 'en'" required class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden disabled:bg-slate-100 disabled:text-slate-400">
+                            <input type="hidden" name="direction" value="ltr" :disabled="editLang.code !== 'en'">
+                            <select name="direction" x-model="editLang.direction" :disabled="editLang.code === 'en'" :required="editLang.code !== 'en'" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden disabled:bg-slate-100 disabled:text-slate-400">
                                 <option value="ltr">LTR (Left to Right)</option>
                                 <option value="rtl">RTL (Right to Left)</option>
                             </select>

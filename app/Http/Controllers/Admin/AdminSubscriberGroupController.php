@@ -25,6 +25,18 @@ class AdminSubscriberGroupController extends Controller
         return view('admin.subscriber-groups.index', compact('groups'));
     }
 
+    protected function uniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($name) ?: 'group-'.time();
+        $candidate = $base;
+        $counter = 2;
+        while (SubscriberGroup::where('slug', $candidate)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $candidate = $base.'-'.$counter++;
+        }
+
+        return $candidate;
+    }
+
     /**
      * Store new group.
      */
@@ -37,7 +49,7 @@ class AdminSubscriberGroupController extends Controller
 
         $group = SubscriberGroup::create([
             'name' => trim($validated['name']),
-            'slug' => Str::slug($validated['name']),
+            'slug' => $this->uniqueSlug($validated['name']),
             'description' => $validated['description'] ?? null,
             'is_system' => false,
         ]);
@@ -60,7 +72,7 @@ class AdminSubscriberGroupController extends Controller
 
         $group->update([
             'name' => trim($validated['name']),
-            'slug' => $group->is_system ? $group->slug : Str::slug($validated['name']),
+            'slug' => $group->is_system ? $group->slug : $this->uniqueSlug($validated['name'], $group->id),
             'description' => $validated['description'] ?? null,
         ]);
 

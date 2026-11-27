@@ -61,6 +61,8 @@ class EmailMarketingService
 
         // Configure optional Secondary / Failover Transactional SMTP Relay (e.g., Brevo / Resend / Postmark / SES)
         $hasActiveFailover = false;
+        $fbFrom = trim((string) $this->settings->get('smtp_fallback_from_address', ''));
+        $fbName = trim((string) $this->settings->get('smtp_fallback_from_name', ''));
         if ($fallbackEnabled && $fallbackHost !== '') {
             $fbPort = (int) $this->settings->get('smtp_fallback_port', 587);
             $fbEnc = (string) $this->settings->get('smtp_fallback_encryption', 'tls');
@@ -74,6 +76,10 @@ class EmailMarketingService
             Config::set('mail.mailers.smtp_fallback.scheme', $fbEnc === 'ssl' ? 'smtps' : null);
             Config::set('mail.mailers.smtp_fallback.username', $fbUser !== '' ? $fbUser : null);
             Config::set('mail.mailers.smtp_fallback.password', $fbPass !== '' ? $fbPass : null);
+            if ($fbFrom !== '') {
+                Config::set('mail.mailers.smtp_fallback.from.address', $fbFrom);
+                Config::set('mail.mailers.smtp_fallback.from.name', $fbName !== '' ? $fbName : $fromName);
+            }
             $hasActiveFailover = true;
         }
 
@@ -82,6 +88,12 @@ class EmailMarketingService
             Config::set('mail.mailers.failover.mailers', $mailersChain);
             Config::set('mail.mailers.failover.retry_after', 15);
             Config::set('mail.default', 'failover');
+            if ($host === '' && $fbFrom !== '') {
+                $fromAddress = $fbFrom;
+                if ($fbName !== '') {
+                    $fromName = $fbName;
+                }
+            }
         } elseif (! empty($driver)) {
             Config::set('mail.default', $driver);
         }
@@ -138,6 +150,17 @@ class EmailMarketingService
     }
 
     /**
+     * Compute a tamper-evident HMAC signature for a tracked click URL so legitimate external
+     * campaign destinations (e.g. WhatsApp, Google Reviews) work without introducing an open redirect.
+     */
+    public static function signTrackedUrl(string $token, string $url): string
+    {
+        $key = (string) config('app.key', 'dunes-click-signing-fallback');
+
+        return substr(hash_hmac('sha256', $token.'|'.$url, $key), 0, 32);
+    }
+
+    /**
      * Render full personalized HTML email with tracking pixel and link rewrites.
      */
     public function renderHtml(string $rawHtml, Subscriber $subscriber, ?EmailCampaignLog $log = null): string
@@ -149,7 +172,7 @@ class EmailMarketingService
             $token = $log->tracking_token;
             $clickBase = url('/email/track/click/'.$token);
 
-            $html = preg_replace_callback('/<a\s+([^>]*?)href=["\']([^"\']+)["\']([^>]*?)>/i', function ($matches) use ($clickBase, $subscriber) {
+            $html = preg_replace_callback('/<a\s+([^>]*?)href=["\']([^"\']+)["\']([^>]*?)>/i', function ($matches) use ($clickBase, $token, $subscriber) {
                 $before = $matches[1];
                 $url = $matches[2];
                 $after = $matches[3];
@@ -166,7 +189,8 @@ class EmailMarketingService
                     return $matches[0];
                 }
 
-                $trackedUrl = $clickBase.'?url='.urlencode($url);
+                $sig = self::signTrackedUrl($token, $url);
+                $trackedUrl = $clickBase.'?url='.urlencode($url).'&sig='.$sig;
 
                 return '<a '.$before.'href="'.$trackedUrl.'"'.$after.'>';
             }, $html);
@@ -207,25 +231,18 @@ class EmailMarketingService
     {
         $this->applySmtpConfig();
 
-        // 1. Atomically claim scheduled campaigns so concurrent runners cannot double-send
-        if ($campaign->status === 'scheduled') {
-            $claimed = EmailCampaign::where('id', $campaign->id)
-                ->where('status', 'scheduled')
-                ->update([
-                    'status' => 'sending',
-                    'sent_at' => now(),
-                ]);
-
-            if (! $claimed) {
-                return ['success' => false, 'sent' => 0, 'failed' => 0, 'total' => 0];
-            }
-            $campaign->refresh();
-        } else {
-            $campaign->update([
+        // 1. Atomically claim draft/scheduled campaigns so concurrent clicks or schedulers cannot double-send
+        $claimed = EmailCampaign::where('id', $campaign->id)
+            ->whereIn('status', ['draft', 'scheduled'])
+            ->update([
                 'status' => 'sending',
                 'sent_at' => now(),
             ]);
+
+        if (! $claimed) {
+            return ['success' => false, 'sent' => 0, 'failed' => 0, 'total' => 0];
         }
+        $campaign->refresh();
 
         // 2. Query target audience
         $query = Subscriber::query()->where('status', 'subscribed');
@@ -265,18 +282,34 @@ class EmailMarketingService
                     ]
                 );
 
+                // Skip subscribers who already received this campaign (safe retry / resumption)
+                if (in_array($log->status, ['delivered', 'opened', 'clicked'], true)) {
+                    continue;
+                }
+
                 try {
                     $parsedSubject = $this->parseTags($campaign->subject, $sub, $log);
                     $parsedHtml = $this->renderHtml($campaign->content_html, $sub, $log);
-                    $parsedPlain = ! empty($campaign->content_plain) ? $this->parseTags($campaign->content_plain, $sub, $log) : strip_tags($parsedHtml);
+                    $parsedPlain = ! empty($campaign->content_plain)
+                        ? $this->parseTags($campaign->content_plain, $sub, $log)
+                        : trim(preg_replace('/\s+/', ' ', strip_tags(str_replace(['<br>', '<br/>', '<br />', '</p>', '</div>'], "\n", $parsedHtml))));
+                    $unsubUrl = $sub->unsubscribe_url;
 
-                    Mail::html($parsedHtml, function ($message) use ($sub, $parsedSubject, $fromAddress, $fromName, $replyTo) {
+                    Mail::send([], [], function ($message) use ($sub, $parsedSubject, $parsedHtml, $parsedPlain, $fromAddress, $fromName, $replyTo, $unsubUrl) {
                         $message->to($sub->email, $sub->full_name)
                             ->subject($parsedSubject)
-                            ->from($fromAddress, $fromName);
+                            ->from($fromAddress, $fromName)
+                            ->html($parsedHtml)
+                            ->text($parsedPlain ?: $parsedSubject);
 
                         if (! empty($replyTo)) {
                             $message->replyTo($replyTo);
+                        }
+
+                        if (! empty($unsubUrl)) {
+                            $headers = $message->getHeaders();
+                            $headers->addTextHeader('List-Unsubscribe', '<'.$unsubUrl.'>');
+                            $headers->addTextHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
                         }
                     });
 
@@ -303,22 +336,29 @@ class EmailMarketingService
 
                     if ($isBounce) {
                         $sub->update(['status' => 'bounced']);
-                        $campaign->increment('bounced_count');
                     }
                 }
             }
 
-            // Optional delay between chunks to respect shared hosting SMTP throttling
-            if ($delaySeconds > 0) {
+            // Optional delay between chunks to respect shared hosting SMTP throttling (skipped in testing)
+            if ($delaySeconds > 0 && ! app()->environment('testing')) {
                 sleep($delaySeconds);
             }
         });
 
-        // 3. Update Final Campaign Metrics
+        // 3. Recompute Final Campaign Metrics accurately from persisted logs
+        $deliveredTotal = EmailCampaignLog::where('campaign_id', $campaign->id)
+            ->whereIn('status', ['delivered', 'opened', 'clicked'])
+            ->count();
+        $bouncedTotal = EmailCampaignLog::where('campaign_id', $campaign->id)
+            ->where('status', 'bounced')
+            ->count();
+
         $campaign->update([
             'status' => 'sent',
-            'sent_count' => $sentCount,
-            'delivered_count' => $sentCount,
+            'sent_count' => $deliveredTotal,
+            'delivered_count' => $deliveredTotal,
+            'bounced_count' => $bouncedTotal,
         ]);
 
         return [

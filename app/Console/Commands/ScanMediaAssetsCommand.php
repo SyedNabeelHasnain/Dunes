@@ -51,6 +51,7 @@ class ScanMediaAssetsCommand extends Command
                 ['Existing Assets Updated', $stats['updated']],
                 ['Files Skipped (Non-Media)', $stats['skipped']],
                 ['Assets In-Use (Tours/Blogs/Reviews)', $stats['in_use']],
+                ['Duplicates Merged / Deleted', $dedup['deleted'] ?? 0],
             ]
         );
 

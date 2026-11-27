@@ -631,7 +631,7 @@ class LocationLandingService
                         'highlights' => '30-60m Self-Drive ATV / Can-Am Buggy in daylight + Full Evening Safari & BBQ',
                     ],
                 ],
-                'transit_time' => '35 Minutes direct drive via Al Majaz & E66/E44',
+                'transit_time' => '35 Minutes direct drive via Sheikh Zayed Road & E44/E66',
                 'geo' => ['lat' => 25.2104, 'lng' => 55.2810],
                 'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1262862',
                 'landmarks' => [

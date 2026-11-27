@@ -11,8 +11,8 @@ use InvalidArgumentException;
 class SvgSanitizer
 {
     /**
-     * Sanitize raw SVG XML string, removing executable elements, event attributes,
-     * XML external entities, and dangerous URI schemes.
+     * Sanitize raw SVG XML string via DOMDocument, removing executable elements,
+     * SMIL animation vectors, event attributes, XML external entities, and dangerous URI schemes.
      */
     public static function sanitize(string $svg): string
     {
@@ -28,28 +28,7 @@ class SvgSanitizer
         // Remove PHP / ASP processing tags while preserving standard <?xml declarations
         $clean = (string) preg_replace('/<\?(?:php|=|\s).*?\?>/is', '', $clean);
 
-        // Remove dangerous elements and their bodies
-        $dangerousTags = ['script', 'foreignObject', 'iframe', 'object', 'embed', 'applet', 'audio', 'video', 'meta', 'link', 'base'];
-        foreach ($dangerousTags as $tag) {
-            $clean = (string) preg_replace('/<'.$tag.'\b[^>]*>.*?<\/'.$tag.'>/is', '', $clean);
-            $clean = (string) preg_replace('/<'.$tag.'\b[^>]*\/?>/is', '', $clean);
-        }
-
-        // Strip inline JavaScript event handler attributes (onload=, onclick=, onerror=, etc.)
-        $clean = (string) preg_replace('/\s+on[a-z0-9_-]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/is', '', $clean);
-
-        // Strip javascript:, vbscript:, and data:text/html URIs in href / xlink:href / src
-        $clean = (string) preg_replace(
-            '/\s+(?:xlink:)?(?:href|src|action|formaction)\s*=\s*(["\'])\s*(?:javascript|vbscript|data\s*:\s*text\/html)[^"\']*\1/is',
-            '',
-            $clean
-        );
-
-        // Strip dangerous CSS expressions or url(javascript:...) inside style attributes or <style>
-        $clean = (string) preg_replace('/expression\s*\([^)]*\)/is', '', $clean);
-        $clean = (string) preg_replace('/url\s*\(\s*["\']?\s*(?:javascript|vbscript|data\s*:\s*text\/html)[^)]*\)/is', 'none', $clean);
-
-        // Validate resulting markup via DOMDocument with network & entity expansion disabled
+        // Parse via DOMDocument with network & entity expansion strictly disabled
         $prevUseErrors = libxml_use_internal_errors(true);
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $loaded = $dom->loadXML($clean, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
@@ -60,7 +39,81 @@ class SvgSanitizer
             throw new InvalidArgumentException('Uploaded SVG could not be parsed as safe XML.');
         }
 
-        return $dom->saveXML($dom->documentElement) ?: $clean;
+        $blockedTags = [
+            'script', 'foreignobject', 'iframe', 'object', 'embed', 'applet',
+            'audio', 'video', 'meta', 'link', 'base', 'style', 'use', 'image',
+            'feimage', 'handler', 'listener', 'animate', 'animatemotion',
+            'animatetransform', 'animatecolor', 'set',
+        ];
+
+        $toRemove = [];
+        $walk = function (\DOMNode $node) use (&$walk, &$toRemove, $blockedTags): void {
+            if ($node instanceof \DOMProcessingInstruction || $node instanceof \DOMComment) {
+                $toRemove[] = $node;
+
+                return;
+            }
+
+            if ($node instanceof \DOMElement) {
+                $tag = strtolower($node->localName ?: $node->nodeName);
+                if (in_array($tag, $blockedTags, true)) {
+                    $toRemove[] = $node;
+
+                    return;
+                }
+
+                if ($node->hasAttributes()) {
+                    $attrsToRemove = [];
+                    foreach ($node->attributes as $attr) {
+                        $attrName = strtolower($attr->name);
+                        $localAttr = strtolower($attr->localName ?: $attr->name);
+                        // Decode entities and strip control/whitespace chars before scheme inspection
+                        $decodedVal = html_entity_decode((string) $attr->value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $compactVal = strtolower((string) preg_replace('/[\x00-\x20]+/', '', $decodedVal));
+
+                        // Block all on* event handlers
+                        if (str_starts_with($localAttr, 'on') || str_starts_with($attrName, 'on')) {
+                            $attrsToRemove[] = $attr->name;
+                            continue;
+                        }
+
+                        // Block javascript:/vbscript:/data: URI schemes in any URI/target/style attribute
+                        if (in_array($localAttr, ['href', 'src', 'action', 'formaction', 'from', 'to', 'values', 'by'], true)) {
+                            if (preg_match('/^(?:javascript|vbscript|data):/i', $compactVal)) {
+                                $attrsToRemove[] = $attr->name;
+                                continue;
+                            }
+                        }
+
+                        if ($localAttr === 'style') {
+                            if (preg_match('/(?:expression\s*\(|javascript:|vbscript:|data:|@import|behavior\s*:|-moz-binding)/i', $compactVal)) {
+                                $attrsToRemove[] = $attr->name;
+                                continue;
+                            }
+                        }
+
+                        if (preg_match('/(?:javascript|vbscript):/i', $compactVal)) {
+                            $attrsToRemove[] = $attr->name;
+                        }
+                    }
+
+                    foreach ($attrsToRemove as $name) {
+                        $node->removeAttribute($name);
+                    }
+                }
+            }
+
+            foreach ($node->childNodes as $child) {
+                $walk($child);
+            }
+        };
+
+        $walk($dom->documentElement);
+        foreach ($toRemove as $node) {
+            $node->parentNode?->removeChild($node);
+        }
+
+        return $dom->saveXML($dom->documentElement) ?: throw new InvalidArgumentException('Failed to serialize sanitized SVG.');
     }
 
     /**
@@ -78,7 +131,7 @@ class SvgSanitizer
     }
 
     /**
-     * Assert that a non-SVG image/media upload does not start with PHP/HTML script payloads.
+     * Assert that a non-SVG image/media upload does not contain PHP/HTML script polyglot payloads.
      */
     public static function assertNoScriptPolyglot(string $filePath, string $ext): void
     {
@@ -91,12 +144,32 @@ class SvgSanitizer
         if (! $handle) {
             throw new InvalidArgumentException('Upload rejected: uploaded media file could not be inspected.');
         }
-        $head = (string) fread($handle, 2048);
-        fclose($handle);
 
-        $lowerHead = strtolower($head);
-        if (str_contains($lowerHead, '<?php') || str_contains($lowerHead, '<script') || str_contains($lowerHead, '<!doctype html')) {
-            throw new InvalidArgumentException('Upload rejected: embedded script or HTML signature detected in media file.');
+        $overlap = '';
+        $chunkSize = 65536;
+        $maxScanBytes = 2097152; // Scan up to first 2 MB in overlapping chunks
+        $scanned = 0;
+
+        try {
+            while (! feof($handle) && $scanned < $maxScanBytes) {
+                $chunk = (string) fread($handle, $chunkSize);
+                if ($chunk === '') {
+                    break;
+                }
+                $scanned += strlen($chunk);
+                $window = strtolower($overlap . $chunk);
+                if (
+                    str_contains($window, '<?php')
+                    || str_contains($window, '<?=')
+                    || str_contains($window, '<script')
+                    || str_contains($window, '<!doctype html')
+                ) {
+                    throw new InvalidArgumentException('Upload rejected: embedded script or HTML signature detected in media file.');
+                }
+                $overlap = substr($chunk, -32);
+            }
+        } finally {
+            fclose($handle);
         }
     }
 }

@@ -32,6 +32,8 @@ class RobotsHeaderMiddleware
         'register',
         'forgot-password',
         'reset-password',
+        'verify-email',
+        'confirm-password',
         'profile',
         'email/track',
     ];
@@ -71,7 +73,10 @@ class RobotsHeaderMiddleware
             $content = $response->getContent();
             if (is_string($content) && $content !== '') {
                 $headSlice = substr($content, 0, 12000);
-                if (preg_match('/<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)["\']/i', $headSlice, $m)) {
+                if (
+                    preg_match('/<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)["\']/i', $headSlice, $m)
+                    || preg_match('/<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']robots["\']/i', $headSlice, $m)
+                ) {
                     $directive = trim($m[1]);
                     if (stripos($directive, 'noindex') !== false) {
                         $response->headers->set('X-Robots-Tag', $directive);

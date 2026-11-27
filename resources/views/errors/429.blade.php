@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @php
+    $isErrorPage = true;
     $pageTitle = 'Too Many Requests (429) | Dunes Discovery Tourism';
     $pageDesc = 'Too many requests were received from your connection. Please wait a moment and try again.';
     $pageRobots = 'noindex, nofollow';
@@ -21,12 +22,12 @@
             <a href="{{ localized_route('home') }}" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
                 <i class="bi bi-house-door-fill"></i> {{ __('ui.nav.home') }}
             </a>
-            <a href="{{ route('login') }}" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
-                <i class="bi bi-box-arrow-in-right"></i> Sign In
-            </a>
+            <button type="button" onclick="window.location.reload()" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px] cursor-pointer">
+                <i class="bi bi-arrow-clockwise"></i> Try Again
+            </button>
         </div>
         <div class="mt-6 pt-4 border-t border-slate-200 text-slate-500 text-xs">
-            Need urgent help? <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20am%20seeing%20a%20rate%20limit%20issue" target="_blank" rel="noopener" class="btn-whatsapp text-primary font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"><i class="bi bi-whatsapp"></i> {{ __('ui.common.whatsapp_chat') }}</a>
+            Need urgent help? <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20am%20seeing%20a%20rate%20limit%20issue" target="_blank" rel="noopener noreferrer" class="btn-whatsapp text-primary font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"><i class="bi bi-whatsapp"></i> {{ __('ui.common.whatsapp_chat') }}</a>
         </div>
     </div>
 </div>

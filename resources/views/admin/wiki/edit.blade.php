@@ -3,7 +3,11 @@
 @section('page_title', 'Edit Knowledge Article')
 
 @section('content')
-<div class="space-y-6 max-w-5xl">
+@php
+    $activeLangs = isset($languages) && $languages->count() ? $languages : \App\Models\Language::getActive();
+    $defaultLangCode = $activeLangs->firstWhere('is_default', true)?->code ?? 'en';
+@endphp
+<div class="space-y-6 max-w-5xl" x-data="{ activeLang: '{{ $defaultLangCode }}' }">
     <div class="flex items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
@@ -12,18 +16,32 @@
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">Edit Knowledge Article</h1>
         </div>
         <div>
+            @if($article->pillar)
             <a href="{{ localized_route('wiki.article', ['pillarSlug' => $article->pillar->slug, 'articleSlug' => $article->slug]) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition">
                 <i class="bi bi-box-arrow-up-right text-slate-400"></i> View Live Guide
             </a>
+            @endif
         </div>
     </div>
 
     <form method="POST" action="{{ route('admin.wiki.articles.update', $article->id) }}" class="space-y-6">
         @csrf
         @method('PUT')
+        <input type="hidden" name="tours_submitted" value="1">
 
         <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-5">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2">Article Core Details</h2>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Article Core Details</h2>
+                @if($activeLangs->count() > 1)
+                <div class="inline-flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                    @foreach($activeLangs as $lang)
+                        <button type="button" @click="activeLang = '{{ $lang->code }}'" :class="activeLang === '{{ $lang->code }}' ? 'bg-white text-primary shadow-2xs' : 'text-slate-600 hover:text-slate-900'" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer">
+                            {{ strtoupper($lang->code) }}
+                        </button>
+                    @endforeach
+                </div>
+                @endif
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -43,12 +61,7 @@
                 </div>
             </div>
 
-            <div>
-                <label for="title" class="block text-xs font-bold text-slate-700 mb-1">Article Headline / Title *</label>
-                <input type="text" name="title" id="title" required value="{{ old('title', $article->title) }}" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary outline-hidden font-bold">
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="slug" class="block text-xs font-bold text-slate-700 mb-1">Custom URL Slug</label>
                     <input type="text" name="slug" id="slug" value="{{ old('slug', $article->slug) }}" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden font-mono">
@@ -57,23 +70,37 @@
                     <label for="reading_time_minutes" class="block text-xs font-bold text-slate-700 mb-1">Reading Time (Minutes)</label>
                     <input type="number" name="reading_time_minutes" id="reading_time_minutes" value="{{ old('reading_time_minutes', $article->reading_time_minutes) }}" min="1" max="60" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">
                 </div>
+                <div>
+                    <label for="hero_image" class="block text-xs font-bold text-slate-700 mb-1">Hero Image Path / URL</label>
+                    <input type="text" name="hero_image" id="hero_image" value="{{ old('hero_image', $article->hero_image) }}" placeholder="/images/..." class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">
+                </div>
             </div>
 
-            <div>
-                <label for="subtitle" class="block text-xs font-bold text-slate-700 mb-1">Subtitle / Key Takeaway</label>
-                <input type="text" name="subtitle" id="subtitle" value="{{ old('subtitle', $article->subtitle) }}" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">
-            </div>
+            @foreach($activeLangs as $lang)
+            @php $lc = $lang->code; $isRtl = $lang->isRtl(); @endphp
+            <div x-show="activeLang === '{{ $lc }}'" @if($lc !== $defaultLangCode) x-cloak @endif class="space-y-4" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
+                <div>
+                    <label for="title_{{ $lc }}" class="block text-xs font-bold text-slate-700 mb-1">Article Headline / Title ({{ strtoupper($lc) }}) {{ $lc === 'en' ? '*' : '' }}</label>
+                    <input type="text" name="title[{{ $lc }}]" id="title_{{ $lc }}" {{ $lc === 'en' ? 'required' : '' }} value="{{ old('title.'.$lc, $article->getTranslation('title', $lc, false)) }}" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary outline-hidden font-bold">
+                </div>
 
-            <div>
-                <label for="excerpt" class="block text-xs font-bold text-slate-700 mb-1">Executive Summary / Excerpt *</label>
-                <textarea name="excerpt" id="excerpt" rows="2" required class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">{{ old('excerpt', $article->excerpt) }}</textarea>
-            </div>
+                <div>
+                    <label for="subtitle_{{ $lc }}" class="block text-xs font-bold text-slate-700 mb-1">Subtitle / Key Takeaway ({{ strtoupper($lc) }})</label>
+                    <input type="text" name="subtitle[{{ $lc }}]" id="subtitle_{{ $lc }}" value="{{ old('subtitle.'.$lc, $article->getTranslation('subtitle', $lc, false)) }}" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">
+                </div>
 
-            <div>
-                <label for="content" class="block text-xs font-bold text-slate-700 mb-1">Article Body (Markdown Supported) *</label>
-                <div class="text-[11px] text-slate-400 mb-1.5">Use ## for major section headings, ### for sub-sections. Headings are automatically parsed into the sticky Table of Contents.</div>
-                <textarea name="content" id="content" rows="18" required class="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-xs text-slate-800 focus:border-primary outline-hidden font-mono leading-relaxed">{{ old('content', $article->content) }}</textarea>
+                <div>
+                    <label for="excerpt_{{ $lc }}" class="block text-xs font-bold text-slate-700 mb-1">Executive Summary / Excerpt ({{ strtoupper($lc) }}) {{ $lc === 'en' ? '*' : '' }}</label>
+                    <textarea name="excerpt[{{ $lc }}]" id="excerpt_{{ $lc }}" rows="2" {{ $lc === 'en' ? 'required' : '' }} class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">{{ old('excerpt.'.$lc, $article->getTranslation('excerpt', $lc, false)) }}</textarea>
+                </div>
+
+                <div>
+                    <label for="content_{{ $lc }}" class="block text-xs font-bold text-slate-700 mb-1">Article Body (Markdown Supported — {{ strtoupper($lc) }}) {{ $lc === 'en' ? '*' : '' }}</label>
+                    <div class="text-[11px] text-slate-400 mb-1.5" dir="ltr">Use ## for major section headings, ### for sub-sections. Headings are automatically parsed into the sticky Table of Contents.</div>
+                    <textarea name="content[{{ $lc }}]" id="content_{{ $lc }}" rows="18" {{ $lc === 'en' ? 'required' : '' }} class="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-xs text-slate-800 focus:border-primary outline-hidden font-mono leading-relaxed">{{ old('content.'.$lc, $article->getTranslation('content', $lc, false)) }}</textarea>
+                </div>
             </div>
+            @endforeach
         </div>
 
         <!-- Marshal Verification & Conversion Widget -->
@@ -128,17 +155,22 @@
 
         <!-- SEO Meta -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2">Search Engine Optimization (SEO & Social Cards)</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2">Search Engine Optimization (SEO &amp; Social Cards)</h2>
 
-            <div>
-                <label for="meta_title" class="block text-xs font-bold text-slate-700 mb-1">Custom Meta Title</label>
-                <input type="text" name="meta_title" id="meta_title" value="{{ old('meta_title', $article->meta_title) }}" placeholder="Max 60 characters. Default uses article title." class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">
-            </div>
+            @foreach($activeLangs as $lang)
+            @php $lc = $lang->code; $isRtl = $lang->isRtl(); @endphp
+            <div x-show="activeLang === '{{ $lc }}'" @if($lc !== $defaultLangCode) x-cloak @endif class="space-y-4" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
+                <div>
+                    <label for="meta_title_{{ $lc }}" class="block text-xs font-bold text-slate-700 mb-1">Custom Meta Title ({{ strtoupper($lc) }})</label>
+                    <input type="text" name="meta_title[{{ $lc }}]" id="meta_title_{{ $lc }}" value="{{ old('meta_title.'.$lc, $article->getTranslation('meta_title', $lc, false)) }}" placeholder="Max 60 characters. Default uses article title." class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">
+                </div>
 
-            <div>
-                <label for="meta_description" class="block text-xs font-bold text-slate-700 mb-1">Custom Meta Description</label>
-                <textarea name="meta_description" id="meta_description" rows="2" placeholder="Max 160 characters. Default uses excerpt." class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">{{ old('meta_description', $article->meta_description) }}</textarea>
+                <div>
+                    <label for="meta_description_{{ $lc }}" class="block text-xs font-bold text-slate-700 mb-1">Custom Meta Description ({{ strtoupper($lc) }})</label>
+                    <textarea name="meta_description[{{ $lc }}]" id="meta_description_{{ $lc }}" rows="2" placeholder="Max 160 characters. Default uses excerpt." class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden">{{ old('meta_description.'.$lc, $article->getTranslation('meta_description', $lc, false)) }}</textarea>
+                </div>
             </div>
+            @endforeach
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">

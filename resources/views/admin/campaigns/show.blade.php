@@ -43,6 +43,11 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
+            @if(in_array($campaign->status, ['draft', 'scheduled']))
+                <a href="{{ route('admin.campaigns.edit', $campaign->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition">
+                    <i class="bi bi-pencil-square"></i> Edit Campaign
+                </a>
+            @endif
             <button type="button" @click="$dispatch('open-test-email')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sky-200 hover:bg-sky-50 text-sky-700 text-xs font-bold transition cursor-pointer">
                 <i class="bi bi-send-check"></i> Send Test Copy
             </button>
@@ -151,7 +156,7 @@
             <div class="sm:col-span-4">
                 <select name="log_status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
                     <option value="">All Delivery Statuses</option>
-                    <option value="sent" {{ request('log_status') === 'sent' ? 'selected' : '' }}>Sent</option>
+                    <option value="delivered" {{ in_array(request('log_status'), ['delivered', 'sent'], true) ? 'selected' : '' }}>Delivered</option>
                     <option value="opened" {{ request('log_status') === 'opened' ? 'selected' : '' }}>Opened</option>
                     <option value="clicked" {{ request('log_status') === 'clicked' ? 'selected' : '' }}>Clicked</option>
                     <option value="bounced" {{ request('log_status') === 'bounced' ? 'selected' : '' }}>Bounced</option>
@@ -201,7 +206,7 @@
                                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                     <i class="bi bi-envelope-open text-[11px]"></i> Opened
                                 </span>
-                            @elseif($log->status === 'sent')
+                            @elseif(in_array($log->status, ['delivered', 'sent'], true))
                                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     <i class="bi bi-check2 text-[11px]"></i> Delivered
                                 </span>

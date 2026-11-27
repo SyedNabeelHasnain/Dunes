@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Language;
 use App\Models\Tour;
 use App\Models\WikiArticle;
 use App\Models\WikiGlossaryTerm;
@@ -15,6 +16,19 @@ use Illuminate\Support\Str;
 class AdminWikiController extends Controller
 {
     use NormalizesLocalizedInputs;
+
+    protected function uniqueSlug(string $modelClass, string $column, string $base, ?int $ignoreId = null): string
+    {
+        $slug = Str::slug($base) ?: 'item-'.time();
+        $candidate = $slug;
+        $counter = 2;
+
+        while ($modelClass::where($column, $candidate)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $candidate = $slug.'-'.$counter++;
+        }
+
+        return $candidate;
+    }
 
     protected function clearWikiCaches(): void
     {
@@ -92,8 +106,8 @@ class AdminWikiController extends Controller
             ['name', 'headline', 'description']
         );
 
-        $slug = $request->filled('slug') ? Str::slug($request->input('slug')) : Str::slug($this->extractSlugSource($request->name));
-        $data['slug'] = $slug ?: 'pillar-' . time();
+        $slugSource = $request->filled('slug') ? (string) $request->input('slug') : $this->extractSlugSource($request->name, 'pillar');
+        $data['slug'] = $this->uniqueSlug(WikiPillar::class, 'slug', $slugSource);
         $data['priority'] = (int) $request->input('priority', 0);
         $data['status'] = $request->input('status', 'active');
         $data['icon'] = $request->input('icon', 'bi-compass');
@@ -120,11 +134,12 @@ class AdminWikiController extends Controller
 
         $data = $this->normalizeLocalizedData(
             $request->except(['hero_image']),
-            ['name', 'headline', 'description']
+            ['name', 'headline', 'description'],
+            $pillar
         );
 
         if ($request->filled('slug')) {
-            $data['slug'] = Str::slug($request->input('slug'));
+            $data['slug'] = $this->uniqueSlug(WikiPillar::class, 'slug', (string) $request->input('slug'), $pillar->id);
         }
         $data['priority'] = (int) $request->input('priority', $pillar->priority);
         $data['status'] = $request->input('status', 'active');
@@ -155,8 +170,9 @@ class AdminWikiController extends Controller
     {
         $pillars = WikiPillar::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tours = Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+        $languages = Language::getActive();
 
-        return view('admin.wiki.create', compact('pillars', 'tours'));
+        return view('admin.wiki.create', compact('pillars', 'tours', 'languages'));
     }
 
     /**
@@ -175,16 +191,22 @@ class AdminWikiController extends Controller
             'priority' => 'nullable|integer',
             'reviewed_by_name' => 'nullable|string|max:100',
             'reviewed_by_title' => 'nullable|string|max:150',
+            'hero_image' => 'nullable|string|max:500',
             'tours' => 'nullable|array',
+            'tours.*' => 'integer|exists:tours,id',
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tours', 'hero_image']),
+            $request->except(['tours', 'tours_submitted', 'hero_image']),
             ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords']
         );
 
-        $slug = $request->filled('slug') ? Str::slug($request->input('slug')) : Str::slug($this->extractSlugSource($request->title));
-        $data['slug'] = $slug ?: 'article-' . time();
+        if ($request->filled('hero_image')) {
+            $data['hero_image'] = trim((string) $request->input('hero_image'));
+        }
+
+        $slugSource = $request->filled('slug') ? (string) $request->input('slug') : $this->extractSlugSource($request->title, 'article');
+        $data['slug'] = $this->uniqueSlug(WikiArticle::class, 'slug', $slugSource);
         $data['pillar_id'] = (int) $request->input('pillar_id');
         $data['status'] = $request->input('status', 'published');
         $data['is_featured'] = $request->boolean('is_featured');
@@ -197,7 +219,7 @@ class AdminWikiController extends Controller
         $article = WikiArticle::create($data);
 
         if ($request->has('tours')) {
-            $article->tours()->sync($request->input('tours'));
+            $article->tours()->sync($request->input('tours', []));
         }
 
         $this->clearWikiCaches();
@@ -210,11 +232,12 @@ class AdminWikiController extends Controller
      */
     public function editArticle($id)
     {
-        $article = WikiArticle::with('tours')->findOrFail($id);
+        $article = WikiArticle::with(['tours', 'pillar'])->findOrFail($id);
         $pillars = WikiPillar::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tours = Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+        $languages = Language::getActive();
 
-        return view('admin.wiki.edit', compact('article', 'pillars', 'tours'));
+        return view('admin.wiki.edit', compact('article', 'pillars', 'tours', 'languages'));
     }
 
     /**
@@ -235,16 +258,23 @@ class AdminWikiController extends Controller
             'priority' => 'nullable|integer',
             'reviewed_by_name' => 'nullable|string|max:100',
             'reviewed_by_title' => 'nullable|string|max:150',
+            'hero_image' => 'nullable|string|max:500',
             'tours' => 'nullable|array',
+            'tours.*' => 'integer|exists:tours,id',
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tours', 'hero_image']),
-            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords']
+            $request->except(['tours', 'tours_submitted', 'hero_image']),
+            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords'],
+            $article
         );
 
+        if ($request->has('hero_image')) {
+            $data['hero_image'] = trim((string) $request->input('hero_image')) ?: null;
+        }
+
         if ($request->filled('slug')) {
-            $data['slug'] = Str::slug($request->input('slug'));
+            $data['slug'] = $this->uniqueSlug(WikiArticle::class, 'slug', (string) $request->input('slug'), $article->id);
         }
         $data['pillar_id'] = (int) $request->input('pillar_id');
         $data['status'] = $request->input('status', 'published');
@@ -268,10 +298,8 @@ class AdminWikiController extends Controller
         } catch (\Throwable) {
         }
 
-        if ($request->has('tours')) {
-            $article->tours()->sync($request->input('tours'));
-        } else {
-            $article->tours()->detach();
+        if ($request->has('tours') || $request->has('tours_submitted')) {
+            $article->tours()->sync($request->input('tours', []));
         }
 
         $this->clearWikiCaches();
@@ -296,7 +324,7 @@ class AdminWikiController extends Controller
      */
     public function glossary()
     {
-        $terms = WikiGlossaryTerm::with('article')->orderBy('term_key', 'asc')->paginate(25);
+        $terms = WikiGlossaryTerm::with('article.pillar')->orderBy('term_key', 'asc')->paginate(25);
         $articles = WikiArticle::published()->orderBy('title', 'asc')->get();
 
         return view('admin.wiki.glossary', compact('terms', 'articles'));
@@ -316,8 +344,8 @@ class AdminWikiController extends Controller
             ['term', 'definition']
         );
 
-        $termKey = $request->filled('term_key') ? Str::slug($request->input('term_key')) : Str::slug($this->extractSlugSource($request->term));
-        $data['term_key'] = $termKey ?: 'term-' . time();
+        $termKeySource = $request->filled('term_key') ? (string) $request->input('term_key') : $this->extractSlugSource($request->term, 'term');
+        $data['term_key'] = $this->uniqueSlug(WikiGlossaryTerm::class, 'term_key', $termKeySource);
         $data['wiki_article_id'] = $request->filled('wiki_article_id') ? (int) $request->input('wiki_article_id') : null;
 
         WikiGlossaryTerm::create($data);
@@ -339,11 +367,12 @@ class AdminWikiController extends Controller
 
         $data = $this->normalizeLocalizedData(
             $request->all(),
-            ['term', 'definition']
+            ['term', 'definition'],
+            $term
         );
 
         if ($request->filled('term_key')) {
-            $data['term_key'] = Str::slug($request->input('term_key'));
+            $data['term_key'] = $this->uniqueSlug(WikiGlossaryTerm::class, 'term_key', (string) $request->input('term_key'), $term->id);
         }
         $data['wiki_article_id'] = $request->filled('wiki_article_id') ? (int) $request->input('wiki_article_id') : null;
 

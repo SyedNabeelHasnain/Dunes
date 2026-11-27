@@ -65,6 +65,9 @@ class ImageOptimizationService
         if ($targetFormat === 'avif' && empty($supported['avif'])) {
             $targetFormat = 'webp';
         }
+        if ($targetFormat === 'webp' && empty($supported['webp'])) {
+            throw new \RuntimeException('WebP encoding is not supported by the installed PHP GD library.');
+        }
 
         $sourcePath = $file->getRealPath();
         if (! $sourcePath || ! file_exists($sourcePath)) {
@@ -75,6 +78,15 @@ class ImageOptimizationService
         $originalName = $file->getClientOriginalName();
         $originalExt = strtolower($file->getClientOriginalExtension() ?: pathinfo($originalName, PATHINFO_EXTENSION));
 
+        // Guard against GD decompression memory bombs (> 25 megapixels)
+        $dimInfo = @getimagesize($sourcePath);
+        if (is_array($dimInfo) && isset($dimInfo[0], $dimInfo[1])) {
+            $pixels = (int) $dimInfo[0] * (int) $dimInfo[1];
+            if ($pixels > 25_000_000) {
+                throw new \RuntimeException("Image '{$originalName}' exceeds the 25-megapixel optimization safety limit.");
+            }
+        }
+
         // Load image into GD resource
         $img = $this->createGdImageFromPath($sourcePath, $originalExt);
         if (! $img) {
@@ -83,6 +95,11 @@ class ImageOptimizationService
 
         // Auto-orient based on EXIF metadata if present (e.g. mobile photo uploads)
         $img = $this->autoOrient($img, $sourcePath, $originalExt);
+
+        // Convert palette images (PNG-8 / GIF) to truecolor before alpha & WebP/AVIF encoding
+        if (function_exists('imagepalettetotruecolor')) {
+            @imagepalettetotruecolor($img);
+        }
 
         // Preserve alpha transparency for PNG / WebP / AVIF
         imagealphablending($img, false);
@@ -118,7 +135,8 @@ class ImageOptimizationService
 
         $convertedSize = (int) filesize($tempPath);
         $baseName = pathinfo($originalName, PATHINFO_FILENAME);
-        $newFilename = Str::slug($baseName) . '.' . $targetFormat;
+        $safeSlug = Str::slug($baseName) ?: ('image-'.Str::random(6));
+        $newFilename = $safeSlug.'.'.$targetFormat;
         $targetMime = $targetFormat === 'webp' ? 'image/webp' : 'image/avif';
 
         $convertedUploadedFile = new UploadedFile(

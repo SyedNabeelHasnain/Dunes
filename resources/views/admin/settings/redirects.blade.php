@@ -161,6 +161,7 @@
 
                 <div class="flex items-center justify-between pt-2">
                     <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" name="is_active" value="1" checked class="rounded-md border-slate-300 text-primary focus:ring-primary">
                         <span class="text-xs font-semibold text-slate-700">Activate Rule Immediately</span>
                     </label>

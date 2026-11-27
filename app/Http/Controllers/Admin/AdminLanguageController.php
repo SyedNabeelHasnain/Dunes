@@ -37,7 +37,7 @@ class AdminLanguageController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'code' => 'required|string|min:2|max:10|regex:/^[a-zA-Z\-]+$/|unique:languages,code',
+            'code' => ['required', 'string', 'min:2', 'max:5', 'regex:/^[a-zA-Z]{2}(?:-[a-zA-Z]{2})?$/', 'unique:languages,code'],
             'name' => 'required|string|max:100',
             'native_name' => 'required|string|max:100',
             'direction' => 'required|in:ltr,rtl',
@@ -46,6 +46,9 @@ class AdminLanguageController extends Controller
         ]);
 
         $code = strtolower(trim($validated['code']));
+        if (in_array($code, ['en', 'js'], true)) {
+            return back()->withInput()->withErrors(['code' => "The locale code '{$code}' is reserved."]);
+        }
 
         $language = Language::create([
             'code' => $code,
@@ -75,7 +78,7 @@ class AdminLanguageController extends Controller
         $rules = [
             'name' => 'required|string|max:100',
             'native_name' => 'required|string|max:100',
-            'direction' => 'required|in:ltr,rtl',
+            'direction' => ($language->code === 'en') ? 'nullable|in:ltr,rtl' : 'required|in:ltr,rtl',
             'flag' => 'nullable|string|max:50',
             'sort_order' => 'nullable|integer',
         ];

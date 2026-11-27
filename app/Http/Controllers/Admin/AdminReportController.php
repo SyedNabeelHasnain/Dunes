@@ -11,6 +11,7 @@ use App\Services\VisitorTrackerService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AdminReportController extends Controller
 {
@@ -78,7 +79,7 @@ class AdminReportController extends Controller
     public function exportCsv(Request $request)
     {
         $dataset = $request->input('dataset', 'bookings');
-        $datePreset = $request->input('date_preset', 'all_time');
+        $datePreset = $request->input('date_preset', 'this_month');
         $channel = $request->input('traffic_channel');
         $status = $request->input('status');
         $paymentStatus = $request->input('payment_status');
@@ -139,7 +140,7 @@ class AdminReportController extends Controller
     public function printView(Request $request)
     {
         $dataset = $request->input('dataset', 'bookings');
-        $datePreset = $request->input('date_preset', 'all_time');
+        $datePreset = $request->input('date_preset', 'this_month');
         $channel = $request->input('traffic_channel');
         $status = $request->input('status');
         $paymentStatus = $request->input('payment_status');
@@ -425,7 +426,7 @@ class AdminReportController extends Controller
      */
     protected function buildInquiriesReport(?string $from, ?string $to, ?string $channel, ?string $status): array
     {
-        $query = Contact::query();
+        $query = Contact::clean();
 
         if ($from) $query->whereDate('created_at', '>=', $from);
         if ($to) $query->whereDate('created_at', '<=', $to);
@@ -526,19 +527,22 @@ class AdminReportController extends Controller
         $bookingQuery = Booking::where('status', '!=', 'draft');
         $draftQuery = Booking::where('status', 'draft');
         $waQuery = WhatsappInquiry::query();
-        $contactQuery = Contact::query();
+        $contactQuery = Contact::clean();
+        $convertedQuery = Booking::where('status', 'converted');
 
         if ($from) {
             $bookingQuery->whereDate('tour_date', '>=', $from);
             $draftQuery->whereDate('created_at', '>=', $from);
             $waQuery->whereDate('created_at', '>=', $from);
             $contactQuery->whereDate('created_at', '>=', $from);
+            $convertedQuery->whereDate('updated_at', '>=', $from);
         }
         if ($to) {
             $bookingQuery->whereDate('tour_date', '<=', $to);
             $draftQuery->whereDate('created_at', '<=', $to);
             $waQuery->whereDate('created_at', '<=', $to);
             $contactQuery->whereDate('created_at', '<=', $to);
+            $convertedQuery->whereDate('updated_at', '<=', $to);
         }
 
         $confirmedBookings = (clone $bookingQuery)->whereIn('status', ['confirmed', 'completed'])->count();
@@ -554,7 +558,7 @@ class AdminReportController extends Controller
         $waCount = (clone $waQuery)->count();
         $contactCount = (clone $contactQuery)->count();
 
-        $convertedDraftsCount = Booking::where('status', 'converted')->count();
+        $convertedDraftsCount = $convertedQuery->count();
 
         return [
             'revenue' => $revenue,
@@ -613,30 +617,42 @@ class AdminReportController extends Controller
     }
 
     /**
-     * Calculate tour performance metrics.
+     * Calculate tour performance metrics (single grouped query per table — zero N+1).
      */
     protected function calculateTourPerformance(?string $from, ?string $to): array
     {
-        $tours = Tour::all();
+        $tours = Tour::select('id', 'name')->get();
+
+        $bStatsQuery = Booking::whereIn('status', ['confirmed', 'completed'])
+            ->selectRaw('tour_id, COUNT(*) as bookings_count, COALESCE(SUM(total), 0) as total_rev, COALESCE(SUM(adults + children), 0) as total_guests')
+            ->groupBy('tour_id');
+        if ($from) {
+            $bStatsQuery->whereDate('tour_date', '>=', $from);
+        }
+        if ($to) {
+            $bStatsQuery->whereDate('tour_date', '<=', $to);
+        }
+        $bStats = $bStatsQuery->get()->keyBy('tour_id');
+
+        $dStatsQuery = Booking::where('status', 'draft')
+            ->selectRaw('tour_id, COUNT(*) as drafts_count')
+            ->groupBy('tour_id');
+        if ($from) {
+            $dStatsQuery->whereDate('created_at', '>=', $from);
+        }
+        if ($to) {
+            $dStatsQuery->whereDate('created_at', '<=', $to);
+        }
+        $dStats = $dStatsQuery->get()->keyBy('tour_id');
+
         $result = [];
-
         foreach ($tours as $tour) {
-            $bQuery = Booking::where('tour_id', $tour->id)->where('status', '!=', 'draft');
-            $dQuery = Booking::where('tour_id', $tour->id)->where('status', 'draft');
-
-            if ($from) {
-                $bQuery->whereDate('tour_date', '>=', $from);
-                $dQuery->whereDate('created_at', '>=', $from);
-            }
-            if ($to) {
-                $bQuery->whereDate('tour_date', '<=', $to);
-                $dQuery->whereDate('created_at', '<=', $to);
-            }
-
-            $bookingsCount = (clone $bQuery)->whereIn('status', ['confirmed', 'completed'])->count();
-            $rev = (float) (clone $bQuery)->whereIn('status', ['confirmed', 'completed'])->sum('total');
-            $guests = (int) (clone $bQuery)->whereIn('status', ['confirmed', 'completed'])->sum(DB::raw('adults + children'));
-            $drafts = (clone $dQuery)->count();
+            $bs = $bStats->get($tour->id);
+            $ds = $dStats->get($tour->id);
+            $bookingsCount = (int) ($bs->bookings_count ?? 0);
+            $rev = (float) ($bs->total_rev ?? 0.0);
+            $guests = (int) ($bs->total_guests ?? 0);
+            $drafts = (int) ($ds->drafts_count ?? 0);
 
             $result[] = [
                 'id' => $tour->id,
@@ -660,6 +676,10 @@ class AdminReportController extends Controller
     protected function resolveDateRange(string $preset, ?string $from, ?string $to): array
     {
         $today = Carbon::today();
+
+        if ((! empty($from) || ! empty($to)) && ! in_array($preset, ['today', 'yesterday', 'last_7_days', 'last_month', 'this_quarter', 'year_to_date', 'all_time'], true)) {
+            $preset = 'custom';
+        }
 
         return match ($preset) {
             'today' => [$today->toDateString(), $today->toDateString()],

@@ -168,7 +168,7 @@
                 </div>
 
                 <!-- Error Container -->
-                <div id="waError" class="d-none hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
+                <div id="waError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
 
                 <!-- Action Button -->
                 <div class="pt-1">

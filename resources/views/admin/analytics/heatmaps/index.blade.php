@@ -62,10 +62,17 @@
                     <i class="bi bi-fire text-orange-600"></i>
                     Self-Hosted (Zero-Cost Canvas)
                 </span>
+                @if($isEnabled ?? true)
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     Aggregating Clicks
                 </span>
+                @else
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 inline-flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                    Tracking Paused
+                </span>
+                @endif
             </div>
             <p class="text-xs text-slate-500 mt-1">
                 Visual click intensity density and vertical scroll drop-off gradients: see exactly where guests focus, tap, and abandon pages.
@@ -90,6 +97,13 @@
                     <span>Scroll Depth Map</span>
                 </button>
             </div>
+
+            <button type="button"
+                    @click="settingsModal = true"
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition cursor-pointer">
+                <i class="bi bi-sliders text-slate-500"></i>
+                <span>Settings &amp; Purge</span>
+            </button>
 
             <a href="{{ route('admin.analytics.recordings.index') }}" 
                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition">
@@ -190,14 +204,17 @@
                 </div>
             </div>
 
-            <!-- Heatmap Frame Container -->
-            <div class="heatmap-frame-container rounded-b-2xl" id="heatmap-viewport">
+            <!-- Heatmap Frame Container (scrollable wrapper so full document height matches normalized y_ratio 1:1) -->
+            <div class="overflow-y-auto rounded-b-2xl bg-slate-900" style="max-height: 900px;">
+            <div class="heatmap-frame-container relative" id="heatmap-viewport" :style="`height: ${frameHeight}px;`">
                 
                 <!-- Underlay Page Iframe -->
                 <iframe :src="selectedPage" 
                         id="heatmap-iframe" 
-                        class="w-full h-full border-0 rounded-b-2xl bg-white" 
-                        style="min-height: 850px; opacity: 0.92;"
+                        @load="syncIframeHeight()"
+                        class="w-full h-full border-0 bg-white" 
+                        :style="`height: ${frameHeight}px; opacity: 0.92;`"
+                        scrolling="no"
                         loading="lazy"></iframe>
 
                 <!-- Mode 1: Click Heatmap Overlay Container -->
@@ -213,7 +230,7 @@
                         <span class="bg-slate-900/90 px-2 py-1 rounded text-emerald-400 border border-emerald-500/40">
                             25% Depth &bull; Top Section
                         </span>
-                        <span class="bg-emerald-500 text-white px-2.5 py-1 rounded-full font-black text-xs shadow-md" x-text="(scrollMetrics?.reach_25 || 100) + '% Reached'"></span>
+                        <span class="bg-emerald-500 text-white px-2.5 py-1 rounded-full font-black text-xs shadow-md" x-text="(scrollMetrics?.reach_25 ?? 0) + '% Reached'"></span>
                     </div>
 
                     <!-- 50% Scroll Line (Mid-page Fold) -->
@@ -253,6 +270,7 @@
                     </p>
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- Right: Analytics Summary Sidebar -->
@@ -269,7 +287,7 @@
                 <div>
                     <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Recorded Clicks</div>
                     <div class="text-3xl font-black text-slate-900 mt-1" x-text="totalClicksCount"></div>
-                    <div class="text-[11px] text-slate-500 mt-0.5">Normalized $(x,y)$ coordinates</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Normalized (x, y) coordinates</div>
                 </div>
 
                 <!-- Avg Scroll Depth -->
@@ -324,10 +342,10 @@
                     <div>
                         <div class="flex justify-between font-bold text-slate-700 mb-1">
                             <span>Top 25% (Header &amp; Hero)</span>
-                            <span class="font-mono" x-text="(scrollMetrics?.reach_25 || 100) + '%'"></span>
+                            <span class="font-mono" x-text="(scrollMetrics?.reach_25 ?? 0) + '%'"></span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                            <div class="bg-emerald-500 h-1.5 rounded-full" :style="`width: ${scrollMetrics?.reach_25 || 100}%`"></div>
+                            <div class="bg-emerald-500 h-1.5 rounded-full" :style="`width: ${scrollMetrics?.reach_25 ?? 0}%`"></div>
                         </div>
                     </div>
 
@@ -366,6 +384,49 @@
         </div>
     </div>
 
+    <!-- Settings & Retention Purge Modal -->
+    <div x-show="settingsModal" x-cloak class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4" @keydown.escape.window="settingsModal = false">
+        <div @click.outside="settingsModal = false" class="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full shadow-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-sliders text-primary"></i> Heatmap Capture &amp; Retention
+                </h3>
+                <button type="button" @click="settingsModal = false" class="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">&times;</button>
+            </div>
+
+            <form method="POST" action="{{ route('admin.analytics.heatmaps.settings') }}" class="space-y-3">
+                @csrf
+                <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer">
+                    <input type="hidden" name="heatmaps_enabled" value="0">
+                    <input type="checkbox" name="heatmaps_enabled" value="1" @checked($isEnabled ?? true) class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary">
+                    <div class="text-xs">
+                        <div class="font-bold text-slate-900">Enable Public Click &amp; Scroll Heatmap Capture</div>
+                        <p class="text-slate-500 mt-0.5">When disabled, public pages stop transmitting click coordinates and scroll depth beacons.</p>
+                    </div>
+                </label>
+                <div class="flex justify-end">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer">Save Capture Preference</button>
+                </div>
+            </form>
+
+            <div class="border-t border-slate-100 pt-4 space-y-3">
+                <h4 class="text-xs font-extrabold uppercase tracking-wider text-rose-700">Purge Stored Heatmap Logs</h4>
+                <form method="POST" action="{{ route('admin.analytics.heatmaps.purge') }}" onsubmit="return confirm('Permanently purge heatmap click and scroll logs matching the selected retention window?')" class="flex items-center gap-2">
+                    @csrf
+                    <select name="days" class="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 bg-white">
+                        <option value="30">Older than 30 days</option>
+                        <option value="7">Older than 7 days</option>
+                        <option value="90">Older than 90 days</option>
+                        <option value="0">Purge ALL logs (0 days)</option>
+                    </select>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold cursor-pointer">
+                        <i class="bi bi-trash3 me-1"></i> Purge
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </div>
 @endsection
 
@@ -374,11 +435,13 @@
 <script>
 function heatmapsHubApp() {
     return {
+        settingsModal: false,
         mode: 'clicks', // 'clicks' or 'scroll'
-        selectedPage: '{{ $selectedPage }}',
-        selectedDevice: '{{ $selectedDevice }}',
-        selectedDays: '{{ $days }}',
+        selectedPage: @js($selectedPage),
+        selectedDevice: @js($selectedDevice),
+        selectedDays: @js((string) $days),
         heatmapRadius: 35,
+        frameHeight: 850,
         loading: false,
         totalClicksCount: {{ $heatmapData['total_clicks'] ?? 0 }},
         currentClicks: @json($heatmapData['clicks'] ?? []),
@@ -391,6 +454,26 @@ function heatmapsHubApp() {
                 this.initHeatmapCanvas();
                 this.redrawHeatmap();
             });
+        },
+
+        syncIframeHeight() {
+            try {
+                const iframe = document.getElementById('heatmap-iframe');
+                const doc = iframe?.contentDocument || iframe?.contentWindow?.document;
+                const docH = Math.max(
+                    doc?.documentElement?.scrollHeight || 0,
+                    doc?.body?.scrollHeight || 0
+                );
+                if (docH > 850) {
+                    this.frameHeight = Math.min(docH, 12000);
+                    this.$nextTick(() => {
+                        this.initHeatmapCanvas();
+                        this.redrawHeatmap();
+                    });
+                }
+            } catch (e) {
+                // Cross-origin fallback retains 850px
+            }
         },
 
         setMode(newMode) {
@@ -409,7 +492,7 @@ function heatmapsHubApp() {
             container.innerHTML = '';
             this.heatmapInstance = h337.create({
                 container: container,
-                radius: parseInt(this.heatmapRadius),
+                radius: parseInt(this.heatmapRadius, 10) || 35,
                 maxOpacity: 0.82,
                 minOpacity: 0.15,
                 blur: 0.85
@@ -425,8 +508,13 @@ function heatmapsHubApp() {
             const container = document.getElementById('heatmap-canvas-container');
             if (!container) return;
 
+            const radiusVal = parseInt(this.heatmapRadius, 10) || 35;
+            if (typeof this.heatmapInstance.configure === 'function') {
+                this.heatmapInstance.configure({ radius: radiusVal });
+            }
+
             const w = container.offsetWidth || 1000;
-            const h = container.offsetHeight || 850;
+            const h = container.offsetHeight || this.frameHeight || 850;
 
             const points = [];
             this.currentClicks.forEach(c => {
@@ -436,7 +524,8 @@ function heatmapsHubApp() {
                     points.push({
                         x: px,
                         y: py,
-                        value: 1
+                        value: 1,
+                        radius: radiusVal
                     });
                 }
             });

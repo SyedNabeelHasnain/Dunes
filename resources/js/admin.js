@@ -170,6 +170,16 @@ function initSpotlight() {
             return 0;
         }
 
+        const escHtml = (val) => String(val ?? '').replace(/[&<>"']/g, (ch) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[ch]));
+        const safeHref = (url) => {
+            const s = String(url ?? '').trim();
+            return (s.startsWith('/') || /^https?:\/\//i.test(s)) ? escHtml(s) : '#';
+        };
+        const safeIcon = (cls) => String(cls ?? 'bi bi-dot').replace(/[^a-zA-Z0-9\s\-_]/g, '');
+        if (!window.escapeHtml) window.escapeHtml = escHtml;
+
         let totalDynamicItems = 0;
 
         categories.forEach(cat => {
@@ -182,7 +192,7 @@ function initSpotlight() {
             const headerEl = document.createElement('div');
             headerEl.className = 'text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1 flex items-center justify-between';
             headerEl.innerHTML = `
-                <span class="flex items-center gap-1.5"><i class="${cat.icon || 'bi bi-database-fill text-primary'}"></i> ${cat.label}</span>
+                <span class="flex items-center gap-1.5"><i class="${safeIcon(cat.icon || 'bi bi-database-fill text-primary')}"></i> ${escHtml(cat.label)}</span>
                 <span class="text-[10px] text-emerald-600 font-mono bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">${cat.items.length} live records</span>
             `;
             sectionEl.appendChild(headerEl);
@@ -194,7 +204,7 @@ function initSpotlight() {
                 totalDynamicItems++;
                 const itemEl = document.createElement('div');
                 itemEl.className = 'cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer';
-                itemEl.dataset.keywords = `${item.title} ${item.subtitle} ${item.badge || ''}`;
+                itemEl.dataset.keywords = `${item.title || ''} ${item.subtitle || ''} ${item.badge || ''}`;
                 itemEl.dataset.category = cat.key;
 
                 const badgeColorClass = item.badge_color === 'emerald' ? 'bg-emerald-100 text-emerald-800'
@@ -207,7 +217,7 @@ function initSpotlight() {
                 let previewHtml = '';
                 if (item.preview_url) {
                     previewHtml = `
-                        <a href="${item.preview_url}" target="_blank" class="p-1.5 text-slate-400 hover:text-cyan-600 rounded-lg hover:bg-white transition" title="Preview on live website" onclick="event.stopPropagation();">
+                        <a href="${safeHref(item.preview_url)}" target="_blank" rel="noopener noreferrer" class="p-1.5 text-slate-400 hover:text-cyan-600 rounded-lg hover:bg-white transition" title="Preview on live website" onclick="event.stopPropagation();">
                             <i class="bi bi-box-arrow-up-right text-xs"></i>
                         </a>
                     `;
@@ -215,19 +225,19 @@ function initSpotlight() {
 
                 itemEl.innerHTML = `
                     <div class="flex items-center justify-between p-2.5">
-                        <a href="${item.url}" class="flex items-center gap-3 flex-1 min-w-0">
-                            <i class="${item.icon || 'bi bi-dot'} text-lg shrink-0"></i>
+                        <a href="${safeHref(item.url)}" class="flex items-center gap-3 flex-1 min-w-0">
+                            <i class="${safeIcon(item.icon || 'bi bi-dot')} text-lg shrink-0"></i>
                             <div class="truncate">
                                 <div class="flex items-center gap-2">
-                                    <strong class="text-xs font-bold text-slate-900 group-hover:text-primary truncate">${item.title}</strong>
-                                    ${item.badge ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${badgeColorClass} shrink-0">${item.badge}</span>` : ''}
+                                    <strong class="text-xs font-bold text-slate-900 group-hover:text-primary truncate">${escHtml(item.title)}</strong>
+                                    ${item.badge ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${badgeColorClass} shrink-0">${escHtml(item.badge)}</span>` : ''}
                                 </div>
-                                <span class="text-[11px] text-slate-500 truncate block">${item.subtitle}</span>
+                                <span class="text-[11px] text-slate-500 truncate block">${escHtml(item.subtitle)}</span>
                             </div>
                         </a>
                         <div class="flex items-center gap-1 shrink-0 ms-2">
                             ${previewHtml}
-                            <a href="${item.url}" class="p-1 text-slate-300 group-hover:text-primary transition">
+                            <a href="${safeHref(item.url)}" class="p-1 text-slate-300 group-hover:text-primary transition">
                                 <i class="bi bi-chevron-right text-xs"></i>
                             </a>
                         </div>
@@ -431,6 +441,8 @@ window.hideLoader = function() {
 
 window.initVisitorsPoller = function(endpointUrl) {
     if (!endpointUrl) return;
+    // Avoid double polling on the dedicated live-visitors dashboard which manages its own poller
+    if (window.location.pathname.includes('/admin/analytics/live-visitors')) return;
 
     let lastPayload = '';
 
@@ -443,7 +455,10 @@ window.initVisitorsPoller = function(endpointUrl) {
                 'Accept': 'application/json'
             }
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        })
         .then(data => {
             const currentPayload = JSON.stringify(data);
             if (currentPayload === lastPayload) return;
@@ -498,7 +513,10 @@ window.initCachePurgeHandler = function(purgeUrl, csrfToken) {
             },
             body: JSON.stringify({ _token: csrfToken })
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        })
         .then(res => {
             if (window.Swal) {
                 window.Swal.fire({
@@ -682,7 +700,6 @@ window.initQuillEditors = function() {
 
         const form = textarea.closest('form');
         if (form) {
-            form.setAttribute('novalidate', 'true');
             form.addEventListener('submit', () => {
                 textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
             });

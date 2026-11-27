@@ -16,7 +16,7 @@ class IndexNowController extends Controller
     {
         $configuredKey = $indexNow->getKey();
 
-        if ($key !== $configuredKey) {
+        if ($configuredKey === '' || ! hash_equals($configuredKey, $key)) {
             abort(404, 'IndexNow key not found.');
         }
 

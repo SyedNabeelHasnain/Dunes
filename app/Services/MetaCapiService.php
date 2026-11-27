@@ -25,16 +25,16 @@ class MetaCapiService
             return;
         }
 
-        // Capture request context in front-end context before queue execution
-        $clientIp = request()->ip();
-        $userAgent = request()->userAgent();
+        // Capture request context in front-end context before queue execution (allow explicit booking context override for webhooks)
+        $clientIp = ! empty($data['client_ip']) ? (string) $data['client_ip'] : request()->ip();
+        $userAgent = ! empty($data['user_agent']) ? (string) $data['user_agent'] : request()->userAgent();
 
         $cookies = [
-            'fbp' => request()->cookie('_fbp'),
-            'fbc' => request()->cookie('_fbc'),
+            'fbp' => $data['fbp'] ?? request()->cookie('_fbp'),
+            'fbc' => $data['fbc'] ?? request()->cookie('_fbc'),
         ];
 
-        $eventSourceUrl = request()->fullUrl();
+        $eventSourceUrl = ! empty($data['event_source_url']) ? (string) $data['event_source_url'] : request()->fullUrl();
 
         // Dispatch background job
         SendMetaCapiEvent::dispatch($eventName, $data, $clientIp, $userAgent, $cookies, $eventSourceUrl);

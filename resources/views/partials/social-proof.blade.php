@@ -118,7 +118,11 @@
             imgEl.src = item.image;
         }
         if (timeEl) {
-            timeEl.innerHTML = '<i class="bi bi-clock me-1"></i>' + (item.time_ago || 'Just now');
+            timeEl.textContent = '';
+            const clk = document.createElement('i');
+            clk.className = 'bi bi-clock me-1';
+            timeEl.appendChild(clk);
+            timeEl.appendChild(document.createTextNode(String(item.time_ago || 'Just now')));
         }
 
         toastEl.style.display = 'block';

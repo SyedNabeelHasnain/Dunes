@@ -165,7 +165,7 @@
 
                                     <!-- Thumbnail -->
                                     <template x-if="item.is_image">
-                                        <img :src="item.clean_public_url" 
+                                        <img :src="item.clean_public_url || item.public_url" 
                                              :alt="item.alt_text || item.filename" 
                                              loading="lazy" 
                                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -173,7 +173,7 @@
                                     </template>
                                     <template x-if="item.is_video">
                                         <div class="w-full h-full relative bg-slate-900 flex items-center justify-center overflow-hidden">
-                                            <video :src="item.clean_public_url + '#t=0.001'" 
+                                            <video :src="(item.clean_public_url || item.public_url) + '#t=0.001'" 
                                                    :poster="item.poster_url"
                                                    preload="metadata"
                                                    class="w-full h-full object-cover">
@@ -231,12 +231,12 @@
                                 <!-- Large Preview -->
                                 <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-900 aspect-video relative flex items-center justify-center">
                                     <template x-if="selectedAsset.is_image">
-                                        <img :src="selectedAsset.clean_public_url" 
+                                        <img :src="selectedAsset.clean_public_url || selectedAsset.public_url" 
                                              class="w-full h-full object-contain"
                                              onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23f8fafc\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><path d=\'M30 40a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm-15 45h70L65 55 50 70 40 60 15 85z\' fill=\'%23cbd5e1\'/></svg>'; this.onerror=null;">
                                     </template>
                                     <template x-if="selectedAsset.is_video">
-                                        <video :src="selectedAsset.clean_public_url" 
+                                        <video :src="selectedAsset.clean_public_url || selectedAsset.public_url" 
                                                controls 
                                                playsinline 
                                                class="w-full h-full object-contain">
@@ -301,7 +301,7 @@
                                 <div class="grid grid-cols-3 gap-1.5 max-h-60 overflow-y-auto p-1">
                                     <template x-for="item in selectedAssets" :key="item.id">
                                         <div class="aspect-square rounded-lg overflow-hidden border border-slate-200 relative">
-                                            <img :src="item.clean_public_url" class="w-full h-full object-cover">
+                                            <img :src="item.clean_public_url || item.public_url" class="w-full h-full object-cover">
                                         </div>
                                     </template>
                                 </div>
@@ -492,7 +492,7 @@ function universalMediaPickerModal() {
                     if (this.preselectedIdentifier && !this.selectedAsset) {
                         const matched = this.assets.find(a => 
                             a.file_path === this.preselectedIdentifier || 
-                            a.clean_public_url === this.preselectedIdentifier || 
+                            (a.clean_public_url || a.public_url) === this.preselectedIdentifier || 
                             a.filename === this.preselectedIdentifier
                         );
                         if (matched) {

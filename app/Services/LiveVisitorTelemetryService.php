@@ -53,38 +53,47 @@ class LiveVisitorTelemetryService
                 : $v->client_ip;
         });
 
-        // Batch resolve existing drafts and inquiries in this time window
-        $sessionIds = $rawVisitors->pluck('session_id')->filter()->unique()->toArray();
-        $clientIps = $rawVisitors->pluck('client_ip')->filter()->unique()->toArray();
+        // Batch resolve existing drafts and inquiries in this time window (skip full-table scan when empty)
+        $sessionIds = $rawVisitors->pluck('session_id')->filter()->unique()->values()->toArray();
+        $clientIps = $rawVisitors->pluck('client_ip')->filter()->unique()->values()->toArray();
 
-        $drafts = Booking::where('status', 'draft')
-            ->where(function ($q) use ($sessionIds, $clientIps) {
-                if (! empty($sessionIds)) {
-                    $q->whereIn('draft_token', $sessionIds);
-                }
-                if (! empty($clientIps)) {
-                    $q->orWhereIn('ip_address', $clientIps);
-                }
-            })
-            ->latest()
-            ->get()
-            ->keyBy(function ($b) {
-                return $b->draft_token ?: $b->ip_address;
-            });
+        $drafts = collect();
+        if (! empty($sessionIds) || ! empty($clientIps)) {
+            $drafts = Booking::where('status', 'draft')
+                ->where(function ($q) use ($sessionIds, $clientIps) {
+                    if (! empty($sessionIds)) {
+                        $q->whereIn('draft_token', $sessionIds);
+                    }
+                    if (! empty($clientIps)) {
+                        if (! empty($sessionIds)) {
+                            $q->orWhereIn('ip_address', $clientIps);
+                        } else {
+                            $q->whereIn('ip_address', $clientIps);
+                        }
+                    }
+                })
+                ->latest()
+                ->get()
+                ->keyBy(function ($b) {
+                    return $b->draft_token ?: $b->ip_address;
+                });
+        }
 
         $visitors = [];
         foreach ($grouped as $key => $group) {
             $latest = $group->first();
             $pagesCount = $group->count();
             $earliest = $group->last();
-            $durationSec = max(0, Carbon::parse($latest->request_timestamp)->diffInSeconds(Carbon::parse($earliest->request_timestamp)));
+            $durationSec = (int) round(max(0, Carbon::parse($earliest->request_timestamp)->diffInSeconds(Carbon::parse($latest->request_timestamp))));
 
             // Check for drafts
             $draft = $drafts->get($latest->session_id) ?: $drafts->get($latest->client_ip);
 
             // Check for errors (404, etc.)
             $hasError = $group->contains(function ($r) {
-                return $r->entity_type === 'error_404' || str_contains($r->request_uri, '404') || str_contains($r->entity_type, 'error');
+                return $r->entity_type === 'error_404'
+                    || str_contains((string) $r->request_uri, '404')
+                    || str_contains((string) $r->entity_type, 'error');
             });
 
             // Check for WhatsApp clicks
@@ -92,9 +101,9 @@ class LiveVisitorTelemetryService
                 return $r->entity_type === 'whatsapp' || $r->entity_type === 'whatsapp_click';
             });
 
-            // Calculate human-friendly last active time
-            $diffMinutes = Carbon::parse($latest->request_timestamp)->diffInMinutes(now());
-            $diffSeconds = Carbon::parse($latest->request_timestamp)->diffInSeconds(now());
+            // Calculate human-friendly last active time (Carbon 3 returns floats; floor to integer)
+            $diffSeconds = (int) floor(max(0, Carbon::parse($latest->request_timestamp)->diffInSeconds(now())));
+            $diffMinutes = (int) floor($diffSeconds / 60);
             $lastActiveHuman = $diffSeconds < 45 ? 'Just now' : ($diffMinutes < 1 ? "{$diffSeconds}s ago" : "{$diffMinutes}m ago");
 
             $visitors[] = [
@@ -146,26 +155,25 @@ class LiveVisitorTelemetryService
             return ['success' => false, 'message' => 'Valid session identifier or IP address required.'];
         }
 
-        $query = RequestLog::query();
-        if (! empty($sessionId) && ! empty($clientIp)) {
-            $query->where(function ($q) use ($sessionId, $clientIp) {
-                $q->where('session_id', $sessionId)
-                  ->orWhere('client_ip', $clientIp);
-            });
-        } elseif (! empty($sessionId)) {
-            $query->where(function ($q) use ($sessionId) {
-                $q->where('session_id', $sessionId)
-                  ->orWhere('client_ip', $sessionId);
-            });
-        } else {
-            $query->where('client_ip', $clientIp);
+        // Prefer exact session_id match (bounded to last 30 days & 500 events) to avoid NAT IP cross-contamination
+        $since = now()->subDays(30);
+        $logs = collect();
+        if (! empty($sessionId)) {
+            $logs = RequestLog::where('session_id', $sessionId)
+                ->where('request_timestamp', '>=', $since)
+                ->orderBy('request_timestamp', 'asc')
+                ->limit(500)
+                ->get();
         }
-
-        $logs = $query->orderBy('request_timestamp', 'asc')->get();
-
-        // Fallback: If no logs found with combined query, query by IP if valid
-        if ($logs->isEmpty() && ! empty($clientIp)) {
-            $logs = RequestLog::where('client_ip', $clientIp)->orderBy('request_timestamp', 'asc')->get();
+        if ($logs->isEmpty()) {
+            $fallbackIp = $clientIp ?: $sessionId;
+            if (! empty($fallbackIp)) {
+                $logs = RequestLog::where('client_ip', $fallbackIp)
+                    ->where('request_timestamp', '>=', $since)
+                    ->orderBy('request_timestamp', 'asc')
+                    ->limit(500)
+                    ->get();
+            }
         }
 
         $effectiveIp = $clientIp ?: (! empty($sessionId) && filter_var($sessionId, FILTER_VALIDATE_IP) ? $sessionId : ($logs->last()?->client_ip ?? '127.0.0.1'));
@@ -257,13 +265,14 @@ class LiveVisitorTelemetryService
             'last_active' => Carbon::parse($latestLog->request_timestamp)->format('h:i:s A (M d)'),
             'is_active_now' => Carbon::parse($latestLog->request_timestamp)->diffInMinutes(now()) <= 3,
             'total_steps' => $logs->count(),
-            'total_duration_sec' => max(0, Carbon::parse($latestLog->request_timestamp)->diffInSeconds(Carbon::parse($firstLog->request_timestamp))),
+            'total_duration_sec' => (int) round(max(0, Carbon::parse($firstLog->request_timestamp)->diffInSeconds(Carbon::parse($latestLog->request_timestamp)))),
             'is_ignored_ip' => $this->ipSecurity->isIpIgnoredFromAnalytics($ip),
             'is_blocked_ip' => $this->ipSecurity->isIpBlocked($ip),
         ];
 
         // 2. Resolve Customer Lead (Draft checkout, Inquiry, or WhatsApp)
         $lead = null;
+        $draft = null;
         try {
             $draft = Booking::where('status', 'draft')
                 ->where(function ($q) use ($sessionId, $ip) {
@@ -271,7 +280,11 @@ class LiveVisitorTelemetryService
                         $q->where('draft_token', $sessionId);
                     }
                     if (! empty($ip)) {
-                        $q->orWhere('ip_address', $ip);
+                        if (! empty($sessionId)) {
+                            $q->orWhere('ip_address', $ip);
+                        } else {
+                            $q->where('ip_address', $ip);
+                        }
                     }
                 })
                 ->latest()
@@ -301,14 +314,14 @@ class LiveVisitorTelemetryService
                 if ($wa) {
                     $lead = [
                         'type' => 'whatsapp_inquiry',
-                        'reference' => 'WA-#' . $wa->id,
+                        'reference' => $wa->ref_code ?: ('WA-#' . $wa->id),
                         'name' => $wa->name ?: 'WhatsApp Guest',
                         'email' => $wa->email,
                         'phone' => $wa->phone,
                         'tour_name' => $wa->tour_name,
                         'tier_name' => 'Direct Message',
-                        'tour_date' => $wa->tour_date ? Carbon::parse($wa->tour_date)->format('M d, Y') : null,
-                        'guests' => $wa->guests,
+                        'tour_date' => null,
+                        'guests' => null,
                         'subtotal' => 0.0,
                         'total' => 0.0,
                         'url' => route('admin.whatsapp.index', ['search' => $wa->phone ?: $wa->name]),
@@ -317,7 +330,7 @@ class LiveVisitorTelemetryService
                     // Check Contact Inquiries (table has ip_address)
                     $contact = null;
                     if (! empty($ip)) {
-                        $contact = Contact::where('ip_address', $ip)->latest()->first();
+                        $contact = Contact::clean()->where('ip_address', $ip)->latest()->first();
                     }
                     if ($contact) {
                         $lead = [
@@ -343,7 +356,7 @@ class LiveVisitorTelemetryService
 
         // 3. Resolve Current Live Screen Data
         $currentScreen = $this->resolveCurrentScreenData($latestLog->request_uri, $latestLog->entity_type, $draft);
-        $currentStepDwellSec = max(1, now()->diffInSeconds(Carbon::parse($latestLog->request_timestamp)));
+        $currentStepDwellSec = (int) round(max(1, Carbon::parse($latestLog->request_timestamp)->diffInSeconds(now())));
         $currentScreen['dwell_seconds'] = $currentStepDwellSec;
         $currentScreen['dwell_formatted'] = $this->formatDwellTime($currentStepDwellSec);
 
@@ -365,7 +378,7 @@ class LiveVisitorTelemetryService
 
         // Obstacle 2: 404 Page Not Found Encountered
         $errorLogs = $logs->filter(function ($l) {
-            return $l->entity_type === 'error_404' || str_contains($l->request_uri, '404');
+            return $l->entity_type === 'error_404' || str_contains((string) $l->request_uri, '404');
         });
         if ($errorLogs->isNotEmpty()) {
             foreach ($errorLogs as $err) {
@@ -440,8 +453,8 @@ class LiveVisitorTelemetryService
             $next = ($i < $logCount - 1) ? $logs[$i + 1] : null;
 
             $stepDwellSec = $next
-                ? max(1, Carbon::parse($next->request_timestamp)->diffInSeconds(Carbon::parse($current->request_timestamp)))
-                : max(1, now()->diffInSeconds(Carbon::parse($current->request_timestamp)));
+                ? (int) round(max(1, Carbon::parse($current->request_timestamp)->diffInSeconds(Carbon::parse($next->request_timestamp))))
+                : (int) round(max(1, Carbon::parse($current->request_timestamp)->diffInSeconds(now())));
 
             $pageTitle = $this->resolveFriendlyPageTitle($current->request_uri, $current->entity_type);
 

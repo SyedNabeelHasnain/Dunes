@@ -337,7 +337,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-10 text-slate-400">
+                        <td colspan="7" class="text-center py-10 text-slate-400">
                             <i class="bi bi-envelope-x text-3xl block mb-2 opacity-50"></i>
                             No contact inquiries match your filter criteria.
                         </td>
@@ -593,7 +593,15 @@ $(document).ready(function() {
             return;
         }
 
-        const actionLabel = 'mark as ' + action.replace('status_', '');
+        const actionLabels = {
+            status_read: 'mark as In Review (Read)',
+            status_replied: 'mark as Replied',
+            status_new: 'mark as Action Needed (New)',
+            mark_spam: 'move to Spam Quarantine',
+            mark_spam_and_block: 'move to Spam Quarantine & Block IP',
+            restore_spam: 'restore to Clean Inbox',
+        };
+        const actionLabel = actionLabels[action] || ('update (' + action.replace(/_/g, ' ') + ')');
 
         Swal.fire({
             title: 'Are you sure?',

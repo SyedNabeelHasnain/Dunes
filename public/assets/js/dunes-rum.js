@@ -45,8 +45,9 @@
         try {
             if (navigator.sendBeacon) {
                 var blob = new Blob([payload], { type: 'application/json' });
-                navigator.sendBeacon('/api/v1/rum/vitals', blob);
-                return;
+                if (navigator.sendBeacon('/api/v1/rum/vitals', blob)) {
+                    return;
+                }
             }
             fetch('/api/v1/rum/vitals', {
                 method: 'POST',
@@ -85,14 +86,34 @@
         }).observe({ type: 'largest-contentful-paint', buffered: true });
     } catch (e) {}
 
-    // CLS (Cumulative Layout Shift excluding user-initiated transitions)
+    // CLS (Standard Web Vitals max session window: <= 1s gap, <= 5s total duration)
     try {
-        var clsValue = 0;
+        var maxClsValue = 0;
+        var sessionValue = 0;
+        var sessionEntries = [];
         new PerformanceObserver(function (list) {
             list.getEntries().forEach(function (entry) {
-                if (!entry.hadRecentInput) {
-                    clsValue += entry.value;
-                    metrics.CLS = clsValue;
+                if (entry.hadRecentInput) {
+                    return;
+                }
+                var firstEntry = sessionEntries[0];
+                var lastEntry = sessionEntries[sessionEntries.length - 1];
+                if (
+                    sessionValue > 0
+                    && lastEntry
+                    && firstEntry
+                    && (entry.startTime - lastEntry.startTime < 1000)
+                    && (entry.startTime - firstEntry.startTime < 5000)
+                ) {
+                    sessionValue += entry.value;
+                    sessionEntries.push(entry);
+                } else {
+                    sessionValue = entry.value;
+                    sessionEntries = [entry];
+                }
+                if (sessionValue > maxClsValue) {
+                    maxClsValue = sessionValue;
+                    metrics.CLS = maxClsValue;
                 }
             });
         }).observe({ type: 'layout-shift', buffered: true });

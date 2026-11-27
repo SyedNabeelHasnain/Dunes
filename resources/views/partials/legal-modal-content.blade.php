@@ -82,8 +82,22 @@
         @endforeach
     </div>
 
+    @php
+        $legalRouteMap = [
+            'terms' => 'terms',
+            'terms-and-conditions' => 'terms',
+            'privacy' => 'privacy',
+            'privacy-policy' => 'privacy',
+            'cookies' => 'cookies',
+            'cookie-policy' => 'cookies',
+            'cancellation' => 'cancellation',
+            'cancellation-policy' => 'cancellation',
+            'refund-policy' => 'cancellation',
+        ];
+        $legalRouteName = $legalRouteMap[strtolower((string) ($page->slug ?? ''))] ?? 'terms';
+    @endphp
     <div class="pt-4 mt-6 border-t border-slate-200 flex justify-between items-center flex-wrap gap-2 text-xs">
-        <a href="{{ localized_route('legal.show', $page->slug) }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline inline-flex items-center gap-1">
+        <a href="{{ localized_route($legalRouteName) }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline inline-flex items-center gap-1">
             <span>View Full Document</span>
             <i class="bi bi-box-arrow-up-right text-[10px]"></i>
         </a>

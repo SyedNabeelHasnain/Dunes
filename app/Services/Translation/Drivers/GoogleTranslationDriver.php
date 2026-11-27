@@ -43,26 +43,44 @@ class GoogleTranslationDriver implements TranslationDriverInterface
             return $text;
         }
 
-        $payload = [
-            'q' => $values,
-            'target' => strtolower(trim($targetLocale)),
-            'source' => strtolower(trim($sourceLocale)),
-            'format' => $isHtml ? 'html' : 'text',
-        ];
+        $translatedTexts = [];
+        $encodedKey = urlencode($this->apiKey);
+        $target = strtolower(trim($targetLocale));
+        $source = strtolower(trim($sourceLocale));
 
-        $response = Http::timeout(30)->post(
-            'https://translation.googleapis.com/language/translate/v2?key='.$this->apiKey,
-            $payload
-        );
+        foreach (array_chunk($values, 100) as $chunk) {
+            $payload = [
+                'q' => $chunk,
+                'target' => $target,
+                'source' => $source,
+                'format' => $isHtml ? 'html' : 'text',
+            ];
 
-        if (! $response->successful()) {
-            $errorMsg = $response->json('error.message') ?? $response->body();
-            Log::error('Google Translation failed: '.$errorMsg, ['status' => $response->status()]);
-            throw new \RuntimeException('Google Translation API Error (HTTP '.$response->status().'): '.$errorMsg);
+            try {
+                $response = Http::timeout(30)->post(
+                    'https://translation.googleapis.com/language/translate/v2?key='.$encodedKey,
+                    $payload
+                );
+            } catch (\Throwable $e) {
+                $safeMsg = $this->scrubKey($e->getMessage());
+                Log::error('Google Translation transport failed: '.$safeMsg);
+                throw new \RuntimeException('Google Translation connection error: '.$safeMsg, 0, $e);
+            }
+
+            if (! $response->successful()) {
+                $errorMsg = $this->scrubKey((string) ($response->json('error.message') ?? $response->body()));
+                Log::error('Google Translation failed: '.$errorMsg, ['status' => $response->status()]);
+                throw new \RuntimeException('Google Translation API Error (HTTP '.$response->status().'): '.$errorMsg);
+            }
+
+            $items = $response->json('data.translations') ?? [];
+            foreach ($items as $item) {
+                $rawText = (string) ($item['translatedText'] ?? '');
+                $translatedTexts[] = $isHtml
+                    ? $rawText
+                    : html_entity_decode($rawText, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
         }
-
-        $items = $response->json('data.translations') ?? [];
-        $translatedTexts = array_map(fn ($item) => html_entity_decode($item['translatedText'] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'), $items);
 
         if ($isSingle) {
             return $translatedTexts[0] ?? $text;
@@ -84,7 +102,7 @@ class GoogleTranslationDriver implements TranslationDriverInterface
 
         try {
             $response = Http::timeout(10)->get(
-                'https://translation.googleapis.com/language/translate/v2/languages?key='.$this->apiKey.'&target=en'
+                'https://translation.googleapis.com/language/translate/v2/languages?key='.urlencode($this->apiKey).'&target=en'
             );
 
             if ($response->successful()) {
@@ -99,13 +117,23 @@ class GoogleTranslationDriver implements TranslationDriverInterface
 
             return [
                 'success' => false,
-                'message' => 'Google Translation API returned HTTP '.$response->status().': '.($response->json('error.message') ?? $response->body()),
+                'message' => 'Google Translation API returned HTTP '.$response->status().': '.$this->scrubKey((string) ($response->json('error.message') ?? $response->body())),
             ];
         } catch (\Throwable $e) {
             return [
                 'success' => false,
-                'message' => 'Failed to connect to Google Translation: '.$e->getMessage(),
+                'message' => 'Failed to connect to Google Translation: '.$this->scrubKey($e->getMessage()),
             ];
         }
+    }
+
+    protected function scrubKey(string $message): string
+    {
+        $scrubbed = (string) preg_replace('/(key=)[^&\s\'"]+/i', '$1[REDACTED]', $message);
+        if ($this->apiKey !== '') {
+            $scrubbed = str_replace([$this->apiKey, urlencode($this->apiKey)], '[REDACTED]', $scrubbed);
+        }
+
+        return $scrubbed;
     }
 }

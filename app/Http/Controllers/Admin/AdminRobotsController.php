@@ -23,9 +23,10 @@ class AdminRobotsController extends Controller
         $content = $this->robots->getCurrentContent();
         $botGroups = RobotsTxtService::BOT_GROUPS;
         $botStates = $this->robots->getBotStates($content);
+        $customDisallows = $this->robots->extractCustomDisallows($content);
         $validationIssues = $this->robots->validateContent($content);
 
-        return view('admin.settings.robots', compact('content', 'botGroups', 'botStates', 'validationIssues'));
+        return view('admin.settings.robots', compact('content', 'botGroups', 'botStates', 'customDisallows', 'validationIssues'));
     }
 
     public function update(Request $request): RedirectResponse

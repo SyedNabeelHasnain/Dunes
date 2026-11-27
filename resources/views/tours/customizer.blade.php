@@ -294,7 +294,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Open red dunes exploration with high-power Yamaha 400cc automatic ATV.
                             </p>
-                            <div class="font-black text-primary text-sm" data-aed="220">+AED 220 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-sm"><span data-aed="220" data-is-addon="true">+AED 220</span> <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="sports" data-name="1000cc Can-Am Buggy (2-Seater)" data-price="550" data-type="flat">
@@ -303,7 +303,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 2-Seater Can-Am Maverick Turbo buggy with roll cage & 4-point racing harness.
                             </p>
-                            <div class="font-black text-primary text-sm" data-aed="550">+AED 550 <span class="text-slate-400 font-normal text-xs">/ vehicle</span></div>
+                            <div class="font-black text-primary text-sm"><span data-aed="550" data-is-addon="true">+AED 550</span> <span class="text-slate-400 font-normal text-xs">/ 2-seater buggy</span></div>
                         </div>
                     </div>
                 </div>
@@ -323,7 +323,7 @@
                                     <span class="text-slate-500 text-[11px] block">No buffet lines, table-side food service</span>
                                 </div>
                             </div>
-                            <div class="font-bold text-primary text-xs whitespace-nowrap" data-aed="60">+AED 60/guest</div>
+                            <div class="font-bold text-primary text-xs whitespace-nowrap"><span data-aed="60" data-is-addon="true">+AED 60</span>/guest</div>
                         </div>
 
                         <div class="custom-addon-item p-4 rounded-2xl bg-white border border-slate-200 hover:border-primary/50 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs" data-addon="shisha" data-name="Private Table Shisha" data-price="50" data-type="flat">
@@ -334,7 +334,7 @@
                                     <span class="text-slate-500 text-[11px] block">Choice of Double Apple, Mint, Grape</span>
                                 </div>
                             </div>
-                            <div class="font-bold text-primary text-xs whitespace-nowrap" data-aed="50">+AED 50/table</div>
+                            <div class="font-bold text-primary text-xs whitespace-nowrap"><span data-aed="50" data-is-addon="true">+AED 50</span>/table</div>
                         </div>
 
                         <div class="custom-addon-item p-4 rounded-2xl bg-white border border-slate-200 hover:border-primary/50 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs" data-addon="falcon" data-name="Falconry Keepsake Photo" data-price="40" data-type="per_person">
@@ -345,7 +345,7 @@
                                     <span class="text-slate-500 text-[11px] block">Hold a trained UAE falcon for iconic photos</span>
                                 </div>
                             </div>
-                            <div class="font-bold text-primary text-xs whitespace-nowrap" data-aed="40">+AED 40/guest</div>
+                            <div class="font-bold text-primary text-xs whitespace-nowrap"><span data-aed="40" data-is-addon="true">+AED 40</span>/guest</div>
                         </div>
 
                         <div class="custom-addon-item p-4 rounded-2xl bg-white border border-slate-200 hover:border-primary/50 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs" data-addon="cake" data-name="Desert Birthday / Anniversary Cake" data-price="80" data-type="flat">
@@ -356,7 +356,7 @@
                                     <span class="text-slate-500 text-[11px] block">Chocolate or Vanilla with personalized message</span>
                                 </div>
                             </div>
-                            <div class="font-bold text-primary text-xs whitespace-nowrap" data-aed="80">+AED 80/cake</div>
+                            <div class="font-bold text-primary text-xs whitespace-nowrap"><span data-aed="80" data-is-addon="true">+AED 80</span>/cake</div>
                         </div>
                     </div>
                 </div>
@@ -851,7 +851,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 sports_name: state.sports.name,
                 sports_price: state.sports.price,
                 sports_type: state.sports.type,
-                addons: state.addons.map(a => ({ key: a.key, name: a.name, price: a.price, type: a.type })),
+                addons: state.addons.map(a => ({ id: a.key, key: a.key, name: a.name, price: a.price, type: a.type })),
                 adults: state.adults,
                 children: state.children,
                 subtotal: subtotalVal,

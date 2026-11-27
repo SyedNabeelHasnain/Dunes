@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\BookingAdminNotification;
-use App\Mail\BookingNotification;
+use App\Models\Backlink;
 use App\Models\Booking;
 use App\Models\BookingPayment;
 use App\Models\Coupon;
@@ -14,9 +13,9 @@ use App\Services\SettingsService;
 use App\Services\ZiinaPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class ZiinaWebhookController extends Controller
 {
@@ -64,6 +63,12 @@ class ZiinaWebhookController extends Controller
             ]);
 
             return response()->json(['error' => 'Invalid signature'], 401);
+        }
+
+        // Deduplicate rapid replays of the exact same signed payload
+        $replayKey = 'ziina_webhook_evt_'.hash('sha256', $rawPayload);
+        if (! Cache::add($replayKey, 1, 300)) {
+            return response()->json(['success' => true, 'message' => 'Duplicate webhook event ignored'], 200);
         }
 
         // 2. Parse Payload
@@ -118,6 +123,18 @@ class ZiinaWebhookController extends Controller
 
         // 5. Process Payment Completion atomically
         if ($status === 'completed') {
+            $intentCurrency = strtoupper((string) ($intent['currency_code'] ?? $intent['currency'] ?? 'AED'));
+            $intentTestMismatch = isset($intent['test']) && ((bool) $intent['test'] !== $this->ziina->isTestMode());
+            if ($intentCurrency !== 'AED' || $intentTestMismatch) {
+                Log::warning('Ziina Webhook: Currency or test-mode mismatch rejected', [
+                    'intent_id' => $intentId,
+                    'currency' => $intentCurrency,
+                    'test_flag' => $intent['test'] ?? null,
+                ]);
+
+                return response()->json(['error' => 'Payment currency or mode mismatch'], 422);
+            }
+
             $totalPaid = 0.00;
             $newPaymentStatus = 'paid';
             $shouldNotify = false;
@@ -129,23 +146,28 @@ class ZiinaWebhookController extends Controller
                 $lockedPayment = $paymentRecord ? BookingPayment::where('id', $paymentRecord->id)->lockForUpdate()->first() : null;
 
                 $wasCompleted = ($lockedPayment && $lockedPayment->status === 'completed')
-                    || (! $lockedPayment && $lockedBooking && $lockedBooking->status === 'confirmed' && $lockedBooking->payment_status === 'paid');
+                    || (! $lockedPayment && $lockedBooking && $lockedBooking->status === 'confirmed' && in_array($lockedBooking->payment_status, ['paid', 'partial'], true));
 
                 if ($lockedPayment && $lockedPayment->status !== 'completed') {
                     $lockedPayment->update(['status' => 'completed']);
                 }
 
-                $totalPaid = BookingPayment::where('booking_id', $lockedBooking->id)
+                $totalPaid = (float) BookingPayment::where('booking_id', $lockedBooking->id)
                     ->where('status', 'completed')
                     ->sum('amount');
 
-                if ($totalPaid <= 0 && isset($intent['amount'])) {
-                    $totalPaid = (float) ($intent['amount'] / 100);
+                if ($totalPaid <= 0 && isset($intent['amount']) && is_numeric($intent['amount'])) {
+                    $totalPaid = round((float) $intent['amount'] / 100, 2);
+                } elseif (isset($intent['amount']) && is_numeric($intent['amount']) && $lockedPayment) {
+                    $intentPaidAed = round((float) $intent['amount'] / 100, 2);
+                    if ($intentPaidAed > 0 && $intentPaidAed + 0.01 < (float) $lockedPayment->amount) {
+                        $totalPaid = min($totalPaid, $intentPaidAed);
+                    }
                 }
 
-                $remBalance = max(0, (float) $lockedBooking->total - (float) $totalPaid);
+                $remBalance = max(0, round((float) $lockedBooking->total - $totalPaid, 2));
                 $method = $lockedBooking->payment_method;
-                $newPaymentStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
+                $newPaymentStatus = ($remBalance <= 0.01) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
                 $bookingStatus = ($method === 'full' && $remBalance > 0.01) ? 'pending' : 'confirmed';
 
                 $lockedBooking->update([
@@ -156,32 +178,38 @@ class ZiinaWebhookController extends Controller
                     'payment_amount' => $totalPaid,
                 ]);
 
-                // Record coupon usage and trigger notification only if this is the first completion event
-                if (! $wasCompleted) {
+                // Record coupon usage, backlink attribution, and trigger notification only if this is the first completion event
+                if (! $wasCompleted && $bookingStatus === 'confirmed') {
                     $shouldNotify = true;
                     $this->recordCouponUsage($lockedBooking);
+                    $this->recordBacklinkAttribution($lockedBooking);
                 }
             });
 
             // Dispatch emails & Meta CAPI outside the transaction
             if ($shouldNotify) {
+                $freshBooking = $booking->fresh();
                 $emailType = ($newPaymentStatus === 'partial') ? 'booking_advance' : 'booking_full';
-                $this->sendEmailNotification($emailType, $booking->fresh());
+                $this->sendEmailNotification($emailType, $freshBooking);
 
                 try {
                     $custom = [
-                        'value' => (float) $booking->total,
+                        'value' => (float) $freshBooking->total,
                         'currency' => 'AED',
-                        'content_ids' => ['TOUR-'.$booking->tour_id],
+                        'content_ids' => ['TOUR-'.$freshBooking->tour_id],
                         'content_type' => 'product',
-                        'contents' => [['id' => 'TOUR-'.$booking->tour_id, 'quantity' => 1]],
-                        'coupon' => $booking->coupon_code,
-                        'discount_amount' => (float) $booking->discount_amount,
+                        'contents' => [['id' => 'TOUR-'.$freshBooking->tour_id, 'quantity' => 1]],
+                        'coupon' => $freshBooking->coupon_code,
+                        'discount_amount' => (float) $freshBooking->discount_amount,
                     ];
                     $this->metaCapi->dispatchEvent('Purchase', [
-                        'event_id' => 'BOOK-'.$booking->reference,
-                        'email' => $booking->email,
-                        'phone' => $booking->phone,
+                        'event_id' => 'BOOK-'.$freshBooking->reference,
+                        'email' => $freshBooking->email,
+                        'phone' => $freshBooking->phone,
+                        'client_ip' => $freshBooking->ip_address,
+                        'user_agent' => $freshBooking->user_agent,
+                        'event_source_url' => $freshBooking->landing_page ?: url('/'),
+                        'fbc' => $freshBooking->fbclid ? ('fb.1.'.time().'.'.$freshBooking->fbclid) : null,
                         'custom_data' => $custom,
                     ]);
                 } catch (\Throwable $e) {
@@ -241,11 +269,13 @@ class ZiinaWebhookController extends Controller
             ]);
         }
 
-        // Other statuses (pending, processing, etc.)
+        // Other statuses (pending, processing, etc.) — never downgrade already-paid bookings
         if ($paymentRecord && $paymentRecord->status !== 'completed') {
             $paymentRecord->update(['status' => $status]);
         }
-        $booking->update(['ziina_status' => $status]);
+        if (! in_array($booking->payment_status, ['paid', 'partial'], true) && $booking->ziina_status !== 'completed') {
+            $booking->update(['ziina_status' => $status]);
+        }
 
         return response()->json([
             'success' => true,
@@ -264,11 +294,10 @@ class ZiinaWebhookController extends Controller
         }
 
         try {
-            $alreadyRecorded = CouponUsage::where('booking_id', $booking->id)->exists();
-            if (! $alreadyRecorded) {
-                CouponUsage::create([
+            $usage = CouponUsage::firstOrCreate(
+                ['booking_id' => $booking->id],
+                [
                     'coupon_id' => $booking->coupon_id,
-                    'booking_id' => $booking->id,
                     'booking_reference' => $booking->reference,
                     'customer_name' => $booking->name,
                     'customer_email' => strtolower($booking->email),
@@ -277,15 +306,40 @@ class ZiinaWebhookController extends Controller
                     'order_subtotal' => (float) $booking->original_total,
                     'order_final_total' => (float) $booking->total,
                     'used_at' => now(),
-                ]);
+                ]
+            );
 
-                $coupon = Coupon::find($booking->coupon_id);
+            if ($usage->wasRecentlyCreated) {
+                $coupon = Coupon::where('id', $booking->coupon_id)->lockForUpdate()->first();
                 if ($coupon) {
                     $coupon->increment('used_count');
                 }
             }
         } catch (\Throwable $e) {
             Log::error("Ziina Webhook: Failed to record coupon usage for {$booking->reference}: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * Record backlink conversion attribution upon confirmed webhook payment.
+     */
+    protected function recordBacklinkAttribution(Booking $booking): void
+    {
+        if (! $booking->backlink_id) {
+            return;
+        }
+
+        try {
+            $backlink = Backlink::find($booking->backlink_id);
+            if ($backlink) {
+                $backlink->increment('bookings_count');
+                $bookingTotal = max(0, (float) $booking->total);
+                if ($bookingTotal > 0) {
+                    $backlink->increment('revenue_generated_aed', $bookingTotal);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error("Ziina Webhook: Failed to attribute backlink for {$booking->reference}: ".$e->getMessage());
         }
     }
 

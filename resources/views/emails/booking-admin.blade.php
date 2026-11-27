@@ -62,9 +62,11 @@
                     Customer Phone
                 </td>
                 <td style="padding: 9px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
-                    <a href="tel:{{ $booking->phone }}" style="color: #2563eb; font-weight: 700; text-decoration: none;">{{ $booking->phone ?? 'N/A' }}</a>
                     @if(!empty($booking->phone))
-                        &bull; <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $booking->phone) }}" target="_blank" style="color: #16a34a; font-size: 11px; font-weight: 700; text-decoration: underline;">Open WhatsApp</a>
+                        <a href="tel:{{ $booking->phone }}" style="color: #2563eb; font-weight: 700; text-decoration: none;">{{ $booking->phone }}</a>
+                        &bull; <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', (string) $booking->phone) }}" target="_blank" rel="noopener noreferrer" style="color: #16a34a; font-size: 11px; font-weight: 700; text-decoration: underline;">Open WhatsApp</a>
+                    @else
+                        N/A
                     @endif
                 </td>
             </tr>
@@ -73,7 +75,11 @@
                     Customer Email
                 </td>
                 <td style="padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px;">
-                    <a href="mailto:{{ $booking->email }}" style="color: #2563eb; text-decoration: none;">{{ $booking->email ?? 'N/A' }}</a>
+                    @if(!empty($booking->email))
+                        <a href="mailto:{{ $booking->email }}" style="color: #2563eb; text-decoration: none;">{{ $booking->email }}</a>
+                    @else
+                        N/A
+                    @endif
                 </td>
             </tr>
             @if(!empty($booking->traffic_channel))

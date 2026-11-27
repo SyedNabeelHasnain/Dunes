@@ -8,7 +8,6 @@ use App\Models\BlogTag;
 use App\Models\Tour;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
@@ -25,10 +24,11 @@ class BlogController extends Controller
 
         $query = BlogPost::where('status', 'published')->with(['category', 'tags'])->orderBy('published_at', 'desc');
 
+        $matchedCategory = null;
         if ($categorySlug) {
-            $category = BlogCategory::where('slug', $categorySlug)->first();
-            if ($category) {
-                $query->where('category_id', $category->id);
+            $matchedCategory = BlogCategory::where('slug', $categorySlug)->first();
+            if ($matchedCategory) {
+                $query->where('category_id', $matchedCategory->id);
             }
         }
 
@@ -42,10 +42,12 @@ class BlogController extends Controller
         }
 
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%");
+            $escapedSearch = addcslashes((string) $search, '%_!');
+            $likePattern = "%{$escapedSearch}%";
+            $query->where(function ($q) use ($likePattern) {
+                $q->whereRaw("title LIKE ? ESCAPE '!'", [$likePattern])
+                    ->orWhereRaw("content LIKE ? ESCAPE '!'", [$likePattern])
+                    ->orWhereRaw("excerpt LIKE ? ESCAPE '!'", [$likePattern]);
             });
         }
 
@@ -83,14 +85,14 @@ class BlogController extends Controller
             $defaultDesc = 'Read insider travel tips, desert safari packing guides, buggy safety advice, and Dubai itinerary recommendations by Dunes Discovery Tourism.';
             $defaultKeys = 'dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai';
 
-            $pageTitle = $categorySlug
-                ? ucwords(str_replace('-', ' ', $categorySlug))." Guides ({$currentYear}) | Dunes Discovery Blog"
+            $pageTitle = $matchedCategory
+                ? $matchedCategory->name." Guides ({$currentYear}) | Dunes Discovery Blog"
                 : ($settingsService->get('seo_blog_title') ?: $defaultTitle);
             $pageDesc = $settingsService->get('seo_blog_description') ?: $defaultDesc;
             $pageKeys = $settingsService->get('seo_blog_keywords') ?: $defaultKeys;
         } else {
-            $pageTitle = $categorySlug
-                ? ucwords(str_replace('-', ' ', $categorySlug))." ({$currentYear}) | ".__('ui.nav.blog')
+            $pageTitle = $matchedCategory
+                ? $matchedCategory->name." ({$currentYear}) | ".__('ui.nav.blog')
                 : ($settingsService->get("seo_blog_title_{$currentLocale}") ?: __('ui.seo.blog_title', ['year' => $currentYear]));
             $pageDesc = $settingsService->get("seo_blog_description_{$currentLocale}") ?: __('ui.seo.blog_description');
             $pageKeys = $settingsService->get("seo_blog_keywords_{$currentLocale}") ?: __('ui.seo.blog_keywords');
@@ -216,7 +218,7 @@ class BlogController extends Controller
 
         if ($currentLocale && $currentLocale !== 'en' && ! empty($processedContent)) {
             $processedContent = (string) preg_replace(
-                '#href=(["\'])/(?!'.$currentLocale.'(/|$)|admin|api|ajax|images|assets|build|storage|http)#i',
+                '#href=(["\'])/(?!/|'.preg_quote($currentLocale, '#').'(/|$)|admin|api|ajax|images|assets|build|storage|uploads|feeds|booking|driver|unsubscribe|http)#i',
                 'href=$1/'.$currentLocale.'/',
                 $processedContent
             );

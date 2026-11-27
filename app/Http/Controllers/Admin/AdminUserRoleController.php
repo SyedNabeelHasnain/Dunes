@@ -71,8 +71,8 @@ class AdminUserRoleController extends Controller
             'permissions.*' => ['string', Rule::in($validPermissions)],
         ]);
 
-        if ($user->id === auth()->id() && $validated['role'] !== User::ROLE_SUPER_ADMIN) {
-            return back()->withErrors(['role' => 'You cannot downgrade your own Super Administrator role.']);
+        if ($user->id === auth()->id() && $validated['role'] !== $user->normalizedRole()) {
+            return back()->withErrors(['role' => 'You cannot modify your own role. Another Super Administrator must make this change.']);
         }
 
         if ($user->role === User::ROLE_SUPER_ADMIN && $validated['role'] !== User::ROLE_SUPER_ADMIN) {

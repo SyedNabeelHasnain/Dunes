@@ -57,7 +57,7 @@
 
                 <!-- Visual Mini Thumbnail Frame -->
                 <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 relative mb-4 h-40">
-                    <iframe src="{{ route('admin.email-templates.preview', $template->id) }}" class="w-full h-full border-0 pointer-events-none" style="transform: scale(0.65); transform-origin: top left; width: 154%; height: 154%; pointer-events: none;" loading="lazy"></iframe>
+                    <iframe src="{{ route('admin.email-templates.preview', $template->id) }}" sandbox="" class="w-full h-full border-0 pointer-events-none" style="transform: scale(0.65); transform-origin: top left; width: 154%; height: 154%; pointer-events: none;" loading="lazy"></iframe>
                     <div class="absolute inset-0 bg-transparent cursor-pointer" @click="previewTitle = @js($template->name); previewUrl = '{{ route('admin.email-templates.preview', $template->id) }}'; openPreview = true;"></div>
                 </div>
 
@@ -133,7 +133,7 @@
                 </div>
                 <div class="p-4 sm:p-6 bg-slate-100 flex justify-center items-center" style="min-height: 540px;">
                     <div class="w-full transition-all duration-300" :style="previewDevice === 'mobile' ? 'max-width: 420px;' : 'max-width: 100%;'">
-                        <iframe :src="previewUrl" class="w-full rounded-2xl shadow-md border border-slate-200 bg-white" style="height: 650px;" loading="lazy"></iframe>
+                        <iframe :src="previewUrl" sandbox="" class="w-full rounded-2xl shadow-md border border-slate-200 bg-white" style="height: 650px;" loading="lazy"></iframe>
                     </div>
                 </div>
             </div>

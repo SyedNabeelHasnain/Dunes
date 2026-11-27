@@ -72,29 +72,42 @@ class DeepLTranslationDriver implements TranslationDriverInterface
             return $text;
         }
 
-        $payload = [
-            'text' => $values,
-            'target_lang' => $this->mapLocale($targetLocale),
-            'source_lang' => strtoupper(trim($sourceLocale)),
-        ];
+        $translatedTexts = [];
+        $targetLang = $this->mapLocale($targetLocale);
+        $sourceLang = strtoupper(trim($sourceLocale));
 
-        if ($isHtml) {
-            $payload['tag_handling'] = 'html';
+        foreach (array_chunk($values, 45) as $chunk) {
+            $payload = [
+                'text' => $chunk,
+                'target_lang' => $targetLang,
+                'source_lang' => $sourceLang,
+            ];
+
+            if ($isHtml) {
+                $payload['tag_handling'] = 'html';
+            }
+
+            try {
+                $response = Http::withHeaders([
+                    'Authorization' => 'DeepL-Auth-Key '.$this->authKey,
+                    'Content-Type' => 'application/json',
+                ])->timeout(60)->post($this->getBaseUrl().'/translate', $payload);
+            } catch (\Throwable $e) {
+                Log::error('DeepL Translation transport failed: '.$e->getMessage());
+                throw new \RuntimeException('DeepL Translation connection error: '.$e->getMessage(), 0, $e);
+            }
+
+            if (! $response->successful()) {
+                $errorMsg = $response->json('message') ?? $response->body();
+                Log::error('DeepL Translation failed: '.$errorMsg, ['status' => $response->status()]);
+                throw new \RuntimeException('DeepL Translation API Error (HTTP '.$response->status().'): '.$errorMsg);
+            }
+
+            $translatedItems = $response->json('translations') ?? [];
+            foreach ($translatedItems as $item) {
+                $translatedTexts[] = $item['text'] ?? '';
+            }
         }
-
-        $response = Http::withHeaders([
-            'Authorization' => 'DeepL-Auth-Key '.$this->authKey,
-            'Content-Type' => 'application/json',
-        ])->timeout(60)->post($this->getBaseUrl().'/translate', $payload);
-
-        if (! $response->successful()) {
-            $errorMsg = $response->json('message') ?? $response->body();
-            Log::error('DeepL Translation failed: '.$errorMsg, ['status' => $response->status()]);
-            throw new \RuntimeException('DeepL Translation API Error (HTTP '.$response->status().'): '.$errorMsg);
-        }
-
-        $translatedItems = $response->json('translations') ?? [];
-        $translatedTexts = array_map(fn ($item) => $item['text'] ?? '', $translatedItems);
 
         if ($isSingle) {
             return $translatedTexts[0] ?? $text;

@@ -51,22 +51,37 @@ class AdminTourController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'category_id' => 'required|integer',
+            'category_id' => 'required|integer|exists:categories,id',
             'short_desc' => 'required',
             'full_desc' => 'required',
             'duration' => 'required|string|max:255',
             'pickup_time' => 'nullable|string|max:255',
             'dropoff_time' => 'nullable|string|max:255',
+            'video_url' => 'nullable|string|max:500',
+            'rating' => 'nullable|numeric|min:1|max:5',
+            'review_count' => 'nullable|integer|min:0',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
             'hero_image' => $request->hasFile('hero_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
             'thumb_image' => $request->hasFile('thumb_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
             'gallery_images' => 'nullable|array',
-            'gallery_images.*' => 'nullable',
+            'gallery_images.*' => [
+                'nullable',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        $ext = strtolower((string) ($value->guessExtension() ?: $value->getClientOriginalExtension()));
+                        if (! in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'avif'], true) || $value->getSize() > 8388608) {
+                            $fail('Each gallery image upload must be a valid JPG, PNG, WebP, or AVIF image under 8MB.');
+                        }
+                    } elseif (! is_string($value) || strlen($value) > 500) {
+                        $fail('Each gallery image reference must be a valid path string.');
+                    }
+                },
+            ],
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image', 'gallery_images', 'remove_gallery_images']),
+            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image', 'gallery_images', 'gallery_images_submitted', 'remove_gallery_images']),
             ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
         );
         $baseSlug = Str::slug($this->extractSlugSource($request->name));
@@ -121,6 +136,7 @@ class AdminTourController extends Controller
 
         // Sync Tiers & Addons
         if ($request->has('tiers')) {
+            $hasChildPriceCol = \Illuminate\Support\Facades\Schema::hasColumn('tour_tiers', 'child_price');
             $tiersData = [];
             foreach ($request->input('tiers') as $tierId => $pivot) {
                 if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
@@ -129,7 +145,7 @@ class AdminTourController extends Controller
                         'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
                         'price_type' => $pivot['price_type'] ?? 'per person',
                     ];
-                    if (isset($pivot['child_price']) && $pivot['child_price'] !== '') {
+                    if ($hasChildPriceCol && isset($pivot['child_price']) && $pivot['child_price'] !== '') {
                         $tierRow['child_price'] = (float) $pivot['child_price'];
                     }
                     if (isset($pivot['guest_count']) && $pivot['guest_count'] !== '') {
@@ -181,23 +197,39 @@ class AdminTourController extends Controller
 
         $request->validate([
             'name' => 'required',
-            'category_id' => 'required|integer',
+            'category_id' => 'required|integer|exists:categories,id',
             'short_desc' => 'required',
             'full_desc' => 'required',
             'duration' => 'required|string|max:255',
             'pickup_time' => 'nullable|string|max:255',
             'dropoff_time' => 'nullable|string|max:255',
+            'video_url' => 'nullable|string|max:500',
+            'rating' => 'nullable|numeric|min:1|max:5',
+            'review_count' => 'nullable|integer|min:0',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
             'hero_image' => $request->hasFile('hero_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
             'thumb_image' => $request->hasFile('thumb_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
             'gallery_images' => 'nullable|array',
-            'gallery_images.*' => 'nullable',
+            'gallery_images.*' => [
+                'nullable',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        $ext = strtolower((string) ($value->guessExtension() ?: $value->getClientOriginalExtension()));
+                        if (! in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'avif'], true) || $value->getSize() > 8388608) {
+                            $fail('Each gallery image upload must be a valid JPG, PNG, WebP, or AVIF image under 8MB.');
+                        }
+                    } elseif (! is_string($value) || strlen($value) > 500) {
+                        $fail('Each gallery image reference must be a valid path string.');
+                    }
+                },
+            ],
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image', 'gallery_images', 'remove_gallery_images']),
-            ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
+            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image', 'gallery_images', 'gallery_images_submitted', 'remove_gallery_images']),
+            ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords'],
+            $tour
         );
         if ($request->filled('slug') || empty($tour->slug)) {
             $slugSource = $request->filled('slug') ? $request->input('slug') : $this->extractSlugSource($request->name);
@@ -250,6 +282,8 @@ class AdminTourController extends Controller
                 }
             }
             $data['gallery_images'] = array_values(array_unique($currentGallery));
+        } elseif ($request->boolean('gallery_images_submitted')) {
+            $data['gallery_images'] = [];
         } elseif ($request->has('remove_gallery_images') && is_array($request->remove_gallery_images)) {
             $currentGallery = is_array($tour->gallery_images) ? $tour->gallery_images : [];
             $data['gallery_images'] = array_values(array_diff($currentGallery, $request->remove_gallery_images));
@@ -267,6 +301,7 @@ class AdminTourController extends Controller
 
         // Sync Tiers & Addons
         if ($request->has('tiers')) {
+            $hasChildPriceCol = \Illuminate\Support\Facades\Schema::hasColumn('tour_tiers', 'child_price');
             $tiersData = [];
             foreach ($request->input('tiers') as $tierId => $pivot) {
                 if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
@@ -275,7 +310,7 @@ class AdminTourController extends Controller
                         'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
                         'price_type' => $pivot['price_type'] ?? 'per person',
                     ];
-                    if (isset($pivot['child_price']) && $pivot['child_price'] !== '') {
+                    if ($hasChildPriceCol && isset($pivot['child_price']) && $pivot['child_price'] !== '') {
                         $tierRow['child_price'] = (float) $pivot['child_price'];
                     }
                     if (isset($pivot['guest_count']) && $pivot['guest_count'] !== '') {
@@ -340,6 +375,8 @@ class AdminTourController extends Controller
             'description' => 'nullable|string',
             'guest_count' => 'nullable|integer|min:1|max:100',
             'icon' => 'nullable|string|max:100',
+            'badge' => 'nullable|string|max:100',
+            'color' => 'nullable|string|max:20',
             'is_popular' => 'nullable',
             'status' => 'required|string|in:active,inactive',
             'priority' => 'required|integer',
@@ -357,6 +394,8 @@ class AdminTourController extends Controller
             'description' => $request->description,
             'guest_count' => $request->filled('guest_count') ? (int) $request->guest_count : 1,
             'icon' => $request->icon ?: 'star-fill',
+            'badge' => $request->input('badge'),
+            'color' => $request->input('color'),
             'is_popular' => $request->has('is_popular') ? 1 : 0,
             'status' => $request->status,
             'priority' => (int) $request->priority,
@@ -381,6 +420,8 @@ class AdminTourController extends Controller
             'description' => 'nullable|string',
             'guest_count' => 'nullable|integer|min:1|max:100',
             'icon' => 'nullable|string|max:100',
+            'badge' => 'nullable|string|max:100',
+            'color' => 'nullable|string|max:20',
             'is_popular' => 'nullable',
             'status' => 'required|string|in:active,inactive',
             'priority' => 'required|integer',
@@ -393,6 +434,8 @@ class AdminTourController extends Controller
             'description' => $request->description,
             'guest_count' => $request->filled('guest_count') ? (int) $request->guest_count : 1,
             'icon' => $request->icon ?: 'star-fill',
+            'badge' => $request->has('badge') ? $request->input('badge') : $tier->badge,
+            'color' => $request->has('color') ? $request->input('color') : $tier->color,
             'is_popular' => $request->has('is_popular') ? 1 : 0,
             'status' => $request->status,
             'priority' => (int) $request->priority,
@@ -548,7 +591,7 @@ class AdminTourController extends Controller
      */
     public function pricing()
     {
-        $tours = Tour::where('status', 'active')->with('tiers')->orderBy('priority', 'asc')->get();
+        $tours = Tour::where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc')->get();
         $tiers = Tier::where('status', 'active')->orderBy('priority', 'asc')->get();
 
         return view('admin.pricing.index', compact('tours', 'tiers'));
@@ -559,10 +602,23 @@ class AdminTourController extends Controller
      */
     public function updatePricing(Request $request)
     {
+        $request->validate([
+            'pricing' => 'nullable|array',
+            'pricing.*' => 'array',
+            'pricing.*.*.price' => 'nullable|numeric|min:0',
+            'pricing.*.*.old_price' => 'nullable|numeric|min:0',
+            'pricing.*.*.child_price' => 'nullable|numeric|min:0',
+            'pricing.*.*.guest_count' => 'nullable|integer|min:1|max:500',
+            'pricing.*.*.price_type' => 'nullable|string|max:50',
+        ]);
+
         $pricing = $request->input('pricing', []);
+        $hasChildPriceCol = \Illuminate\Support\Facades\Schema::hasColumn('tour_tiers', 'child_price');
+        $tourIds = array_map('intval', array_keys($pricing));
+        $toursById = ! empty($tourIds) ? Tour::whereIn('id', $tourIds)->get()->keyBy('id') : collect();
 
         foreach ($pricing as $tourId => $tiers) {
-            $tour = Tour::find($tourId);
+            $tour = $toursById->get((int) $tourId);
             if ($tour) {
                 $existingPivots = \Illuminate\Support\Facades\DB::table('tour_tiers')
                     ->where('tour_id', $tour->id)
@@ -578,10 +634,12 @@ class AdminTourController extends Controller
                             'old_price' => ! empty($prices['old_price']) ? (float) $prices['old_price'] : null,
                             'price_type' => $prices['price_type'] ?? ($prev->price_type ?? 'per person'),
                         ];
-                        if (isset($prices['child_price']) && $prices['child_price'] !== '') {
-                            $tierRow['child_price'] = (float) $prices['child_price'];
-                        } elseif ($prev && isset($prev->child_price) && $prev->child_price !== null) {
-                            $tierRow['child_price'] = (float) $prev->child_price;
+                        if ($hasChildPriceCol) {
+                            if (isset($prices['child_price']) && $prices['child_price'] !== '') {
+                                $tierRow['child_price'] = (float) $prices['child_price'];
+                            } elseif ($prev && isset($prev->child_price) && $prev->child_price !== null) {
+                                $tierRow['child_price'] = (float) $prev->child_price;
+                            }
                         }
                         if (isset($prices['guest_count']) && $prices['guest_count'] !== '') {
                             $tierRow['guest_count'] = (int) $prices['guest_count'];
@@ -640,7 +698,7 @@ class AdminTourController extends Controller
             'description' => 'nullable',
         ]);
 
-        $data = $this->normalizeLocalizedData($request->all(), ['title', 'description']);
+        $data = $this->normalizeLocalizedData($request->all(), ['title', 'description'], $itinerary);
         $itinerary->update($data);
 
         $this->clearTourCaches();
@@ -680,6 +738,49 @@ class AdminTourController extends Controller
         $this->clearTourCaches();
 
         return response()->json(['success' => true, 'message' => 'Content item created successfully.', 'item' => $item]);
+    }
+
+    /**
+     * Update a global content item.
+     */
+    public function updateContentItem(Request $request, int $id)
+    {
+        $item = ContentItem::findOrFail($id);
+
+        $request->validate([
+            'type' => 'nullable|string|in:inclusion,exclusion,highlight,not_allowed',
+            'title' => 'required',
+            'description' => 'nullable',
+            'icon' => 'nullable|string|max:255',
+            'priority' => 'nullable|integer',
+        ]);
+
+        $data = $this->normalizeLocalizedData($request->all(), ['title', 'description'], $item);
+        if (! $request->filled('type')) {
+            unset($data['type']);
+        }
+        if (! $request->filled('priority')) {
+            unset($data['priority']);
+        }
+        $item->update($data);
+
+        $this->clearTourCaches();
+
+        return response()->json(['success' => true, 'message' => 'Content item updated successfully.', 'item' => $item]);
+    }
+
+    /**
+     * Delete a global content item and detach from all tours.
+     */
+    public function deleteContentItem(int $id)
+    {
+        $item = ContentItem::findOrFail($id);
+        $item->tours()->detach();
+        $item->delete();
+
+        $this->clearTourCaches();
+
+        return response()->json(['success' => true, 'message' => 'Content item deleted successfully.']);
     }
 
     /**
@@ -770,6 +871,61 @@ class AdminTourController extends Controller
     }
 
     /**
+     * Update a Category by ID.
+     */
+    public function updateCategory(Request $request, int $id)
+    {
+        $category = Category::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'icon' => 'nullable|string|max:100',
+            'priority' => 'nullable|integer',
+        ]);
+
+        $newName = trim((string) $request->input('name'));
+        $newSlug = Str::slug($newName) ?: 'category-'.$category->id;
+
+        if (Category::where('slug', $newSlug)->where('id', '!=', $category->id)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Another category already uses this name/slug.'], 422);
+        }
+
+        $category->setTranslation('name', 'en', $newName);
+        $category->slug = $newSlug;
+        if ($request->has('icon')) {
+            $category->icon = $request->input('icon');
+        }
+        if ($request->filled('priority')) {
+            $category->priority = (int) $request->input('priority');
+        }
+        $category->save();
+
+        $this->clearTourCaches();
+
+        return response()->json(['success' => true, 'message' => 'Category updated successfully.', 'category' => $category]);
+    }
+
+    /**
+     * Delete a Category by ID (guarded against active tour references).
+     */
+    public function deleteCategory(int $id)
+    {
+        $category = Category::withCount('tours')->findOrFail($id);
+
+        if ($category->tours_count > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => "Cannot delete category '{$category->name}' because {$category->tours_count} tour(s) are assigned to it. Reassign those tours first.",
+            ], 422);
+        }
+
+        $category->delete();
+        $this->clearTourCaches();
+
+        return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
+    }
+
+    /**
      * Toggle active/inactive status of a tour.
      */
     public function toggleStatus(string $id)
@@ -796,7 +952,9 @@ class AdminTourController extends Controller
         Cache::forget('site_home_cache');
         Cache::forget('site_active_tours_search');
         Cache::forget('site_search_modal_catalog_v4');
-        foreach (['en', 'ar', 'ru', 'es', 'it'] as $loc) {
+        Cache::forget('feeds_tours_rss_xml');
+        $locales = array_unique(array_merge(['en', 'ar', 'ru', 'es', 'it'], Language::getActiveCodes()));
+        foreach ($locales as $loc) {
             Cache::forget('site_active_tours_search_'.$loc);
             Cache::forget('site_search_modal_catalog_v4_'.$loc);
         }

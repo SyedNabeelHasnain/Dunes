@@ -132,8 +132,8 @@
 <!-- Main Gallery Section with Alpine Filter & Lightbox -->
 <section class="py-10 sm:py-16 bg-white min-h-screen" 
     x-data="{
-        category: '{{ $category ?? 'all' }}',
-        source: '{{ $source ?? 'all' }}',
+        category: @js($category ?? 'all'),
+        source: @js($source ?? 'all'),
         activeItem: null,
         lightboxOpen: false,
         items: @js($filteredItems),

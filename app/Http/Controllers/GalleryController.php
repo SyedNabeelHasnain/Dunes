@@ -24,18 +24,28 @@ class GalleryController extends Controller
      */
     public function index(Request $request)
     {
-        $category = $request->query('category', 'all');
-        $source = $request->query('source', 'all');
-        $type = $request->query('type', 'all');
+        $allowedCategories = array_merge(['all'], array_keys(ReviewMediaGalleryService::CATEGORIES));
+        $allowedSources = ['all', 'google', 'tripadvisor', 'direct_ugc', 'direct', 'website', 'ddt_moments', 'video_review', 'curated'];
+        $allowedTypes = ['all', 'photo', 'video'];
+
+        $rawCategory = (string) $request->query('category', 'all');
+        $rawSource = (string) $request->query('source', 'all');
+        $rawType = (string) $request->query('type', 'all');
+
+        $category = in_array($rawCategory, $allowedCategories, true) ? $rawCategory : 'all';
+        $source = in_array($rawSource, $allowedSources, true) ? $rawSource : 'all';
+        $type = in_array($rawType, $allowedTypes, true) ? $rawType : 'all';
 
         $allVerifiedItems = $this->galleryService->getGalleryItems();
         $categoryStats = $this->galleryService->getCategoryStats($allVerifiedItems);
 
-        $filteredItems = $this->galleryService->getGalleryItems([
-            'category' => $category,
-            'source' => $source,
-            'type' => $type,
-        ]);
+        $filteredItems = ($category === 'all' && $source === 'all' && $type === 'all')
+            ? $allVerifiedItems
+            : $this->galleryService->getGalleryItems([
+                'category' => $category,
+                'source' => $source,
+                'type' => $type,
+            ]);
 
         $categories = ReviewMediaGalleryService::CATEGORIES;
 
@@ -78,6 +88,7 @@ class GalleryController extends Controller
         try {
             $videoReviews = $this->galleryService->getCustomerVideoReviews();
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('GalleryController video reviews fetch failed: '.$e->getMessage());
             $videoReviews = [];
         }
 
@@ -120,9 +131,9 @@ class GalleryController extends Controller
                 '@type' => 'VideoObject',
                 '@id' => $canonical . '#video_' . ($item['id'] ?? md5($item['url'])),
                 'name' => $item['title'] ?? ($item['review_title'] ?: 'Dubai Desert Safari Customer Video Review'),
-                'description' => $item['description'] ?: ($item['caption'] ?: $item['review_text']),
+                'description' => ! empty($item['description']) ? $item['description'] : (! empty($item['caption']) ? $item['caption'] : ($item['review_text'] ?? 'Dubai Desert Safari Guest Video Review')),
                 'thumbnailUrl' => [
-                    $item['poster_url'] ?? $item['thumbnail_url'],
+                    $item['poster_url'] ?? $item['thumbnail_url'] ?? asset('images/desert-safari-poster.avif'),
                 ],
                 'uploadDate' => ! empty($item['upload_date_iso'])
                     ? $item['upload_date_iso']

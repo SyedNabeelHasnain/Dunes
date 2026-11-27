@@ -1,65 +1,6 @@
 @extends('layouts.app')
 
-@section('content')
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebPage",
-      "@id": {!! json_encode($canonical . '#legalpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
-      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "name": {!! json_encode($pageTitle ?? $page->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "description": {!! json_encode($pageDesc ?? $page->description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "isPartOf": {
-        "@type": "WebSite",
-        "@id": {!! json_encode(route('home') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "url": {!! json_encode(route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "name": "Dunes Discovery Tourism LLC Dubai"
-      },
-      "publisher": {
-        "@type": "TravelAgency",
-        "@id": {!! json_encode(route('home') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "name": "Dunes Discovery Tourism L.L.C",
-        "url": {!! json_encode(route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "telephone": "+971502456056",
-        "email": "info@dunesdiscoverytourism.com",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Dubai",
-          "addressCountry": "AE"
-        }
-      }
-    },
-    {
-      "@type": "BreadcrumbList",
-      "@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": {!! json_encode(__('ui.nav.legal_policies') ?? 'Legal & Trust', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "item": {!! json_encode(localized_route('terms'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": {!! json_encode($page->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        }
-      ]
-    }
-  ]
-}
-</script>
-
+@push('styles')
 <style>
 .legal-toc-list {
     position: sticky;
@@ -72,14 +13,14 @@
     padding: 6px 12px;
     font-size: 0.85rem;
     color: #475569;
-    border-left: 2px solid transparent;
+    border-inline-start: 2px solid transparent;
     text-decoration: none;
     transition: all 0.2s ease;
 }
 .legal-toc-link:hover,
 .legal-toc-link.active {
     color: #F69044;
-    border-left-color: #F69044;
+    border-inline-start-color: #F69044;
     background-color: rgba(246, 144, 68, 0.08);
     font-weight: 600;
 }
@@ -128,9 +69,78 @@
     }
 }
 </style>
+@endpush
+
+@section('content')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": {!! json_encode($canonical . '#legalpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "name": {!! json_encode($pageTitle ?? $page->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "description": {!! json_encode($pageDesc ?? $page->description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+        "name": "Dunes Discovery Tourism LLC Dubai"
+      },
+      "publisher": {
+        "@type": "TravelAgency",
+        "@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+        "name": "Dunes Discovery Tourism L.L.C",
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+        "telephone": {!! json_encode($settings['site_phone'] ?? '+971502456056', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+        "email": {!! json_encode($settings['site_email'] ?? 'info@dunesdiscoverytourism.com', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Dubai",
+          "addressCountry": "AE"
+        }
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": {!! json_encode(__('ui.nav.home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": {!! json_encode(__('ui.nav.legal_policies'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "item": {!! json_encode(localized_route('terms'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {!! json_encode($page->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+          "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+        }
+      ]
+    }
+  ]
+}
+</script>
 
 @php
     $isAr = (($currentLocale ?? app()->getLocale() ?? 'en') === 'ar');
+    $legalWaPhone = preg_replace('/[^0-9]/', '', (string) ($waPhone ?? ($settings['site_whatsapp'] ?? '971502456056')));
+    $privacyEmail = trim((string) ($settings['privacy_contact_email'] ?? $settings['site_email'] ?? 'info@dunesdiscoverytourism.com'));
+    $pageTitleEn = $page->getTranslation('title', 'en', true) ?: $page->title;
+    $pageTitleAr = $page->getTranslation('title', 'ar', false) ?: $page->title_ar ?: $pageTitleEn;
+    $pageSubtitleEn = $page->getTranslation('subtitle', 'en', false) ?: ($page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates');
+    $pageSubtitleAr = $page->getTranslation('subtitle', 'ar', false) ?: ($page->subtitle_ar ?: ($page->subtitle ?: 'شركة ديونز ديسكفري للسياحة ذ.م.م • دبي، الإمارات العربية المتحدة'));
+    $pageDescEn = $page->getTranslation('description', 'en', false) ?: $page->description;
+    $pageDescAr = $page->getTranslation('description', 'ar', false) ?: ($page->description_ar ?: $pageDescEn);
 @endphp
 <!-- Hero / Page Header -->
 <section class="page-header hero-subpage relative overflow-hidden bg-slate-950 text-white" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
@@ -141,7 +151,7 @@
                 <li class="text-white/40">/</li>
                 <li><a href="{{ localized_route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.nav.legal_policies') ?? 'Legal & Trust' }}</a></li>
                 <li class="text-white/40">/</li>
-                <li class="text-white font-medium" aria-current="page">{{ $isAr && $page->title_ar ? $page->title_ar : $page->title }}</li>
+                <li class="text-white font-medium" aria-current="page">{{ $isAr ? $pageTitleAr : $pageTitleEn }}</li>
             </ol>
         </nav>
         
@@ -149,11 +159,11 @@
             <div>
                 <div class="inline-flex items-center gap-2 bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-full px-3.5 py-1 text-xs font-semibold mb-2.5">
                     <i class="bi bi-shield-check"></i>
-                    <span>Official UAE Tourism Document &bull; License 1430583</span>
+                    <span>Official UAE Tourism Document &bull; License {{ $settings['company_license_number'] ?? '1430583' }}</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-1.5" id="legalPageHeaderTitle">{{ $isAr && $page->title_ar ? $page->title_ar : $page->title }}</h1>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-1.5" id="legalPageHeaderTitle">{{ $isAr ? $pageTitleAr : $pageTitleEn }}</h1>
                 <p class="text-white/75 text-sm sm:text-base" id="legalPageHeaderSubtitle">
-                    {{ $isAr ? ($page->subtitle_ar ?: ($page->subtitle ?: 'شركة ديونز ديسكفري للسياحة ذ.م.م • دبي، الإمارات العربية المتحدة')) : ($page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates') }}
+                    {{ $isAr ? $pageSubtitleAr : $pageSubtitleEn }}
                 </p>
             </div>
 
@@ -194,7 +204,7 @@
                     <i class="bi bi-printer"></i>
                     <span>Print / Save PDF</span>
                 </button>
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery Tourism, I have an inquiry regarding: ' . $page->title) }}" target="_blank" rel="noopener" class="btn-whatsapp text-xs sm:text-sm border border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white font-medium rounded-full px-4 py-2 inline-flex items-center gap-1.5 transition-colors cursor-pointer min-h-[40px]" data-action="whatsapp" data-tour-name="{{ $page->title }}">
+                <a href="https://wa.me/{{ $legalWaPhone }}?text={{ urlencode('Hello Dunes Discovery Tourism, I have an inquiry regarding: ' . $pageTitleEn) }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp text-xs sm:text-sm border border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white font-medium rounded-full px-4 py-2 inline-flex items-center gap-1.5 transition-colors cursor-pointer min-h-[40px]" data-action="whatsapp" data-tour-name="{{ $pageTitleEn }}">
                     <i class="bi bi-whatsapp"></i>
                     <span>Inquire via WhatsApp</span>
                 </a>
@@ -213,8 +223,12 @@
                 </button>
                 <div x-show="openToc" x-collapse x-cloak class="px-5 pb-4 pt-1 border-t border-slate-100 flex flex-col gap-1">
                     @foreach($page->sections as $sec)
-                    <a href="#{{ $isAr ? 'sec-ar-' . $sec->id : 'sec-' . $sec->id }}" @click="openToc = false" class="py-2 px-3 text-xs text-slate-700 hover:text-primary hover:bg-slate-50 rounded-lg transition-colors">
-                        {{ $isAr && $sec->heading_ar ? $sec->heading_ar : $sec->heading }}
+                    @php
+                        $secHeadEn = $sec->getTranslation('heading', 'en', true) ?: $sec->heading;
+                        $secHeadAr = $sec->getTranslation('heading', 'ar', false) ?: ($sec->heading_ar ?: $secHeadEn);
+                    @endphp
+                    <a href="#{{ $isAr ? 'sec-ar-' . $sec->id : 'sec-' . $sec->id }}" data-sec-id="{{ $sec->id }}" data-en="{{ $secHeadEn }}" data-ar="{{ $secHeadAr }}" @click="openToc = false" class="legal-toc-link py-2 px-3 text-xs text-slate-700 hover:text-primary hover:bg-slate-50 rounded-lg transition-colors">
+                        {{ $isAr ? $secHeadAr : $secHeadEn }}
                     </a>
                     @endforeach
                 </div>
@@ -232,8 +246,12 @@
                     </div>
                     <nav class="flex flex-col gap-1" id="legalTocNav">
                         @foreach($page->sections as $sec)
-                        <a href="#{{ $isAr ? 'sec-ar-' . $sec->id : 'sec-' . $sec->id }}" class="legal-toc-link rounded-lg" data-en="{{ $sec->heading }}" data-ar="{{ $sec->heading_ar ?: $sec->heading }}">
-                            {{ $isAr && $sec->heading_ar ? $sec->heading_ar : $sec->heading }}
+                        @php
+                            $secHeadEn = $sec->getTranslation('heading', 'en', true) ?: $sec->heading;
+                            $secHeadAr = $sec->getTranslation('heading', 'ar', false) ?: ($sec->heading_ar ?: $secHeadEn);
+                        @endphp
+                        <a href="#{{ $isAr ? 'sec-ar-' . $sec->id : 'sec-' . $sec->id }}" class="legal-toc-link rounded-lg" data-sec-id="{{ $sec->id }}" data-en="{{ $secHeadEn }}" data-ar="{{ $secHeadAr }}">
+                            {{ $isAr ? $secHeadAr : $secHeadEn }}
                         </a>
                         @endforeach
                     </nav>
@@ -247,27 +265,31 @@
 
                         <!-- English Container -->
                         <div id="contentEn" class="legal-content-container {{ $isAr ? 'hidden' : '' }}">
-                            @if($page->description)
+                            @if($pageDescEn)
                             <div class="p-5 bg-slate-50 rounded-2xl border-l-4 border-primary mb-8 text-slate-700 text-sm sm:text-base leading-relaxed">
-                                {!! nl2br(e($page->description)) !!}
+                                {!! nl2br(e($pageDescEn)) !!}
                             </div>
                             @endif
 
                             @if($page->sections->count() > 0)
                                 <div class="legal-sections-wrapper space-y-8">
                                     @foreach($page->sections as $section)
+                                        @php
+                                            $secHeadEn = $section->getTranslation('heading', 'en', true) ?: $section->heading;
+                                            $secSubEn = $section->getTranslation('subheading', 'en', false) ?: $section->subheading;
+                                        @endphp
                                         <div class="legal-section-block pt-2" id="sec-{{ $section->id }}">
                                             <div class="flex items-start justify-between gap-3 mb-3">
                                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-s-4 border-primary ps-3">
-                                                    {{ $section->heading }}
+                                                    {{ $secHeadEn }}
                                                 </h2>
                                                 <a href="#sec-{{ $section->id }}" class="text-slate-400 hover:text-primary transition-colors text-xs pt-1" title="{{ __('ui.common.direct_link') }}">
                                                     <i class="bi bi-link-45deg text-lg"></i>
                                                 </a>
                                             </div>
 
-                                            @if($section->subheading)
-                                                <h3 class="text-sm font-bold text-slate-600 mb-3 ms-4">{{ $section->subheading }}</h3>
+                                            @if($secSubEn)
+                                                <h3 class="text-sm font-bold text-slate-600 mb-3 ms-4">{{ $secSubEn }}</h3>
                                             @endif
 
                                             @if($section->items->count() > 0)
@@ -275,7 +297,7 @@
                                                     @foreach($section->items as $item)
                                                         <li class="flex items-start gap-3">
                                                             <i class="bi bi-check-circle-fill text-primary mt-1 shrink-0 text-sm"></i>
-                                                            <span class="text-slate-600 text-sm sm:text-base leading-relaxed">{{ $item->content }}</span>
+                                                            <span class="text-slate-600 text-sm sm:text-base leading-relaxed">{{ $item->getTranslation('content', 'en', true) ?: $item->content }}</span>
                                                         </li>
                                                     @endforeach
                                                 </ul>
@@ -296,27 +318,31 @@
 
                         <!-- Arabic Container (RTL) -->
                         <div id="contentAr" class="legal-content-container legal-rtl {{ $isAr ? '' : 'hidden' }}">
-                            @if($page->description_ar || $page->description)
+                            @if($pageDescAr)
                             <div class="p-5 bg-slate-50 rounded-2xl border-s-4 border-primary mb-8 text-slate-700 text-sm sm:text-base leading-loose">
-                                {!! nl2br(e($page->description_ar ?: $page->description)) !!}
+                                {!! nl2br(e($pageDescAr)) !!}
                             </div>
                             @endif
 
                             @if($page->sections->count() > 0)
                                 <div class="legal-sections-wrapper space-y-8">
                                     @foreach($page->sections as $section)
+                                        @php
+                                            $secHeadAr = $section->getTranslation('heading', 'ar', false) ?: ($section->heading_ar ?: $section->getTranslation('heading', 'en', true));
+                                            $secSubAr = $section->getTranslation('subheading', 'ar', false) ?: ($section->subheading_ar ?: $section->getTranslation('subheading', 'en', false));
+                                        @endphp
                                         <div class="legal-section-block pt-2" id="sec-ar-{{ $section->id }}">
                                             <div class="flex items-start justify-between gap-3 mb-3">
                                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-s-4 border-primary ps-3">
-                                                    {{ $section->heading_ar ?: $section->heading }}
+                                                    {{ $secHeadAr }}
                                                 </h2>
                                                 <a href="#sec-ar-{{ $section->id }}" class="text-slate-400 hover:text-primary transition-colors text-xs pt-1" title="رابط مباشر للبند">
                                                     <i class="bi bi-link-45deg text-lg"></i>
                                                 </a>
                                             </div>
 
-                                            @if($section->subheading_ar || $section->subheading)
-                                                <h3 class="text-sm font-bold text-slate-600 mb-3 ms-4">{{ $section->subheading_ar ?: $section->subheading }}</h3>
+                                            @if($secSubAr)
+                                                <h3 class="text-sm font-bold text-slate-600 mb-3 ms-4">{{ $secSubAr }}</h3>
                                             @endif
 
                                             @if($section->items->count() > 0)
@@ -324,7 +350,7 @@
                                                     @foreach($section->items as $item)
                                                         <li class="flex items-start gap-3">
                                                             <i class="bi bi-check-circle-fill text-primary mt-1 shrink-0 text-sm"></i>
-                                                            <span class="text-slate-600 text-sm sm:text-base leading-loose">{{ $item->content_ar ?: $item->content }}</span>
+                                                            <span class="text-slate-600 text-sm sm:text-base leading-loose">{{ $item->getTranslation('content', 'ar', false) ?: ($item->content_ar ?: $item->getTranslation('content', 'en', true)) }}</span>
                                                         </li>
                                                     @endforeach
                                                 </ul>
@@ -352,11 +378,17 @@
                         <i class="bi bi-shield-lock-fill text-2xl"></i>
                     </div>
                     <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-2" id="legalHelpTitle">{{ $isAr ? 'هل لديك أي استفسار حول سياساتنا أو التراخيص الرسمية؟' : 'Questions About Our Policies or Compliance?' }}</h3>
-                    <p class="text-slate-500 text-sm sm:text-base mb-6 max-w-xl mx-auto leading-relaxed" id="legalHelpDesc">
+                    <p class="text-slate-500 text-sm sm:text-base mb-4 max-w-xl mx-auto leading-relaxed" id="legalHelpDesc">
                         {{ $isAr ? 'فريق الامتثال القانوني وخدمة العملاء في دبي متاح على مدار الساعة للرد على استفساراتكم أو تنسيق الحجوزات المؤسسية.' : 'Our legal compliance desk and customer concierge team in Dubai are available 24/7 to assist with any policy questions, corporate travel agreements, or booking amendments.' }}
                     </p>
+                    @if(in_array($page->slug, ['privacy-policy', 'cookie-policy'], true) && $privacyEmail !== '')
+                    <p class="text-xs text-slate-600 mb-6">
+                        Data Protection &amp; Privacy Requests:
+                        <a href="mailto:{{ $privacyEmail }}" class="font-bold text-primary hover:underline">{{ $privacyEmail }}</a>
+                    </p>
+                    @endif
                     <div class="flex flex-col sm:flex-row justify-center gap-3">
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hi Dunes Discovery Tourism, I have a question regarding: ' . $page->title) }}" class="btn-whatsapp btn-whatsapp-animated text-sm sm:text-base font-bold rounded-full px-6 py-3 text-white inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener" data-action="whatsapp" data-tour-name="{{ $page->title }}">
+                        <a href="https://wa.me/{{ $legalWaPhone }}?text={{ urlencode('Hi Dunes Discovery Tourism, I have a question regarding: ' . $pageTitleEn) }}" class="btn-whatsapp btn-whatsapp-animated text-sm sm:text-base font-bold rounded-full px-6 py-3 text-white inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener noreferrer" data-action="whatsapp" data-tour-name="{{ $pageTitleEn }}">
                             <i class="bi bi-whatsapp"></i>
                             <span>Chat with Legal Desk</span>
                         </a>
@@ -402,33 +434,33 @@ function switchLegalLanguage(lang) {
         if (enBox) enBox.classList.add('hidden');
         if (arBox) arBox.classList.remove('hidden');
         
-        if (titleEl) titleEl.textContent = @json($page->title_ar ?: $page->title);
-        if (subEl) subEl.textContent = @json($page->subtitle_ar ?: ($page->subtitle ?: 'شركة ديونز ديسكفري للسياحة ذ.م.م • دبي، الإمارات العربية المتحدة'));
+        if (titleEl) titleEl.textContent = @json($pageTitleAr);
+        if (subEl) subEl.textContent = @json($pageSubtitleAr);
         
         if (helpTitle) helpTitle.textContent = "هل لديك أي استفسار حول سياساتنا أو التراخيص الرسمية؟";
         if (helpDesc) helpDesc.textContent = "فريق الامتثال القانوني وخدمة العملاء في دبي متاح على مدار الساعة للرد على استفساراتكم أو تنسيق الحجوزات المؤسسية.";
 
         tocLinks.forEach(link => {
             const arText = link.getAttribute('data-ar');
+            const secId = link.getAttribute('data-sec-id');
             if (arText) link.textContent = arText;
-            const targetId = link.getAttribute('href').replace('#sec-', '#sec-ar-');
-            link.setAttribute('href', targetId);
+            if (secId) link.setAttribute('href', '#sec-ar-' + secId);
         });
     } else {
         if (arBox) arBox.classList.add('hidden');
         if (enBox) enBox.classList.remove('hidden');
         
-        if (titleEl) titleEl.textContent = @json($page->title);
-        if (subEl) subEl.textContent = @json($page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates');
+        if (titleEl) titleEl.textContent = @json($pageTitleEn);
+        if (subEl) subEl.textContent = @json($pageSubtitleEn);
 
         if (helpTitle) helpTitle.textContent = "Questions About Our Policies or Compliance?";
         if (helpDesc) helpDesc.textContent = "Our legal compliance desk and customer concierge team in Dubai are available 24/7 to assist with any policy questions, corporate travel agreements, or booking amendments.";
 
         tocLinks.forEach(link => {
             const enText = link.getAttribute('data-en');
+            const secId = link.getAttribute('data-sec-id');
             if (enText) link.textContent = enText;
-            const targetId = link.getAttribute('href').replace('#sec-ar-', '#sec-');
-            link.setAttribute('href', targetId);
+            if (secId) link.setAttribute('href', '#sec-' + secId);
         });
     }
 }

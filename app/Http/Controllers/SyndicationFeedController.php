@@ -51,14 +51,14 @@ class SyndicationFeedController extends Controller
         $xml .= '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dunes="https://dunesdiscoverytourism.com/ns/tours">' . "\n";
         $xml .= "  <channel>\n";
         $xml .= '    <title>' . $this->escape('Dunes Discovery Tourism | Dubai Tours & Desert Safaris Feed') . "</title>\n";
-        $xml .= "    <link>{$siteUrl}</link>\n";
+        $xml .= '    <link>' . $this->escape($siteUrl) . "</link>\n";
         $xml .= '    <description>' . $this->escape("Official syndicated catalog of certified Dubai Desert Safaris, Dune Buggy Rentals, City Tours, and Luxury Cruises by Dunes Discovery Tourism LLC (DET License #{$license}).") . "</description>\n";
         $xml .= "    <language>en</language>\n";
         $xml .= "    <lastBuildDate>{$now}</lastBuildDate>\n";
-        $xml .= "    <atom:link href=\"{$feedUrl}\" rel=\"self\" type=\"application/rss+xml\" />\n";
+        $xml .= '    <atom:link href="' . $this->escape($feedUrl) . "\" rel=\"self\" type=\"application/rss+xml\" />\n";
 
         foreach ($tours as $tour) {
-            $tourUrl = url('/' . $tour->slug);
+            $tourUrl = $this->escape(url('/' . $tour->slug));
             $title = $this->escape($tour->name);
             $category = $this->escape($tour->category?->name ?? 'Desert Safari');
             

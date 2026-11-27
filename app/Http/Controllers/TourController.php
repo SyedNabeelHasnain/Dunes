@@ -158,7 +158,12 @@ class TourController extends Controller
         $query = Tour::where('slug', $slug)
             ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category']);
 
-        if (! auth()->check()) {
+        $isStaff = auth()->check() && in_array(
+            (string) (auth()->user()->role ?? ''),
+            ['super_admin', 'admin', 'editor', 'marketing_seo', 'ops_dispatcher'],
+            true
+        );
+        if (! $isStaff) {
             $query->where('status', 'active');
         }
 
@@ -243,13 +248,6 @@ class TourController extends Controller
             $pageTitle = $tour->meta_title ?: "{$tour->name} Dubai {$currentYear}: {$enPriceText} | Dunes Discovery";
             $defaultDesc = "Book {$tour->name} in Dubai. Luxury 4x4 Land Cruiser transfers, live BBQ dining, thrilling dune bashing, and 24/7 WhatsApp assistance. Instant confirmation {$enPriceText}.";
             $pageDesc = $tour->meta_desc ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
-        }
-
-        if ($tour->id === 3 || str_contains($tour->slug, 'overnight')) {
-            $pageTitle = str_ireplace('From AED 350', 'From AED 798 (2 Guests)', $pageTitle);
-            $pageTitle = str_ireplace('AED 350', 'AED 798 (2 Guests)', $pageTitle);
-            $pageDesc = str_ireplace('From AED 350', 'From AED 798 (2 Guests)', $pageDesc);
-            $pageDesc = str_ireplace('AED 350', 'AED 798 (2 Guests)', $pageDesc);
         }
 
         $pageKeys = $tour->meta_keywords ?: strtolower("{$tour->name}, {$tour->name} dubai, book {$tour->name}, desert safari dubai, dubai tours {$currentYear}");
@@ -403,14 +401,32 @@ class TourController extends Controller
                 ]);
             }
 
-            // Resilient active tours retrieval (guards against serialized model cache corruption)
+            // Resilient active tours retrieval (plain-array cache for serializable_classes=false safety)
             $allActiveTours = null;
             $cacheKey = 'site_active_tours_search_'.app()->getLocale();
             try {
                 $cached = Cache::get($cacheKey);
-                if (is_iterable($cached) && ! ($cached instanceof \__PHP_Incomplete_Class)) {
-                    $allActiveTours = $cached;
-                } else {
+                if (is_array($cached) && ! empty($cached) && isset($cached[0]['attributes'])) {
+                    $allActiveTours = collect($cached)->map(function (array $entry) {
+                        $tour = (new Tour)->newFromBuilder($entry['attributes']);
+                        if (! empty($entry['category']) && is_array($entry['category'])) {
+                            $tour->setRelation('category', (new \App\Models\Category)->newFromBuilder($entry['category']));
+                        } else {
+                            $tour->setRelation('category', null);
+                        }
+                        $tiers = collect($entry['tiers'] ?? [])->map(function (array $tierEntry) use ($tour) {
+                            $tier = (new \App\Models\Tier)->newFromBuilder($tierEntry['attributes']);
+                            if (! empty($tierEntry['pivot']) && is_array($tierEntry['pivot'])) {
+                                $tier->setRelation('pivot', $tier->newPivot($tour, $tierEntry['pivot'], 'tour_tiers', true));
+                            }
+
+                            return $tier;
+                        });
+                        $tour->setRelation('tiers', $tiers);
+
+                        return $tour;
+                    });
+                } elseif ($cached !== null) {
                     Cache::forget($cacheKey);
                 }
             } catch (\Throwable $e) {
@@ -423,7 +439,17 @@ class TourController extends Controller
                     ->orderBy('priority', 'asc')
                     ->get();
                 try {
-                    Cache::put($cacheKey, $allActiveTours, 600);
+                    $serializable = $allActiveTours->map(function (Tour $tour) {
+                        return [
+                            'attributes' => $tour->getAttributes(),
+                            'category' => $tour->category ? $tour->category->getAttributes() : null,
+                            'tiers' => $tour->tiers->map(fn ($tier) => [
+                                'attributes' => $tier->getAttributes(),
+                                'pivot' => $tier->pivot ? $tier->pivot->getAttributes() : null,
+                            ])->all(),
+                        ];
+                    })->all();
+                    Cache::put($cacheKey, $serializable, 600);
                 } catch (\Throwable $e) {
                     // Ignore cache write failure
                 }
@@ -495,11 +521,14 @@ class TourController extends Controller
             $locations = [];
             if ($cleanQuery !== '') {
                 try {
+                    $escapedQuery = addcslashes($cleanQuery, '%_!');
+                    $likeQuery = "%{$escapedQuery}%";
+
                     $matchedBlogs = BlogPost::where('status', 'published')
-                        ->where(function ($qBuilder) use ($cleanQuery) {
-                            $qBuilder->where('title', 'like', "%{$cleanQuery}%")
-                                ->orWhere('excerpt', 'like', "%{$cleanQuery}%")
-                                ->orWhere('slug', 'like', "%{$cleanQuery}%");
+                        ->where(function ($qBuilder) use ($likeQuery) {
+                            $qBuilder->whereRaw("title LIKE ? ESCAPE '!'", [$likeQuery])
+                                ->orWhereRaw("excerpt LIKE ? ESCAPE '!'", [$likeQuery])
+                                ->orWhereRaw("slug LIKE ? ESCAPE '!'", [$likeQuery]);
                         })
                         ->orderByDesc('published_at')
                         ->limit(4)
@@ -516,10 +545,10 @@ class TourController extends Controller
 
                     $matchedWiki = \App\Models\WikiArticle::published()
                         ->whereHas('pillar', fn ($pq) => $pq->where('status', 'active'))
-                        ->where(function ($qBuilder) use ($cleanQuery) {
-                            $qBuilder->where('title', 'like', "%{$cleanQuery}%")
-                                ->orWhere('excerpt', 'like', "%{$cleanQuery}%")
-                                ->orWhere('slug', 'like', "%{$cleanQuery}%");
+                        ->where(function ($qBuilder) use ($likeQuery) {
+                            $qBuilder->whereRaw("title LIKE ? ESCAPE '!'", [$likeQuery])
+                                ->orWhereRaw("excerpt LIKE ? ESCAPE '!'", [$likeQuery])
+                                ->orWhereRaw("slug LIKE ? ESCAPE '!'", [$likeQuery]);
                         })
                         ->with('pillar')
                         ->limit(4)
@@ -554,8 +583,8 @@ class TourController extends Controller
                             ];
                         }
                     }
-                } catch (\Throwable) {
-                    // Non-blocking supplementary search enrichment
+                } catch (\Throwable $suppEx) {
+                    \Illuminate\Support\Facades\Log::debug('liveSearch supplementary enrichment failed: '.$suppEx->getMessage());
                 }
             }
 
@@ -574,12 +603,13 @@ class TourController extends Controller
             ]);
 
             return response()->json([
-                'success' => true,
+                'success' => false,
+                'message' => 'Search is temporarily unavailable. Please try again.',
                 'query' => (string) ($request->input('q') ?? ''),
                 'count' => 0,
                 'categories' => [],
                 'results' => [],
-            ]);
+            ], 500);
         }
     }
 

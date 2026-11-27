@@ -353,18 +353,22 @@
                     </div>
 
                     <!-- Top Banner Preview -->
+                    @php
+                        $previewDiscount = (int) $settings->get('welcome_popup_discount', '25');
+                        $previewTimerMins = max(1, (int) $settings->get('welcome_popup_timer_mins', '15'));
+                    @endphp
                     <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Top Banner (25% OFF):</span>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Top Banner ({{ $previewDiscount }}% OFF):</span>
                         <div class="p-2.5 rounded-xl text-white text-center text-xs font-bold flex items-center justify-center gap-2 shadow-xs bg-slate-950 border-b-2 border-primary">
                             <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-mono">{{ $settings->get('top_promo_banner_badge', 'Limited Time Offer') }}</span>
-                            <span>Get 25% OFF</span>
+                            <span>Get {{ $previewDiscount }}% OFF</span>
                             <span class="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-mono text-[10px]">{{ $settings->get('top_promo_banner_code', 'DUNESWELCOME') }}</span>
                         </div>
                     </div>
 
                     <!-- Modal Card Preview -->
                     <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Welcome Modal (25% OFF):</span>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Welcome Modal ({{ $previewDiscount }}% OFF):</span>
                         <div class="border border-primary/30 rounded-2xl p-5 shadow-xs bg-white relative overflow-hidden space-y-3">
                             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-amber-400"></div>
                             
@@ -372,18 +376,18 @@
                                 <i class="bi bi-gift-fill"></i> First-Time Guest Special
                             </span>
 
-                            <h3 class="text-base font-black text-slate-900 leading-snug">{{ $settings->get('welcome_popup_headline', 'Unlock Exclusive 25% OFF') }}</h3>
+                            <h3 class="text-base font-black text-slate-900 leading-snug">{{ $settings->get('welcome_popup_headline', 'Unlock Exclusive ' . $previewDiscount . '% OFF') }}</h3>
                             <p class="text-xs text-slate-500 leading-relaxed">{{ $settings->get('welcome_popup_subheadline', 'Book your unforgettable Dubai Desert Safari today with our premier welcome discount.') }}</p>
 
                             <div class="p-2.5 rounded-xl bg-slate-50 text-center border border-slate-100">
                                 <span class="text-[10px] uppercase font-bold text-slate-400 block">Session Offer Expires In</span>
-                                <span class="text-xl font-black text-primary font-mono">14:59</span>
+                                <span class="text-xl font-black text-primary font-mono">{{ sprintf('%02d:00', $previewTimerMins) }}</span>
                             </div>
 
                             <div class="space-y-2">
                                 <input type="email" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-center font-bold text-slate-400 bg-slate-50" placeholder="name@example.com" disabled>
                                 <button type="button" class="w-full py-2.5 rounded-xl bg-primary text-white font-bold text-xs shadow-xs" disabled>
-                                    Claim My 25% Discount &rarr;
+                                    Claim My {{ $previewDiscount }}% Discount &rarr;
                                 </button>
                             </div>
                         </div>

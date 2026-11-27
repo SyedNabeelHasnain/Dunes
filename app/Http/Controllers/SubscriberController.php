@@ -228,9 +228,10 @@ class SubscriberController extends Controller
      */
     public function trackClick(Request $request, string $token): RedirectResponse
     {
-        $targetUrl = $request->query('url', url('/'));
+        $targetUrl = (string) $request->query('url', url('/'));
+        $providedSig = (string) $request->query('sig', '');
 
-        // URL validation & strict open redirect mitigation
+        // URL validation & open redirect mitigation (allows HMAC-signed campaign links including wa.me / Google Reviews, or unsigned same-host links)
         if (! filter_var($targetUrl, FILTER_VALIDATE_URL)) {
             $targetUrl = url('/');
         } else {
@@ -239,11 +240,12 @@ class SubscriberController extends Controller
             $appHost = strtolower((string) (parse_url(config('app.url'), PHP_URL_HOST) ?: $request->getHost()));
             $appBaseHost = preg_replace('/^www\./', '', $appHost);
 
-            if (
-                ! in_array($scheme, ['http', 'https'], true)
-                || $targetHost === ''
-                || ($targetHost !== $appBaseHost && ! str_ends_with($targetHost, '.'.$appBaseHost))
-            ) {
+            $isSameHost = $targetHost !== ''
+                && ($targetHost === $appBaseHost || str_ends_with($targetHost, '.'.$appBaseHost));
+            $expectedSig = \App\Services\EmailMarketingService::signTrackedUrl($token, $targetUrl);
+            $hasValidSignature = $providedSig !== '' && hash_equals($expectedSig, $providedSig);
+
+            if (! in_array($scheme, ['http', 'https'], true) || (! $isSameHost && ! $hasValidSignature)) {
                 $targetUrl = url('/');
             }
         }

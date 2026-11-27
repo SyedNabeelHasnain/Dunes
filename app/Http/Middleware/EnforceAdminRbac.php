@@ -45,8 +45,13 @@ class EnforceAdminRbac
         $isMutation = ! $request->isMethodSafe();
 
         // Viewer role: strict read-only and blocked from sensitive config/RBAC/firewall modules.
-        if ($user->normalizedRole() === 'viewer' && $isMutation && $path !== 'admin/logout') {
+        if ($user->normalizedRole() === 'viewer' && $isMutation) {
             return $this->deny($request, 'Read-only Viewer accounts cannot modify CMS data or settings.');
+        }
+
+        // POST /admin/audit/run triggers sitewide scan (audit.run); GET /admin/audit/run/{id} inspects a report (audit.view).
+        if ($request->is('admin/audit/run*') && $isMutation && ! $user->hasAnyPermission(['audit.run'])) {
+            return $this->deny($request, 'Your role does not grant permission to launch sitewide audits.');
         }
 
         $rules = [
@@ -56,6 +61,8 @@ class EnforceAdminRbac
             'admin/security*' => ['security.manage'],
             'admin/run-migrations*' => ['security.manage'],
             'admin/clear-cache*' => ['security.manage', 'performance.manage', 'seo.manage'],
+            'admin/settings' => ['security.manage', 'seo.manage'],
+            'admin/settings/seo*' => ['seo.view', 'seo.manage', 'security.manage'],
             'admin/settings/privacy*' => ['privacy.manage'],
             'admin/settings/mail*' => ['security.manage'],
             'admin/settings/notifications*' => ['security.manage'],
@@ -66,18 +73,24 @@ class EnforceAdminRbac
             'admin/settings/google*' => ['seo.manage', 'security.manage'],
             'admin/settings/gttd*' => ['seo.manage', 'security.manage'],
             'admin/settings/meta*' => ['seo.manage', 'security.manage'],
+            'admin/settings/indexnow*' => ['seo.manage', 'security.manage'],
+            'admin/settings/sync-currency*' => ['seo.manage', 'security.manage'],
             'admin/whatsapp-settings*' => ['security.manage', 'seo.manage'],
-            'admin/settings/seo-templates*' => ['seo.templates'],
-            'admin/settings/robots*' => ['robots.request_approval', 'robots.publish'],
-            'admin/settings/keywords*' => ['keywords.manage', 'seo.manage'],
+            'admin/settings/seo-templates*' => ['seo.templates', 'seo.manage'],
+            'admin/settings/robots*' => ['robots.request_approval', 'robots.publish', 'seo.manage'],
+            'admin/settings/keywords*' => ['seo.view', 'keywords.manage', 'seo.manage'],
             'admin/settings/redirects*' => ['redirects.manage'],
-            'admin/redirects*' => ['redirects.manage'],
+            'admin/api/redirects*' => ['redirects.manage'],
+            'admin/api/visitors/quick-block*' => ['security.manage'],
+            'admin/api/visitors/quick-ignore*' => ['security.manage'],
+            'admin/quick-payment*' => ['security.manage'],
+            'admin/bookings/*/payment-link*' => ['security.manage'],
+            'admin/campaigns/*/send*' => ['content.publish', 'security.manage'],
             'admin/analytics/recordings/purge*' => ['security.manage', 'privacy.manage'],
             'admin/analytics/recordings/settings*' => ['security.manage', 'privacy.manage'],
             'admin/analytics/heatmaps/purge*' => ['security.manage', 'privacy.manage'],
             'admin/analytics/heatmaps/settings*' => ['security.manage', 'privacy.manage'],
             'admin/audit/page*' => ['audit.page_view', 'audit.run'],
-            'admin/audit/run*' => ['audit.run'],
             'admin/audit/issues*' => ['audit.manage'],
             'admin/audit/export*' => ['audit.manage', 'audit.view'],
             'admin/audit*' => ['audit.view', 'audit.run'],
@@ -87,7 +100,10 @@ class EnforceAdminRbac
         ];
 
         foreach ($rules as $pattern => $requiredPermissions) {
-            if ($request->is($pattern) && ! $user->hasAnyPermission($requiredPermissions)) {
+            $matched = $pattern === 'admin/settings'
+                ? ($path === 'admin/settings')
+                : $request->is($pattern);
+            if ($matched && ! $user->hasAnyPermission($requiredPermissions)) {
                 return $this->deny($request, 'Your role does not grant access to this CMS capability.');
             }
         }

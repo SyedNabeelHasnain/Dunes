@@ -14,15 +14,7 @@
         <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}">
 
         <!-- Scripts & Styles -->
-        @php
-            $hasVite = file_exists(public_path('build/manifest.json'));
-        @endphp
-        @if($hasVite)
-            @vite(['resources/css/app.css', 'resources/js/admin.js'])
-        @else
-            <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet">
-            <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
-        @endif
+        @vite(['resources/css/app.css', 'resources/js/admin.js'])
 
         <style>
             [x-cloak] { display: none !important; }
@@ -56,7 +48,7 @@
 
             <!-- Footer Details -->
             <div class="mt-6 text-center text-xs text-slate-400 space-y-1">
-                <div>&copy; {{ date('Y') }} Dunes Discovery Tourism L.L.C. All rights reserved.</div>
+                <div>&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }}</div>
                 <div class="text-[11px] text-slate-400/80">Authorized Administrative Personnel Only</div>
             </div>
         </div>

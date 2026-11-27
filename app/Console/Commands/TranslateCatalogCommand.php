@@ -74,9 +74,9 @@ class TranslateCatalogCommand extends Command
 
         if (! $driver) {
             $authKey = Setting::where('setting_key', 'deepl_auth_key')->value('setting_value')
-                ?: (env('DEEPL_AUTH_KEY') ?: '');
+                ?: (string) config('services.deepl.auth_key', '');
             $endpointType = Setting::where('setting_key', 'deepl_endpoint_type')->value('setting_value')
-                ?: (env('DEEPL_ENDPOINT_TYPE') ?: 'free');
+                ?: (string) config('services.deepl.endpoint_type', 'free');
 
             if (! empty($authKey)) {
                 $driver = new DeepLTranslationDriver($authKey, $endpointType);
@@ -239,17 +239,13 @@ class TranslateCatalogCommand extends Command
             $this->info("Completed {$modelName}: {$count} field translations across {$recordCount} records.");
         }
 
-        // 4. Clear Frontend & Sitemap Caches
+        // 4. Clear Frontend, CMS & Sitemap Caches
         try {
             Cache::forget('site_tours_header_cache');
-            Cache::forget('sitemap_tours_xml');
-            Cache::forget('sitemap_blogs_xml');
-            Cache::forget('sitemap_images_xml');
-            Cache::forget('sitemap_wiki_xml');
-            Cache::forget('site_llms_txt');
-            Cache::forget('site_llms_full_txt');
+            \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
+            app(\App\Services\CmsContentService::class)->clearCache();
         } catch (\Throwable $e) {
-            // Silently continue
+            Log::warning('TranslateCatalogCommand cache flush failed: '.$e->getMessage());
         }
 
         $this->table(['Entity Model', 'Total Records', 'Fields Translated'], $summary);
@@ -284,6 +280,8 @@ class TranslateCatalogCommand extends Command
 
         $totalFields = 0;
         $recordsById = $records->keyBy(fn ($r) => (string) $r->getKey());
+        $requireReview = (string) (Setting::where('setting_key', 'translation_require_review')->value('setting_value') ?? '0') === '1';
+        $driverName = $driver->getName();
 
         foreach ($targetLocales as $locale) {
             // 1. Collect all plain-text attributes needing translation
@@ -337,7 +335,7 @@ class TranslateCatalogCommand extends Command
                             usleep(100000); // 100ms pause between batches
                         }
                     } catch (\Throwable $e) {
-                        $this->warn("DeepL plain batch error for [{$locale}] in {$modelName}: ".$e->getMessage());
+                        $this->warn("{$driverName} plain batch error for [{$locale}] in {$modelName}: ".$e->getMessage());
                     }
                 }
             }
@@ -375,28 +373,28 @@ class TranslateCatalogCommand extends Command
                             usleep(100000);
                         }
                     } catch (\Throwable $e) {
-                        $this->warn("DeepL HTML translation error for [{$locale}] on {$modelName} #{$record->getKey()}: ".$e->getMessage());
+                        $this->warn("{$driverName} HTML translation error for [{$locale}] on {$modelName} #{$record->getKey()}: ".$e->getMessage());
                     }
                 }
             }
-        }
 
-        // 4. Save any updated records
-        $requireReview = (string) (Setting::where('setting_key', 'translation_require_review')->value('setting_value') ?? '0') === '1';
-        if (! $dryRun) {
-            foreach ($records as $record) {
-                if ($record->isDirty()) {
-                    $record->saveQuietly();
-                    if ($requireReview && in_array($modelClass, [Tour::class, BlogPost::class, WikiArticle::class], true)) {
-                        try {
-                            \App\Models\SeoMetadata::updateOrCreate(
-                                ['entity_type' => $modelClass, 'entity_id' => $record->getKey()],
-                                [
-                                    'editorial_status' => 'in_review',
-                                    'review_notes' => 'Auto-translated via '.$driver->getName().' on '.now()->toDateTimeString().' — awaiting human localization review.',
-                                ]
-                            );
-                        } catch (\Throwable) {
+            // 4. Persist progress immediately after each locale so paid translations are never lost on later failures
+            if (! $dryRun) {
+                foreach ($records as $record) {
+                    if ($record->isDirty()) {
+                        $record->saveQuietly();
+                        if ($requireReview && in_array($modelClass, [Tour::class, BlogPost::class, WikiArticle::class], true)) {
+                            try {
+                                \App\Models\SeoMetadata::updateOrCreate(
+                                    ['entity_type' => $modelClass, 'entity_id' => $record->getKey()],
+                                    [
+                                        'editorial_status' => 'in_review',
+                                        'review_notes' => 'Auto-translated via '.$driverName.' on '.now()->toDateTimeString().' — awaiting human localization review.',
+                                    ]
+                                );
+                            } catch (\Throwable $metaEx) {
+                                Log::debug("TranslateCatalogCommand review metadata update skipped for {$modelName} #{$record->getKey()}: ".$metaEx->getMessage());
+                            }
                         }
                     }
                 }

@@ -85,6 +85,8 @@
                                     data-description="{{ $tier->description }}"
                                     data-guest-count="{{ $tier->guest_count ?? 1 }}"
                                     data-icon="{{ $tier->icon }}"
+                                    data-badge="{{ $tier->badge }}"
+                                    data-color="{{ $tier->color }}"
                                     data-popular="{{ $tier->is_popular ? '1' : '0' }}"
                                     data-status="{{ $tier->status }}"
                                     data-priority="{{ $tier->priority }}"
@@ -167,6 +169,17 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="tierBadge" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Badge Label (Optional)</label>
+                        <input type="text" name="badge" id="tierBadge" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. Best Seller">
+                    </div>
+                    <div>
+                        <label for="tierColor" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Accent Color (Hex)</label>
+                        <input type="text" name="color" id="tierColor" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-mono text-slate-800 outline-hidden focus:border-primary" placeholder="#F69044">
+                    </div>
+                </div>
+
                 <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-slate-50 rounded-xl border border-slate-200">
                     <input class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" type="checkbox" name="is_popular" value="1" id="addTierPopular">
                     <span class="text-xs font-bold text-slate-800">Mark as "Popular / Best Value" Badge</span>
@@ -240,6 +253,17 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="editTierBadge" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Badge Label (Optional)</label>
+                        <input type="text" name="badge" id="editTierBadge" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. Best Seller">
+                    </div>
+                    <div>
+                        <label for="editTierColor" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Accent Color (Hex)</label>
+                        <input type="text" name="color" id="editTierColor" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-mono text-slate-800 outline-hidden focus:border-primary" placeholder="#F69044">
+                    </div>
+                </div>
+
                 <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-slate-50 rounded-xl border border-slate-200">
                     <input class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" type="checkbox" name="is_popular" value="1" id="editTierPopular">
                     <span class="text-xs font-bold text-slate-800">Mark as "Popular / Best Value" Badge</span>
@@ -262,12 +286,14 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('.edit-tier-btn').on('click', function() {
+    $(document).on('click', '.edit-tier-btn', function() {
         const btn = $(this);
         $('#editTierName').val(btn.data('name'));
         $('#editTierDisplayName').val(btn.data('display-name'));
         $('#editTierSlug').val(btn.data('slug'));
         $('#editTierIcon').val(btn.data('icon'));
+        $('#editTierBadge').val(btn.data('badge') || '');
+        $('#editTierColor').val(btn.data('color') || '');
         $('#editTierGuestCount').val(btn.data('guest-count') || 1);
         $('#editTierStatus').val(btn.data('status'));
         $('#editTierPriority').val(btn.data('priority'));

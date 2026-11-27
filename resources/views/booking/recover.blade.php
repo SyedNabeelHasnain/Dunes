@@ -110,11 +110,11 @@ window.dataLayer.push({
                     <form id="recoveryCheckoutForm" method="POST" action="{{ localized_route('booking.recover.process', ['reference' => $booking->reference]) }}" class="space-y-5">
                         @csrf
                         <input type="hidden" name="payment_method" id="selectedPaymentMethod" value="{{ $initialMethod }}">
-                        <input type="hidden" name="gps_lat" id="gpsLat" value="{{ request('gps_lat', '') }}">
-                        <input type="hidden" name="gps_lng" id="gpsLng" value="{{ request('gps_lng', '') }}">
-                        <input type="hidden" name="gps_accuracy" id="gpsAccuracy" value="">
-                        <input type="hidden" name="gps_timestamp" id="gpsTimestamp" value="">
-                        <input type="hidden" name="gps_consent" id="gpsConsent" value="No">
+                        <input type="hidden" name="gps_lat" id="recoverGpsLat" value="{{ request('gps_lat', '') }}">
+                        <input type="hidden" name="gps_lng" id="recoverGpsLng" value="{{ request('gps_lng', '') }}">
+                        <input type="hidden" name="gps_accuracy" id="recoverGpsAccuracy" value="">
+                        <input type="hidden" name="gps_timestamp" id="recoverGpsTimestamp" value="">
+                        <input type="hidden" name="gps_consent" id="recoverGpsConsent" value="No">
 
                         <!-- Full Name -->
                         <div>
@@ -225,6 +225,7 @@ window.dataLayer.push({
                                 <div class="payment-card cursor-pointer p-4 rounded-2xl transition-all relative flex flex-col justify-between {{ $initialMethod === 'cash' ? 'border-2 border-primary bg-orange-50/70 shadow-xs ring-2 ring-primary/20' : 'border border-slate-200 bg-white hover:border-primary/50 shadow-2xs' }}"
                                      data-method="cash"
                                      role="radio"
+                                     tabindex="0"
                                      aria-checked="{{ $initialMethod === 'cash' ? 'true' : 'false' }}">
                                     <div>
                                         <div class="flex items-center justify-between mb-2">
@@ -248,6 +249,7 @@ window.dataLayer.push({
                                 <div class="payment-card cursor-pointer p-4 rounded-2xl transition-all relative flex flex-col justify-between {{ $initialMethod === 'advance' ? 'border-2 border-primary bg-orange-50/70 shadow-xs ring-2 ring-primary/20' : 'border border-slate-200 bg-white hover:border-primary/50 shadow-2xs' }}"
                                      data-method="advance"
                                      role="radio"
+                                     tabindex="0"
                                      aria-checked="{{ $initialMethod === 'advance' ? 'true' : 'false' }}">
                                     <div>
                                         <div class="flex items-center justify-between mb-2">
@@ -270,6 +272,7 @@ window.dataLayer.push({
                                 <div class="payment-card cursor-pointer p-4 rounded-2xl transition-all relative flex flex-col justify-between {{ $initialMethod === 'full' ? 'border-2 border-primary bg-orange-50/70 shadow-xs ring-2 ring-primary/20' : 'border border-slate-200 bg-white hover:border-primary/50 shadow-2xs' }}"
                                      data-method="full"
                                      role="radio"
+                                     tabindex="0"
                                      aria-checked="{{ $initialMethod === 'full' ? 'true' : 'false' }}">
                                     <div>
                                         <div class="flex items-center justify-between mb-2">
@@ -296,7 +299,7 @@ window.dataLayer.push({
                             <label class="flex items-start gap-3 cursor-pointer">
                                 <input type="checkbox" name="agree_terms" id="agreeTerms" value="1" checked required class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary border-slate-300">
                                 <span class="text-xs text-slate-600 leading-snug">
-                                    I agree to the <a href="{{ localized_route('terms') }}" target="_blank" class="text-primary font-bold hover:underline">Terms of Service</a> & <a href="{{ localized_route('cancellation') }}" target="_blank" class="text-primary font-bold hover:underline">Cancellation Policy</a> (Free cancellation with full refund up to 24 hours prior to departure).
+                                    I agree to the <a href="{{ localized_route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Terms of Service</a> & <a href="{{ localized_route('cancellation') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Cancellation Policy</a> (Free cancellation with full refund up to 24 hours prior to departure).
                                 </span>
                             </label>
                         </div>
@@ -452,7 +455,7 @@ window.dataLayer.push({
                     </div>
                     <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $waPhone) }}?text={{ rawurlencode('Hi Dunes Discovery, I am reviewing my booking #' . $booking->reference . ' for ' . $booking->tour_name . '. Can you assist me?') }}" 
                        target="_blank" 
-                       rel="noopener"
+                       rel="noopener noreferrer"
                        class="shrink-0 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs inline-flex items-center gap-1.5 shadow-sm transition-colors">
                         <i class="bi bi-whatsapp"></i> Chat Now
                     </a>
@@ -553,11 +556,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     const lng = pos.coords.longitude;
                     const accuracy = pos.coords.accuracy;
 
-                    document.getElementById('gpsLat').value = lat;
-                    document.getElementById('gpsLng').value = lng;
-                    document.getElementById('gpsAccuracy').value = accuracy;
-                    document.getElementById('gpsTimestamp').value = new Date().toISOString();
-                    document.getElementById('gpsConsent').value = 'Yes';
+                    document.getElementById('recoverGpsLat').value = lat;
+                    document.getElementById('recoverGpsLng').value = lng;
+                    document.getElementById('recoverGpsAccuracy').value = accuracy;
+                    document.getElementById('recoverGpsTimestamp').value = new Date().toISOString();
+                    document.getElementById('recoverGpsConsent').value = 'Yes';
 
                     // Reverse geocode via Nominatim
                     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)

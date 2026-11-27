@@ -51,7 +51,7 @@
                             <input class="rounded-full text-primary focus:ring-primary w-4 h-4 mt-0.5" type="radio" name="target_type" id="targetAll" value="all" checked onchange="handleTargetChange()">
                             <div>
                                 <div class="font-black text-slate-900 text-xs">All Active Subscribers</div>
-                                <div class="text-[11px] text-slate-500 mt-0.5">Broadcast to every active, unsubscribed recipient</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">Broadcast to every active, subscribed recipient</div>
                                 <div class="mt-2.5">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-white">
                                         {{ number_format($totalActiveSubscribers) }} Recipients
@@ -170,7 +170,7 @@
 
                     <!-- Hidden container storing templates json for instantaneous loading -->
                     <script type="application/json" id="templatesData">
-                        {!! json_encode($templates->keyBy('id')) !!}
+                        {!! json_encode($templates->keyBy('id'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
                     </script>
 
                     <textarea name="content_html" id="campaignHtml" class="w-full font-mono rounded-xl p-4 text-xs bg-slate-950 text-sky-300 border border-slate-800 outline-hidden focus:ring-1 focus:ring-primary @error('content_html') border-rose-500 @enderror" rows="22" style="line-height: 1.6;" required>{{ old('content_html', $templates->first() ? $templates->first()->content_html : '') }}</textarea>
@@ -455,7 +455,7 @@ async function sendDiagnosticTestEmail() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
         const subjectVal = document.getElementById('campaignSubject')?.value?.trim() || '';
         const htmlVal = editor ? editor.value : '';
-        const response = await fetch('{{ route("admin.settings.mail.test") }}', {
+        const response = await fetch('{{ route("admin.campaigns.send-draft-test") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -108,7 +108,22 @@ class AdminGovernanceController extends Controller
 
     public function exportLogs(Request $request): StreamedResponse
     {
-        $logs = ConfigAuditLog::query()->latest()->limit(2000)->get();
+        $logQuery = ConfigAuditLog::query()->latest();
+        if ($request->filled('section')) {
+            $logQuery->where('section', $request->string('section'));
+        }
+        if ($request->filled('action')) {
+            $logQuery->where('action', $request->string('action'));
+        }
+        if ($request->filled('search')) {
+            $term = '%'.$request->string('search')->trim().'%';
+            $logQuery->where(function ($q) use ($term) {
+                $q->where('setting_key', 'like', $term)
+                    ->orWhere('summary', 'like', $term)
+                    ->orWhere('user_email', 'like', $term);
+            });
+        }
+        $logs = $logQuery->limit(2000)->get();
 
         return response()->streamDownload(function () use ($logs) {
             $out = fopen('php://output', 'w');

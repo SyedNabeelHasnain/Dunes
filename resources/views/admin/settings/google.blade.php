@@ -88,7 +88,7 @@
                             <label for="google_places_api_key" class="block text-xs font-bold text-slate-700 mb-1.5">
                                 Google Places API Key
                             </label>
-                            <input type="password" name="google_places_api_key" id="google_places_api_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['google_places_api_key'] ?? '' }}" placeholder="AIzaSy...">
+                            <input type="password" name="google_places_api_key" id="google_places_api_key" autocomplete="new-password" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="" placeholder="{{ !empty($settings['google_places_api_key']) ? '•••••••• (Configured — leave blank to keep current)' : 'AIzaSy...' }}">
                             <div class="mt-1 text-[11px] text-slate-500">Google Cloud API key with Places API enabled for automatic live review sync.</div>
                         </div>
 
@@ -230,8 +230,9 @@
                         </div>
 
                         <div>
-                            <label for="google_maps_api_key" class="block text-xs font-bold text-slate-700 mb-1.5">Google Maps API Key</label>
-                            <input type="text" name="google_maps_api_key" id="google_maps_api_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['google_maps_api_key'] ?? '' }}" placeholder="Key for interactive location maps">
+                            <label for="google_maps_api_key" class="block text-xs font-bold text-slate-700 mb-1.5">Google Maps JavaScript API Key (Optional)</label>
+                            <input type="password" name="google_maps_api_key" id="google_maps_api_key" autocomplete="new-password" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="" placeholder="{{ !empty($settings['google_maps_api_key']) ? '•••••••• (Configured — leave blank to keep current)' : 'Optional Maps SDK key' }}">
+                            <div class="mt-1 text-[11px] text-slate-500">Reserved for future interactive Maps SDK features; the Contact page currently embeds the free Google Maps iframe URL configured in General Settings.</div>
                         </div>
                     </div>
                 </div>
@@ -326,7 +327,7 @@
                                 </div>
                                 <div>
                                     <label for="recaptcha_secret_key" class="block text-xs font-bold text-slate-700 mb-1.5">reCAPTCHA Secret Key</label>
-                                    <input type="password" name="recaptcha_secret_key" id="recaptcha_secret_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="{{ $settings['recaptcha_secret_key'] ?? '' }}" placeholder="Secret Key">
+                                    <input type="password" name="recaptcha_secret_key" id="recaptcha_secret_key" autocomplete="new-password" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="" placeholder="{{ !empty($settings['recaptcha_secret_key']) ? '•••••••• (Configured — leave blank to keep)' : 'Secret Key' }}">
                                 </div>
                                 <div>
                                     <label for="antispam_recaptcha_min_score" class="block text-xs font-bold text-slate-700 mb-1.5">Minimum Human Score (0.1 - 0.9)</label>
@@ -354,7 +355,7 @@
                                 </div>
                                 <div>
                                     <label for="turnstile_secret_key" class="block text-xs font-bold text-slate-700 mb-1.5">Turnstile Secret Key</label>
-                                    <input type="password" name="turnstile_secret_key" id="turnstile_secret_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="{{ $settings['turnstile_secret_key'] ?? '' }}" placeholder="0x4AAAAAAA...">
+                                    <input type="password" name="turnstile_secret_key" id="turnstile_secret_key" autocomplete="new-password" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="" placeholder="{{ !empty($settings['turnstile_secret_key']) ? '•••••••• (Configured — leave blank to keep)' : '0x4AAAAAAA...' }}">
                                 </div>
                             </div>
                         </div>

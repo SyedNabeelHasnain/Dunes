@@ -3,11 +3,11 @@
 namespace App\Services\Audit\Checkers;
 
 use App\Models\BlogPost;
-use App\Models\Page;
 use App\Models\Setting;
 use App\Models\Tour;
 use App\Models\WikiArticle;
 use App\Services\Seo\KeywordIntelligenceService;
+use Illuminate\Support\Facades\Log;
 
 class SeoAuditChecker implements AuditCheckerInterface
 {
@@ -225,7 +225,8 @@ class SeoAuditChecker implements AuditCheckerInterface
                     ];
                 }
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('SeoAuditChecker wiki metadata check failed: '.$e->getMessage());
         }
 
         // 5. Focus Keyword Cannibalization Check
@@ -245,7 +246,8 @@ class SeoAuditChecker implements AuditCheckerInterface
                     'recommended_action' => (string) ($group['recommendation'] ?? 'Differentiate focus keywords or consolidate overlapping pages.'),
                 ];
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('SeoAuditChecker keyword cannibalization check failed: '.$e->getMessage());
         }
 
         return $issues;

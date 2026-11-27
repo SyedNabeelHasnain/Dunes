@@ -136,7 +136,7 @@ class AdminSpotlightController extends Controller
         // 3. Customer Inquiries
         if (in_array($categoryFilter, ['all', 'inquiries'])) {
             try {
-                $inquiries = Contact::where(function ($query) use ($q) {
+                $inquiries = Contact::clean()->where(function ($query) use ($q) {
                     $query->where('name', 'like', "%{$q}%")
                         ->orWhere('email', 'like', "%{$q}%")
                         ->orWhere('phone', 'like', "%{$q}%")

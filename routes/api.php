@@ -25,10 +25,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/syndication/tours', [SyndicationController::class, 'tours'])->middleware('throttle:60,1');
 
     // Tours Auto-complete Live Search
-    Route::get('/tours/search', [TourController::class, 'liveSearch']);
+    Route::get('/tours/search', [TourController::class, 'liveSearch'])->middleware('throttle:60,1');
 
     // GeoIP & IP utilities
-    Route::get('/geoip', [ApiController::class, 'geoip']);
+    Route::get('/geoip', [ApiController::class, 'geoip'])->middleware('throttle:30,1');
 
     // Email OTP Verification
     Route::post('/email/status', [EmailVerificationController::class, 'status'])->middleware('throttle:20,1');
@@ -37,7 +37,7 @@ Route::prefix('v1')->group(function () {
 
     // Coupon Validation & Marketing
     Route::post('/coupon/validate', [CouponController::class, 'validateCoupon'])->middleware('throttle:30,1');
-    Route::get('/coupon/featured', [CouponController::class, 'featured']);
+    Route::get('/coupon/featured', [CouponController::class, 'featured'])->middleware('throttle:60,1');
     Route::post('/welcome-offer/claim', [WelcomeOfferController::class, 'claimOffer'])->middleware('throttle:6,1');
 
     // Booking Checkout & Draft Lead Recovery
@@ -66,9 +66,6 @@ Route::prefix('v1')->group(function () {
     Route::post('/telemetry/heatmaps/click', [SessionTelemetryController::class, 'recordHeatmapClick'])->middleware('throttle:300,1');
     Route::post('/telemetry/heatmaps/scroll', [SessionTelemetryController::class, 'recordHeatmapScroll'])->middleware('throttle:120,1');
 
-    // Admin Real-time Active Visitors tracking
-    Route::middleware('auth:sanctum')->get('/visitors/active', [AdminDashboardController::class, 'activeVisitors']);
-
     // Scheduler Crontab Health Check Endpoint
     Route::get('/cron/status', function () {
         $lastHeartbeat = \Illuminate\Support\Facades\Cache::get('scheduler_last_heartbeat');
@@ -79,19 +76,29 @@ Route::prefix('v1')->group(function () {
             'cron_active' => (bool) $isRecent,
             'last_heartbeat' => $lastHeartbeat,
             'server_time' => now()->toIso8601String(),
-            'minutes_ago' => $lastHeartbeat ? \Carbon\Carbon::parse($lastHeartbeat)->diffInMinutes(now()) : null,
+            'minutes_ago' => $lastHeartbeat ? (int) floor(\Carbon\Carbon::parse($lastHeartbeat)->diffInMinutes(now())) : null,
             'message' => $isRecent
-                ? 'Hostinger crontab is active and executing successfully.'
-                : ($lastHeartbeat ? 'Hostinger crontab was seen earlier but heartbeat is stale.' : 'No scheduler heartbeat recorded yet. Ensure cron is running with proper directory and PHP path.')
+                ? 'Scheduler crontab is active and executing successfully.'
+                : ($lastHeartbeat ? 'Scheduler crontab was seen earlier but heartbeat is stale.' : 'No scheduler heartbeat recorded yet. Ensure cron is running with proper directory and PHP path.'),
         ]);
-    });
+    })->middleware('throttle:30,1');
 
     // Trigger scheduler runner via Web / Cron HTTP request
     Route::match(['get', 'post'], '/cron/run', function (\Illuminate\Http\Request $request) {
         $token = $request->bearerToken() ?: $request->post('token', $request->query('token'));
-        $validToken = (string) config('services.cron.secret_token', 'dunes_cron_2026');
+        $validToken = (string) config('services.cron.secret_token', '');
+        if ($validToken === '' && app()->environment('testing')) {
+            $validToken = 'dunes_cron_2026';
+        }
 
-        if (empty($token) || empty($validToken) || !hash_equals($validToken, (string) $token)) {
+        if (app()->isProduction() && ($validToken === '' || $validToken === 'dunes_cron_2026')) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cron secret token must be configured in production.',
+            ], 503, ['Cache-Control' => 'no-store, private', 'X-Robots-Tag' => 'noindex, nofollow']);
+        }
+
+        if (empty($token) || empty($validToken) || ! hash_equals($validToken, (string) $token)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized cron token.',
@@ -106,7 +113,6 @@ Route::prefix('v1')->group(function () {
             'cron_active' => true,
             'server_time' => now()->toIso8601String(),
             'heartbeat' => now()->toIso8601String(),
-            'output' => trim(\Illuminate\Support\Facades\Artisan::output()) ?: 'No scheduled tasks needed to run right now.',
             'message' => 'Scheduler executed successfully.',
         ], 200, ['Cache-Control' => 'no-store, private', 'X-Robots-Tag' => 'noindex, nofollow']);
     })->middleware('throttle:10,1');

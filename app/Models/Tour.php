@@ -173,7 +173,7 @@ class Tour extends Model
             ];
         }
 
-        if ($categorySlug === 'city-tours') {
+        if (in_array($categorySlug, ['city-tours', 'city-tour'], true)) {
             return [
                 'dubai-city-tour-burj-khalifa-downtown-skyline-panorama.webp',
                 'dubai-city-tour-atlantis-the-palm-resort-waters.webp',
@@ -181,7 +181,7 @@ class Tour extends Model
             ];
         }
 
-        if ($categorySlug === 'cruises') {
+        if (in_array($categorySlug, ['cruises', 'water-activity', 'dhow-cruises'], true)) {
             return [
                 'dhow-cruise-catamaran-dubai-marina-illuminated-night-skyline.webp',
                 'dhow-cruise-dinner-dubai-dune-disovery-tourism.avif',
@@ -208,7 +208,7 @@ class Tour extends Model
     public function tiers()
     {
         return $this->belongsToMany(Tier::class, 'tour_tiers')
-            ->withPivot('price', 'old_price', 'price_type', 'guest_count')
+            ->withPivot('price', 'old_price', 'child_price', 'price_type', 'guest_count')
             ->orderBy('tiers.priority', 'asc');
     }
 
@@ -236,8 +236,11 @@ class Tour extends Model
     public function getStartingPriceAttribute(): float
     {
         if ($this->relationLoaded('tiers') && $this->tiers->isNotEmpty()) {
-            $min = $this->tiers->min(fn ($t) => $t->pivot->price ?? 0);
-            if ($min !== null && (float) $min > 0) {
+            $min = $this->tiers
+                ->map(fn ($t) => (float) ($t->pivot->price ?? 0))
+                ->filter(fn (float $price) => $price > 0)
+                ->min();
+            if ($min !== null && $min > 0) {
                 return (float) $min;
             }
         }

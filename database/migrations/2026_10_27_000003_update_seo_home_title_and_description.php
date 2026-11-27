@@ -24,6 +24,7 @@ return new class extends Migration
             ['setting_value' => $desc, 'updated_at' => now()]
         );
 
+        Cache::forget('site_settings_cache');
         Cache::forget('site_settings_all');
         Cache::forget('site_home_cache');
     }
@@ -44,6 +45,7 @@ return new class extends Migration
             'updated_at' => now(),
         ]);
 
+        Cache::forget('site_settings_cache');
         Cache::forget('site_settings_all');
         Cache::forget('site_home_cache');
     }

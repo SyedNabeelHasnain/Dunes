@@ -303,6 +303,16 @@
     </div>
 
     <!-- Global Catalog Auto-Translation Card -->
+    @php
+        $nonDefaultLangs = $activeLanguages->filter(fn ($l) => ! $l->is_default);
+        $activeDriverLabel = match($activeService) {
+            'deepl' => 'DeepL',
+            'google' => 'Google Cloud Translate',
+            default => 'None Configured',
+        };
+        $allCodesLabel = $activeLanguages->pluck('code')->map(fn ($c) => strtoupper($c))->implode(', ');
+        $targetCodesLabel = $nonDefaultLangs->pluck('code')->map(fn ($c) => strtoupper($c))->implode(', ');
+    @endphp
     <div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden mb-8">
         <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-amber-50/60 to-orange-50/40 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -310,12 +320,12 @@
                     <i class="bi bi-magic"></i>
                 </div>
                 <div>
-                    <h6 class="text-sm font-black text-slate-900">One-Click Global Catalog Auto-Translation (DeepL)</h6>
-                    <div class="text-xs text-slate-500">Translate all 14 commercial tours, 20+ blog posts, FAQs, itineraries, legal pages, and email templates across all 5 languages.</div>
+                    <h6 class="text-sm font-black text-slate-900">One-Click Global Catalog Auto-Translation ({{ $activeDriverLabel }})</h6>
+                    <div class="text-xs text-slate-500">Translate commercial tours, blog posts, FAQs, itineraries, legal pages, and email templates across all {{ $activeLanguages->count() }} active languages.</div>
                 </div>
             </div>
             <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
-                5 Languages (EN, AR, RU, ES, IT)
+                {{ $activeLanguages->count() }} Languages ({{ $allCodesLabel }})
             </span>
         </div>
 
@@ -325,11 +335,10 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Target Language</label>
                     <select x-model="catalogLocale" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden">
-                        <option value="">All 4 Non-Default Languages (AR, RU, ES, IT)</option>
-                        <option value="ar">Arabic Only (العربية - RTL)</option>
-                        <option value="ru">Russian Only (Русский - LTR)</option>
-                        <option value="es">Spanish Only (Español - LTR)</option>
-                        <option value="it">Italian Only (Italiano - LTR)</option>
+                        <option value="">All {{ $nonDefaultLangs->count() }} Non-Default Languages ({{ $targetCodesLabel }})</option>
+                        @foreach($nonDefaultLangs as $lang)
+                            <option value="{{ $lang->code }}">{{ $lang->name }} Only ({{ $lang->native_name }} - {{ strtoupper($lang->direction ?? 'ltr') }})</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -349,7 +358,7 @@
                             :disabled="catalogTranslating"
                             class="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
                         <i class="bi" :class="catalogTranslating ? 'bi-arrow-repeat animate-spin' : 'bi-translate'"></i>
-                        <span x-text="catalogTranslating ? 'Translating Catalog via DeepL...' : 'Translate Entire Portal Catalog Now'"></span>
+                        <span x-text="catalogTranslating ? 'Translating Catalog via {{ $activeDriverLabel }}...' : 'Translate Entire Portal Catalog Now'"></span>
                     </button>
                 </div>
             </div>

@@ -45,6 +45,17 @@ class Backlink extends Model
         'notes',
     ];
 
+    protected $appends = [
+        'source_domain',
+        'rel_type',
+        'platform',
+        'domain_authority',
+        'http_status',
+        'last_crawled_at',
+        'referral_visits',
+        'attributed_revenue_aed',
+    ];
+
     protected $casts = [
         'domain_authority_est' => 'integer',
         'http_status_code' => 'integer',

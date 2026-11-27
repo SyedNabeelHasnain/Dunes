@@ -219,7 +219,7 @@
                                     <button type="button" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs cursor-pointer" onclick="editSubscriber({{ json_encode($s) }}, {{ json_encode($s->groups->pluck('id')) }})" title="Edit Details">
                                         <i class="bi bi-pencil text-xs"></i>
                                     </button>
-                                    <button type="button" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs cursor-pointer" onclick="confirmDelete({{ $s->id }}, '{{ $s->email }}')" title="Delete">
+                                    <button type="button" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs cursor-pointer" data-id="{{ $s->id }}" data-email="{{ $s->email }}" onclick="confirmDelete(this.dataset.id, this.dataset.email)" title="Delete">
                                         <i class="bi bi-trash text-xs"></i>
                                     </button>
                                 </div>
@@ -347,6 +347,7 @@
                     </select>
                 </div>
                 <div>
+                    <input type="hidden" name="groups_submitted" value="1">
                     <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Assign to Groups</label>
                     <div class="flex flex-wrap gap-2">
                         @foreach($groups as $g)
@@ -488,7 +489,7 @@ function editSubscriber(sub, groupIds) {
 function confirmDelete(id, email) {
     Swal.fire({
         title: 'Delete Subscriber?',
-        html: `Are you sure you want to delete <strong>${email}</strong>?`,
+        text: `Are you sure you want to delete ${email}?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',

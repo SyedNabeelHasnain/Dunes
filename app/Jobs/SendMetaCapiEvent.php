@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\Setting;
 use App\Services\SettingsService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,6 +17,10 @@ class SendMetaCapiEvent implements ShouldQueue
 
     public int $tries = 3;
 
+    public int $timeout = 30;
+
+    public int $maxExceptions = 3;
+
     public array $backoff = [15, 60, 180];
 
     protected $eventName;
@@ -32,6 +35,8 @@ class SendMetaCapiEvent implements ShouldQueue
 
     protected $eventSourceUrl;
 
+    protected int $eventTime;
+
     /**
      * Create a new job instance.
      */
@@ -43,6 +48,7 @@ class SendMetaCapiEvent implements ShouldQueue
         $this->userAgent = $userAgent;
         $this->cookies = $cookies;
         $this->eventSourceUrl = $eventSourceUrl;
+        $this->eventTime = time();
     }
 
     /**
@@ -51,8 +57,8 @@ class SendMetaCapiEvent implements ShouldQueue
     public function handle(): void
     {
         $settings = app(SettingsService::class);
-        $pixelId = trim($settings->get('meta_pixel_id', ''));
-        $token = trim($settings->get('meta_capi_token', '') ?: $settings->get('meta_access_token', ''));
+        $pixelId = trim((string) $settings->get('meta_pixel_id', ''));
+        $token = trim((string) ($settings->get('meta_access_token', '') ?: $settings->get('meta_capi_token', '')));
 
         if (empty($pixelId) || empty($token)) {
             return;
@@ -102,7 +108,7 @@ class SendMetaCapiEvent implements ShouldQueue
 
         $eventPayload = [
             'event_name' => $this->eventName,
-            'event_time' => time(),
+            'event_time' => $this->eventTime ?: time(),
             'action_source' => 'website',
             'event_source_url' => $this->eventSourceUrl,
             'user_data' => $userData,
@@ -135,15 +141,25 @@ class SendMetaCapiEvent implements ShouldQueue
                 ]);
 
                 if (($status === 429 || $status >= 500) && $this->job && $this->job->getConnectionName() !== 'sync') {
-                    $this->release(60);
+                    $delay = $this->backoff[max(0, $this->attempts() - 1)] ?? 180;
+                    $this->release($delay);
                 }
             }
         } catch (\Throwable $e) {
             Log::warning("Meta CAPI Exception ({$this->eventName}): ".$e->getMessage());
 
             if ($this->job && $this->job->getConnectionName() !== 'sync') {
-                $this->release(60);
+                $delay = $this->backoff[max(0, $this->attempts() - 1)] ?? 180;
+                $this->release($delay);
             }
         }
+    }
+
+    public function failed(?\Throwable $exception): void
+    {
+        Log::error("Meta CAPI Job Permanently Failed ({$this->eventName})", [
+            'event_id' => $this->data['event_id'] ?? null,
+            'error' => $exception?->getMessage(),
+        ]);
     }
 }

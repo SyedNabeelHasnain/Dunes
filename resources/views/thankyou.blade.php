@@ -179,23 +179,23 @@
                         @if($booking->coupon_code && $booking->discount_amount > 0)
                         <div>
                             <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Original Subtotal</div>
-                            <div class="font-semibold text-slate-500 line-through text-sm">AED {{ number_format($booking->original_total, 2) }}</div>
+                            <div class="font-semibold text-slate-500 line-through text-sm">AED {{ number_format((float) ($booking->original_total ?? 0), 2) }}</div>
                             <div class="text-slate-500 text-xs font-bold uppercase tracking-wider mt-1">Promo Discount ({{ $booking->coupon_code }})</div>
-                            <div class="font-bold text-emerald-600 text-sm">-AED {{ number_format($booking->discount_amount, 2) }}</div>
+                            <div class="font-bold text-emerald-600 text-sm">-AED {{ number_format((float) ($booking->discount_amount ?? 0), 2) }}</div>
                         </div>
                         @endif
                         <div class="pt-2 border-t border-slate-200">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500 font-medium">Total Package:</span>
-                                <span class="font-extrabold text-primary text-lg">AED {{ number_format($booking->total, 2) }}</span>
+                                <span class="font-extrabold text-primary text-lg">AED {{ number_format((float) ($booking->total ?? 0), 2) }}</span>
                             </div>
                             <div class="flex justify-between items-center text-xs text-slate-600 mt-1">
                                 <span>Paid Online:</span>
-                                <span class="font-semibold text-emerald-600">AED {{ number_format($booking->payment_amount ?? 0, 2) }}</span>
+                                <span class="font-semibold text-emerald-600">AED {{ number_format((float) ($booking->payment_amount ?? 0), 2) }}</span>
                             </div>
                             <div class="flex justify-between items-center text-xs text-slate-600 mt-1">
                                 <span>Balance Due:</span>
-                                <span class="font-semibold text-rose-600">AED {{ number_format($booking->balance_due ?? 0, 2) }}</span>
+                                <span class="font-semibold text-rose-600">AED {{ number_format((float) ($booking->balance_due ?? 0), 2) }}</span>
                             </div>
                         </div>
                     </div>
@@ -204,12 +204,12 @@
                 @if($method === 'full' && $paymentStatus === 'completed')
                     <div class="mt-6 p-4 bg-white border border-slate-200 rounded-2xl space-y-1.5 text-xs sm:text-sm">
                         <div class="font-bold text-slate-900 text-sm mb-2">Invoice Summary</div>
-                        <div class="flex justify-between text-slate-500"><span>Subtotal</span><span>AED {{ number_format($booking->subtotal, 2) }}</span></div>
-                        <div class="flex justify-between text-slate-500"><span>Addons</span><span>AED {{ number_format($booking->addons_total, 2) }}</span></div>
+                        <div class="flex justify-between text-slate-500"><span>Subtotal</span><span>AED {{ number_format((float) ($booking->subtotal ?? 0), 2) }}</span></div>
+                        <div class="flex justify-between text-slate-500"><span>Addons</span><span>AED {{ number_format((float) ($booking->addons_total ?? 0), 2) }}</span></div>
                         @if($booking->coupon_code && $booking->discount_amount > 0)
-                        <div class="flex justify-between text-emerald-600"><span>Promo Code ({{ $booking->coupon_code }})</span><span>-AED {{ number_format($booking->discount_amount, 2) }}</span></div>
+                        <div class="flex justify-between text-emerald-600"><span>Promo Code ({{ $booking->coupon_code }})</span><span>-AED {{ number_format((float) ($booking->discount_amount ?? 0), 2) }}</span></div>
                         @endif
-                        <div class="flex justify-between font-bold pt-2 border-t border-slate-200 text-slate-900"><span>Total Paid</span><span>AED {{ number_format($booking->payment_amount, 2) }}</span></div>
+                        <div class="flex justify-between font-bold pt-2 border-t border-slate-200 text-slate-900"><span>Total Paid</span><span>AED {{ number_format((float) ($booking->payment_amount ?? 0), 2) }}</span></div>
                     </div>
                 @endif
             @endif
@@ -226,10 +226,10 @@
                 Your DTCM-certified digital voucher with real-time driver verification QR code is ready. You can present it directly from your phone or download an official PDF copy.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-3">
-                <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" rel="noopener noreferrer" class="btn-desert-animated font-bold rounded-full px-6 py-3.5 text-white shadow-md inline-flex items-center justify-center gap-2 text-sm sm:text-base">
+                <a href="{{ route('booking.voucher', ['reference' => $booking->reference]) }}" target="_blank" rel="noopener noreferrer" class="btn-desert-animated font-bold rounded-full px-6 py-3.5 text-white shadow-md inline-flex items-center justify-center gap-2 text-sm sm:text-base">
                     <i class="bi bi-phone text-lg"></i> View Digital Boarding Pass
                 </a>
-                <a href="{{ route('booking.voucher.pdf', $booking->reference) }}" class="border border-slate-800 hover:bg-slate-900 hover:text-white text-slate-800 font-bold rounded-full px-6 py-3.5 transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base">
+                <a href="{{ route('booking.voucher.pdf', ['reference' => $booking->reference]) }}" class="border border-slate-800 hover:bg-slate-900 hover:text-white text-slate-800 font-bold rounded-full px-6 py-3.5 transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base">
                     <i class="bi bi-file-earmark-pdf text-rose-500 text-lg"></i> Download PDF Voucher
                 </a>
             </div>

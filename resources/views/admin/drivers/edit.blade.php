@@ -111,6 +111,7 @@
             </div>
 
             <div>
+                <input type="hidden" name="languages_submitted" value="1">
                 <label class="block text-xs font-bold text-slate-700 mb-2">Spoken Languages</label>
                 @php $driverLangs = $driver->languages ?: ['English', 'Arabic']; @endphp
                 <div class="flex flex-wrap gap-3">

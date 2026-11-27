@@ -106,6 +106,7 @@ return new class extends Migration
         }
 
         try {
+            Cache::forget('site_settings_cache');
             Cache::forget('site_settings_all');
             Cache::forget('sitemap_tours_xml');
             Cache::forget('sitemap_blogs_xml');

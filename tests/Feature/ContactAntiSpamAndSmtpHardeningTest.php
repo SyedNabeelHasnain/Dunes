@@ -348,7 +348,7 @@ class ContactAntiSpamAndSmtpHardeningTest extends TestCase
 
     public function test_admin_inquiries_scan_and_purge_wipes_historical_spam_while_preserving_clean_leads(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'super_admin']);
 
         $legit = Contact::create([
             'name' => 'Amina Hassan',

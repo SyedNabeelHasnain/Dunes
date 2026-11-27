@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Driver;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AdminVehicleController extends Controller
 {
@@ -64,7 +65,7 @@ class AdminVehicleController extends Controller
     {
         $data = $request->validate([
             'model_name' => 'required|string|max:255',
-            'plate_number' => 'required|string|max:50|unique:vehicles,plate_number',
+            'plate_number' => ['required', 'string', 'max:50', Rule::unique('vehicles', 'plate_number')->whereNull('deleted_at')],
             'plate_code' => 'required|string|max:20',
             'plate_city' => 'nullable|string|max:50',
             'year' => 'nullable|integer|min:2015|max:' . (date('Y') + 1),
@@ -125,7 +126,10 @@ class AdminVehicleController extends Controller
     public function edit($id)
     {
         $vehicle = Vehicle::findOrFail($id);
-        $drivers = Driver::where('status', 'active')->orderBy('name')->get();
+        $drivers = Driver::where('status', 'active')
+            ->when($vehicle->default_driver_id, fn ($q) => $q->orWhere('id', $vehicle->default_driver_id))
+            ->orderBy('name')
+            ->get();
 
         return view('admin.vehicles.edit', compact('vehicle', 'drivers'));
     }
@@ -139,7 +143,7 @@ class AdminVehicleController extends Controller
 
         $data = $request->validate([
             'model_name' => 'required|string|max:255',
-            'plate_number' => 'required|string|max:50|unique:vehicles,plate_number,' . $id,
+            'plate_number' => ['required', 'string', 'max:50', Rule::unique('vehicles', 'plate_number')->ignore($id)->whereNull('deleted_at')],
             'plate_code' => 'required|string|max:20',
             'plate_city' => 'nullable|string|max:50',
             'year' => 'nullable|integer|min:2015|max:' . (date('Y') + 1),
@@ -154,10 +158,19 @@ class AdminVehicleController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
+        if ($request->boolean('features_submitted') && ! $request->has('features')) {
+            $data['features'] = [];
+        }
+
+        $oldDriverId = $vehicle->default_driver_id;
         $vehicle->update($data);
 
-        if (!empty($data['default_driver_id'])) {
-            Driver::where('id', $data['default_driver_id'])->update(['default_vehicle_id' => $vehicle->id]);
+        $newDriverId = $data['default_driver_id'] ?? null;
+        if ($oldDriverId && (string) $oldDriverId !== (string) $newDriverId) {
+            Driver::where('id', $oldDriverId)->where('default_vehicle_id', $vehicle->id)->update(['default_vehicle_id' => null]);
+        }
+        if (! empty($newDriverId)) {
+            Driver::where('id', $newDriverId)->update(['default_vehicle_id' => $vehicle->id]);
         }
 
         return redirect()->route('admin.vehicles.index')->with('success', "Vehicle {$vehicle->display_name} updated successfully.");

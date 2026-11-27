@@ -114,6 +114,23 @@
                     </tr>
 
                     <!-- 3. Authority & Verified Social Media Luxury Dark Footer -->
+                    @php
+                        $emailSettings = $settings ?? app(\App\Services\SettingsService::class)->all();
+                        $emSiteName = $emailSettings['site_name'] ?? 'Dunes Discovery Tourism LLC';
+                        $emLicense = $emailSettings['company_license_number'] ?? '1430583';
+                        $emPhone = $emailSettings['site_phone'] ?? '+971 50 245 6056';
+                        $emPhoneHref = preg_replace('/[^0-9+]/', '', (string) $emPhone) ?: '+971502456056';
+                        $emWaDigits = preg_replace('/[^0-9]/', '', (string) ($emailSettings['site_whatsapp'] ?? '971502456056')) ?: '971502456056';
+                        $emSupportEmail = !empty($emailSettings['site_support_email'])
+                            ? $emailSettings['site_support_email']
+                            : ($emailSettings['site_email'] ?? 'reservations@dunesdiscoverytourism.com');
+                        $emAddress = $emailSettings['site_address'] ?? 'Dubai, United Arab Emirates';
+                        $emCopyright = $emailSettings['site_copyright'] ?? 'All rights reserved.';
+                        $emIg = !empty($emailSettings['social_instagram']) ? $emailSettings['social_instagram'] : 'https://www.instagram.com/dunesdiscoverytourism';
+                        $emFb = !empty($emailSettings['social_facebook']) ? $emailSettings['social_facebook'] : 'https://www.facebook.com/dunesdiscoverytourism';
+                        $emTa = !empty($emailSettings['social_tripadvisor']) ? $emailSettings['social_tripadvisor'] : 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html';
+                        $emTt = !empty($emailSettings['social_tiktok']) ? $emailSettings['social_tiktok'] : 'https://www.tiktok.com/@dunesdiscoverytourism';
+                    @endphp
                     <tr>
                         <td style="background-color: #090d16; border-top: 1px solid #1e293b; padding: 36px 28px 30px 28px; text-align: center; color: #94a3b8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
                             
@@ -125,27 +142,27 @@
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto 22px auto;">
                                 <tr>
                                     <td align="center" style="padding: 3px;">
-                                        <a href="https://www.instagram.com/dunesdiscoverytourism" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
+                                        <a href="{{ $emIg }}" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
                                             Instagram
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
-                                        <a href="https://www.facebook.com/dunesdiscoverytourism" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
+                                        <a href="{{ $emFb }}" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
                                             Facebook
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
-                                        <a href="https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
+                                        <a href="{{ $emTa }}" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
                                             TripAdvisor
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
-                                        <a href="https://wa.me/971502456056" target="_blank" style="display: inline-block; background-color: #064e3b; color: #6ee7b7; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #047857; text-decoration: none; margin: 2px;">
+                                        <a href="https://wa.me/{{ $emWaDigits }}" target="_blank" style="display: inline-block; background-color: #064e3b; color: #6ee7b7; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #047857; text-decoration: none; margin: 2px;">
                                             WhatsApp Concierge
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
-                                        <a href="https://www.tiktok.com/@dunesdiscoverytourism" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
+                                        <a href="{{ $emTt }}" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
                                             TikTok
                                         </a>
                                     </td>
@@ -156,11 +173,11 @@
                             <div style="height: 1px; background-color: #1e293b; width: 100%; margin: 20px 0;"></div>
 
                             <!-- Government Licensing Credentials -->
-                            <div style="font-size: 13px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; margin-bottom: 4px;">
-                                DUNES DISCOVERY TOURISM LLC
+                            <div style="font-size: 13px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; margin-bottom: 4px; text-transform: uppercase;">
+                                {{ $emSiteName }}
                             </div>
                             <div style="font-size: 11px; color: #F58F43; font-weight: 700; margin-bottom: 4px;">
-                                Licensed Tourism Operator &bull; Government of Dubai (DET License #1430583)
+                                Licensed Tourism Operator &bull; Government of Dubai (DET License #{{ $emLicense }})
                             </div>
                             <div style="font-size: 11px; color: #94a3b8; line-height: 1.5; margin-bottom: 16px;">
                                 Certified Dubai Desert Safari, VIP Buggy Excursions & Private Arabian Experiences
@@ -170,9 +187,9 @@
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 11px; color: #94a3b8; margin-bottom: 18px;">
                                 <tr>
                                     <td align="center" style="line-height: 1.7;">
-                                        Dubai, United Arab Emirates<br>
-                                        24/7 Operations Concierge: <a href="tel:+971502456056" style="color: #22c55e; font-weight: bold; text-decoration: none;">+971 50 245 6056</a><br>
-                                        Official Support: <a href="mailto:reservations@dunesdiscoverytourism.com" style="color: #F58F43; text-decoration: none;">reservations@dunesdiscoverytourism.com</a> &bull; <a href="https://dunesdiscoverytourism.com" target="_blank" style="color: #F58F43; text-decoration: none;">dunesdiscoverytourism.com</a>
+                                        {{ $emAddress }}<br>
+                                        24/7 Operations Concierge: <a href="tel:{{ $emPhoneHref }}" style="color: #22c55e; font-weight: bold; text-decoration: none;">{{ $emPhone }}</a><br>
+                                        Official Support: <a href="mailto:{{ $emSupportEmail }}" style="color: #F58F43; text-decoration: none;">{{ $emSupportEmail }}</a> &bull; <a href="{{ rtrim(config('app.url', 'https://dunesdiscoverytourism.com'), '/') }}" target="_blank" style="color: #F58F43; text-decoration: none;">dunesdiscoverytourism.com</a>
                                     </td>
                                 </tr>
                             </table>
@@ -180,8 +197,8 @@
                             <!-- Security & Legal Reassurance -->
                             <div style="font-size: 10px; color: #64748b; line-height: 1.5; border-top: 1px solid #1e293b; padding-top: 14px;">
                                 256-Bit SSL Encrypted Transaction & Official Tourism Provider Guarantee.<br>
-                                You received this transactional email because an official booking or service inquiry was registered with Dunes Discovery Tourism LLC.<br>
-                                &copy; {{ date('Y') }} Dunes Discovery Tourism LLC. All rights reserved.
+                                You received this transactional email because an official booking or service inquiry was registered with {{ $emSiteName }}.<br>
+                                &copy; {{ date('Y') }} {{ $emSiteName }}. {{ $emCopyright }}
                             </div>
 
                         </td>

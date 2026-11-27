@@ -17,7 +17,7 @@ class Tier extends Model
     ];
 
     protected $fillable = [
-        'slug', 'name', 'display_name', 'description', 'guest_count', 'price_type', 'icon', 'badge', 'color',
+        'slug', 'name', 'display_name', 'description', 'guest_count', 'icon', 'badge', 'color',
         'is_popular', 'priority', 'status',
     ];
 
@@ -42,7 +42,7 @@ class Tier extends Model
     public function tours()
     {
         return $this->belongsToMany(Tour::class, 'tour_tiers')
-            ->withPivot('price', 'old_price', 'price_type', 'guest_count');
+            ->withPivot('price', 'old_price', 'child_price', 'price_type', 'guest_count');
     }
 
     public static function normalizePriceType(?string $priceType, ?Tour $tour = null): string

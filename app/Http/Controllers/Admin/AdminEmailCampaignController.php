@@ -147,7 +147,11 @@ class AdminEmailCampaignController extends Controller
             ->latest();
 
         if ($request->filled('log_status')) {
-            $logsQuery->where('status', $request->log_status);
+            if ($request->log_status === 'delivered') {
+                $logsQuery->whereIn('status', ['delivered', 'sent']);
+            } else {
+                $logsQuery->where('status', $request->log_status);
+            }
         }
 
         if ($request->filled('search')) {
@@ -202,6 +206,24 @@ class AdminEmailCampaignController extends Controller
     }
 
     /**
+     * Send a single diagnostic test email from an unsaved campaign draft.
+     */
+    public function sendDraftTest(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'test_email' => 'required|email:filter|max:255',
+            'subject' => 'nullable|string|max:255',
+            'content_html' => 'required|string',
+        ]);
+
+        $recipient = trim($validated['test_email']);
+        $subject = trim((string) ($validated['subject'] ?? '')) ?: 'Campaign Preview';
+        $res = $this->emailService->sendTestEmail($recipient, $subject, $validated['content_html']);
+
+        return response()->json($res);
+    }
+
+    /**
      * Delete campaign.
      */
     public function destroy(int $id): RedirectResponse
@@ -215,11 +237,33 @@ class AdminEmailCampaignController extends Controller
     }
 
     /**
-     * Redirect edit requests to campaign show/analytics view.
+     * Show edit form for draft or scheduled campaigns; redirect sent/sending campaigns to analytics.
      */
-    public function edit(int $id): RedirectResponse
+    public function edit(int $id)
     {
-        return redirect()->route('admin.campaigns.show', $id);
+        $campaign = EmailCampaign::findOrFail($id);
+
+        if (in_array($campaign->status, ['sent', 'sending'], true)) {
+            return redirect()->route('admin.campaigns.show', $id)
+                ->with('info', 'Completed or in-progress campaigns cannot be edited.');
+        }
+
+        $templates = EmailTemplate::latest()->get();
+        $groups = SubscriberGroup::withCount([
+            'subscribers as active_count' => function ($q) {
+                $q->where('status', 'subscribed');
+            },
+        ])->get();
+        $totalActiveSubscribers = Subscriber::where('status', 'subscribed')->count();
+
+        $defaultFromAddress = $this->settings->get('smtp_from_address', config('mail.from.address'));
+        $defaultFromName = $this->settings->get('smtp_from_name', $this->settings->get('site_name', 'Dunes Discovery Tourism'));
+        $defaultReplyTo = $this->settings->get('smtp_reply_to', $defaultFromAddress);
+
+        return view('admin.campaigns.edit', compact(
+            'campaign', 'templates', 'groups', 'totalActiveSubscribers',
+            'defaultFromAddress', 'defaultFromName', 'defaultReplyTo'
+        ));
     }
 
     /**
@@ -242,14 +286,24 @@ class AdminEmailCampaignController extends Controller
             'from_email' => 'nullable|email:filter|max:255',
             'reply_to' => 'nullable|email:filter|max:255',
             'target_type' => 'nullable|in:all,group',
-            'group_id' => 'nullable|integer|exists:subscriber_groups,id',
+            'group_id' => 'nullable|required_if:target_type,group|integer|exists:subscriber_groups,id',
             'template_id' => 'nullable|integer|exists:email_templates,id',
             'content_html' => 'required|string',
             'scheduled_at' => 'nullable|date',
         ]);
 
+        if (($validated['target_type'] ?? $campaign->target_type) === 'all') {
+            $validated['group_id'] = null;
+        }
+
         if (! empty($validated['scheduled_at'])) {
             $validated['scheduled_at'] = Carbon::parse($validated['scheduled_at']);
+            if ($campaign->status === 'draft') {
+                $validated['status'] = 'scheduled';
+            }
+        } elseif ($request->has('scheduled_at') && $campaign->status === 'scheduled') {
+            $validated['scheduled_at'] = null;
+            $validated['status'] = 'draft';
         }
 
         $campaign->update($validated);

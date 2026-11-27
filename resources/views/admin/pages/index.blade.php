@@ -26,7 +26,14 @@
             </div>
 
             <div class="flex items-center justify-between border-t border-slate-100 pt-4">
-                <a href="{{ url('/' . ($page->slug === 'home' ? '' : $page->slug)) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition">
+                @php
+                    $previewPath = match($page->slug) {
+                        'home' => '',
+                        'tours_sidebar' => 'tours',
+                        default => $page->slug,
+                    };
+                @endphp
+                <a href="{{ url('/' . $previewPath) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition">
                     <i class="bi bi-box-arrow-up-right text-slate-400"></i> View
                 </a>
                 <a href="{{ route('admin.pages.edit', $page->id) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">

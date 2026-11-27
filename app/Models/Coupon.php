@@ -122,7 +122,11 @@ class Coupon extends Model
 
         // 2. Tour Date restriction check
         if (! empty($tourDate)) {
-            $tDate = Carbon::parse($tourDate)->startOfDay();
+            try {
+                $tDate = Carbon::parse($tourDate)->startOfDay();
+            } catch (\Throwable $e) {
+                return ['valid' => false, 'message' => 'Please select a valid tour date to apply this promo code.'];
+            }
             if ($this->tour_date_from && $tDate->lt(Carbon::parse($this->tour_date_from)->startOfDay())) {
                 return ['valid' => false, 'message' => 'This promo is only valid for tours starting on or after '.Carbon::parse($this->tour_date_from)->format('M j, Y').'.'];
             }

@@ -102,22 +102,6 @@ if (! function_exists('renderFloatingTextarea')) {
     }
 }
 
-if (! function_exists('formatPhone')) {
-    function formatPhone(string $phone): string
-    {
-        return 'tel:'.preg_replace('/[^0-9+]/', '', $phone);
-    }
-}
-
-if (! function_exists('formatWhatsApp')) {
-    function formatWhatsApp(string $number, string $message = ''): string
-    {
-        $number = preg_replace('/[^0-9]/', '', $number);
-
-        return "https://wa.me/{$number}".($message ? '?text='.urlencode($message) : '');
-    }
-}
-
 if (! function_exists('localized_route')) {
     /**
      * Generate a localized URL for a named route.
@@ -138,7 +122,7 @@ if (! function_exists('localized_route')) {
 
         // Non-default locale: if named localized route exists, use it directly
         $localizedName = str_starts_with($name, 'locale.') ? $name : "locale.{$name}";
-        $routes = app('routes');
+        $routes = \Illuminate\Support\Facades\Route::getRoutes();
         if ($routes && $routes->hasNamedRoute($localizedName)) {
             if (is_array($parameters)) {
                 $params = array_merge(['locale' => $targetLocale], $parameters);
@@ -321,8 +305,8 @@ if (! function_exists('sanitize_csv_cell')) {
         }
 
         if (preg_match('/^[\s]*[=+\-@\t\r]/', $value)) {
-            // Preserve legitimate international phone numbers like "+971 50 245 6056"
-            if (preg_match('/^\+[0-9][0-9\s\-()]{5,20}$/', trim($value))) {
+            // Preserve legitimate E.164 international phone numbers like "+971 50 245 6056" (digits & spaces only; blocks +123-456 formula injection)
+            if (preg_match('/^\+[1-9][0-9\s]{6,16}$/', trim($value))) {
                 return $value;
             }
 

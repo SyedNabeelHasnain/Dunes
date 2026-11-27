@@ -4,7 +4,6 @@ namespace App\Services\Seo;
 
 use App\Models\BlogPost;
 use App\Models\Page;
-use App\Models\SeoMetadata;
 use App\Models\Tour;
 use App\Models\WikiArticle;
 use Illuminate\Support\Str;
@@ -80,7 +79,7 @@ class KeywordIntelligenceService
             ];
         }
 
-        $pages = Page::where('status', 'active')->with('seoMeta')->get();
+        $pages = Page::where('status', 'published')->with('seoMeta')->get();
         foreach ($pages as $page) {
             $focus = trim((string) ($page->seoMeta?->focus_keyword ?: ''));
             $entries[] = [

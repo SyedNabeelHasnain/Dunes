@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tour;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SunsetGuideController extends Controller
 {
@@ -42,7 +43,10 @@ class SunsetGuideController extends Controller
         $pageTitle = $localizedSunsetMeta[$currentLocale]['title'] ?? ($settings->get('seo_sunset_title') ?: "Dubai Desert Sunset Times {$currentYear} | Lahbab Red Dunes Golden Hour Guide | Dunes Discovery");
         $pageDesc = $localizedSunsetMeta[$currentLocale]['desc'] ?? ($settings->get('seo_sunset_description') ?: 'Complete guide to Dubai desert sunset times, golden hour photography windows, and evening safari schedules in Lahbab Red Dunes. Live astronomical countdown and monthly reference charts.');
         $pageKeys = $settings->get('seo_sunset_keywords') ?: 'dubai desert sunset time, what time does the sun set in dubai desert, lahbab golden hour, evening safari sunset dubai, best time for desert photography dubai';
-        $ogImage = asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
+        $customSunsetOg = trim((string) $settings->get('seo_sunset_og_image', ''));
+        $ogImage = $customSunsetOg !== ''
+            ? (str_starts_with($customSunsetOg, 'http') ? $customSunsetOg : asset(ltrim($customSunsetOg, '/')))
+            : asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
 
         // 12-Month Astronomical & Meteorological Reference Data for Lahbab Red Dunes (25.04° N, 55.67° E)
         $monthlySchedule = [
@@ -60,7 +64,7 @@ class SunsetGuideController extends Controller
             12 => ['month' => 'December', 'short' => 'Dec', 'sunset' => '5:34 PM', 'golden_hour' => '5:04 PM – 5:34 PM', 'twilight' => '5:59 PM', 'dusk_temp' => '20°C', 'rating' => 'Cool Winter Solstice', 'photo_tip' => 'Early dusk transitions quickly into cool campfire and stargazing nights.'],
         ];
 
-        $currentMonthNumber = (int) date('n');
+        $currentMonthNumber = (int) now('Asia/Dubai')->month;
         $currentMonthData = $monthlySchedule[$currentMonthNumber] ?? $monthlySchedule[1];
 
         // Fetch top relevant evening & sunset tours
@@ -77,6 +81,7 @@ class SunsetGuideController extends Controller
                 ->limit(3)
                 ->get();
         } catch (\Throwable $e) {
+            Log::warning('SunsetGuideController: failed to load sunset tours: '.$e->getMessage());
             $sunsetTours = collect();
         }
 

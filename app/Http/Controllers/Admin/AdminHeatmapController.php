@@ -87,7 +87,10 @@ class AdminHeatmapController extends Controller
      */
     public function purge(Request $request): RedirectResponse
     {
-        $days = (int) $request->input('days', 30);
+        $validated = $request->validate([
+            'days' => 'nullable|integer|min:0|max:3650',
+        ]);
+        $days = (int) ($validated['days'] ?? 30);
         $res = $this->heatmapService->purgeOldHeatmaps($days);
 
         return back()->with('success', "Purged {$res['deleted_clicks']} click logs and {$res['deleted_scrolls']} scroll logs older than {$days} days.");
@@ -102,6 +105,10 @@ class AdminHeatmapController extends Controller
             ['setting_key' => 'heatmaps_enabled'],
             ['setting_value' => $request->boolean('heatmaps_enabled') ? '1' : '0']
         );
+
+        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
+        \Illuminate\Support\Facades\Cache::forget('site_home_cache');
+        app(\App\Services\SettingsService::class)->clearCache();
 
         return back()->with('success', 'Heatmap preferences updated successfully.');
     }

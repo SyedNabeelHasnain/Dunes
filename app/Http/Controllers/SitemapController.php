@@ -121,48 +121,52 @@ class SitemapController extends Controller
      */
     public function index(): Response
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+        $xml = Cache::remember('sitemap_index_xml', 3600, function () {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+            $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
-        $latestTour = Tour::where('status', 'active')->latest('updated_at')->first();
-        $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
-        $latestWiki = WikiArticle::where('status', 'published')->latest('updated_at')->first();
-        $now = now()->toAtomString();
+            $latestTour = Tour::where('status', 'active')->latest('updated_at')->first();
+            $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
+            $latestWiki = WikiArticle::where('status', 'published')->latest('updated_at')->first();
+            $now = now()->toAtomString();
 
-        $tourUpdatedAt = $latestTour?->updated_at;
-        $blogUpdatedAt = $latestBlog?->updated_at;
-        $wikiUpdatedAt = $latestWiki?->updated_at;
-        $latestImageDate = collect([$tourUpdatedAt, $blogUpdatedAt, $wikiUpdatedAt])->filter()->max();
+            $tourUpdatedAt = $latestTour?->updated_at;
+            $blogUpdatedAt = $latestBlog?->updated_at;
+            $wikiUpdatedAt = $latestWiki?->updated_at;
+            $latestImageDate = collect([$tourUpdatedAt, $blogUpdatedAt, $wikiUpdatedAt])->filter()->max();
 
-        $subMaps = [];
-        $tourTpl = $this->loadSeoTemplate('tour');
-        $blogTpl = $this->loadSeoTemplate('blog_post');
-        $wikiTpl = $this->loadSeoTemplate('wiki_article');
-        $pageTpl = $this->loadSeoTemplate('page');
+            $subMaps = [];
+            $tourTpl = $this->loadSeoTemplate('tour');
+            $blogTpl = $this->loadSeoTemplate('blog_post');
+            $wikiTpl = $this->loadSeoTemplate('wiki_article');
+            $pageTpl = $this->loadSeoTemplate('page');
 
-        if (! $tourTpl || $tourTpl->sitemap_enabled !== false) {
-            $subMaps[url('/sitemap-tours.xml')] = $tourUpdatedAt ? $tourUpdatedAt->toAtomString() : $now;
-        }
-        if (! $blogTpl || $blogTpl->sitemap_enabled !== false) {
-            $subMaps[url('/sitemap-blogs.xml')] = $blogUpdatedAt ? $blogUpdatedAt->toAtomString() : $now;
-        }
-        if (! $wikiTpl || $wikiTpl->sitemap_enabled !== false) {
-            $subMaps[url('/sitemap-wiki.xml')] = $wikiUpdatedAt ? $wikiUpdatedAt->toAtomString() : $now;
-        }
-        if (! $pageTpl || $pageTpl->sitemap_enabled !== false) {
-            $subMaps[url('/sitemap-pages.xml')] = $now;
-        }
-        $subMaps[url('/sitemap-images.xml')] = $latestImageDate ? $latestImageDate->toAtomString() : $now;
-        $subMaps[url('/sitemap-videos.xml')] = $now;
+            if (! $tourTpl || $tourTpl->sitemap_enabled !== false) {
+                $subMaps[url('/sitemap-tours.xml')] = $tourUpdatedAt ? $tourUpdatedAt->toAtomString() : $now;
+            }
+            if (! $blogTpl || $blogTpl->sitemap_enabled !== false) {
+                $subMaps[url('/sitemap-blogs.xml')] = $blogUpdatedAt ? $blogUpdatedAt->toAtomString() : $now;
+            }
+            if (! $wikiTpl || $wikiTpl->sitemap_enabled !== false) {
+                $subMaps[url('/sitemap-wiki.xml')] = $wikiUpdatedAt ? $wikiUpdatedAt->toAtomString() : $now;
+            }
+            if (! $pageTpl || $pageTpl->sitemap_enabled !== false) {
+                $subMaps[url('/sitemap-pages.xml')] = $now;
+            }
+            $subMaps[url('/sitemap-images.xml')] = $latestImageDate ? $latestImageDate->toAtomString() : $now;
+            $subMaps[url('/sitemap-videos.xml')] = $now;
 
-        foreach ($subMaps as $loc => $lastmod) {
-            $xml .= "  <sitemap>\n";
-            $xml .= '    <loc>'.$this->xmlEscape($loc)."</loc>\n";
-            $xml .= '    <lastmod>'.$this->xmlEscape($lastmod)."</lastmod>\n";
-            $xml .= "  </sitemap>\n";
-        }
+            foreach ($subMaps as $loc => $lastmod) {
+                $xml .= "  <sitemap>\n";
+                $xml .= '    <loc>'.$this->xmlEscape($loc)."</loc>\n";
+                $xml .= '    <lastmod>'.$this->xmlEscape($lastmod)."</lastmod>\n";
+                $xml .= "  </sitemap>\n";
+            }
 
-        $xml .= '</sitemapindex>';
+            $xml .= '</sitemapindex>';
+
+            return $xml;
+        });
 
         return response($xml, 200, [
             'Content-Type' => 'text/xml; charset=utf-8',
@@ -335,6 +339,11 @@ class SitemapController extends Controller
     public function pages(): Response
     {
         $content = Cache::remember('sitemap_pages_xml', 3600, function () {
+            $template = $this->loadSeoTemplate('page');
+            if ($template && $template->sitemap_enabled === false) {
+                return '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+            }
+
             try {
                 $languages = Language::getActive();
             } catch (\Throwable $e) {
@@ -700,7 +709,7 @@ class SitemapController extends Controller
             foreach ($videoReviews as $item) {
                 $pageUrl = ! empty($item['tour_slug'])
                     ? url('/'.$item['tour_slug'])
-                    : url('/gallery?item='.$item['id']);
+                    : url('/gallery');
                 $videoUrl = $item['url'];
                 $thumbnailUrl = $item['poster_url'];
                 $title = $item['title'];

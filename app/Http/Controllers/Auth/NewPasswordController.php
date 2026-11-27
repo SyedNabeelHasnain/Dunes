@@ -37,6 +37,12 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $targetUser = User::where('email', strtolower(trim((string) $request->input('email'))))->first();
+        if ($targetUser && isset($targetUser->is_active) && ! $targetUser->is_active) {
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'This staff account is deactivated and cannot reset its password.']);
+        }
+
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
