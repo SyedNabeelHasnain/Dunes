@@ -96,6 +96,7 @@ class EnforceAdminRbac
             'admin/audit*' => ['audit.view', 'audit.run'],
             'admin/qa-simulator/run*' => ['audit.run', 'system_health.view'],
             'admin/qa-simulator/settings*' => ['security.manage', 'system_health.view'],
+            'admin/qa-simulator/cleanup-all*' => ['security.manage', 'audit.manage'],
             'admin/qa-simulator/runs/*/cleanup*' => ['security.manage', 'audit.manage'],
             'admin/qa-simulator*' => ['audit.view', 'system_health.view', 'audit.run'],
             'admin/health*' => ['system_health.view', 'performance.manage'],

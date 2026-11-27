@@ -96,6 +96,105 @@ class SyntheticJourneySimulatorTest extends TestCase
         app(SettingsService::class)->clearCache();
     }
 
+    public function test_default_live_real_mode_persists_single_identifiable_dummy_record_per_flow_and_records_delivered_emails(): void
+    {
+        $realBooking = Booking::create([
+            'reference' => 'DDT261127KEEP01',
+            'tour_id' => $this->tour->id,
+            'tier_id' => $this->tier->id,
+            'tour_name' => 'Evening Desert Safari Dubai',
+            'tier_name' => 'Classic',
+            'tour_date' => now()->addDays(6)->toDateString(),
+            'adults' => 2,
+            'children' => 0,
+            'name' => 'Genuine Guest To Keep',
+            'email' => 'keep.guest@example.com',
+            'phone' => '+971509998877',
+            'subtotal' => 300,
+            'addons_total' => 0,
+            'total' => 300,
+            'currency' => 'AED',
+            'status' => 'confirmed',
+            'payment_method' => 'cash',
+            'payment_status' => 'unpaid',
+            'balance_due' => 300,
+        ]);
+
+        Setting::updateOrCreate(['setting_key' => 'site_email'], ['setting_value' => 'qa-inbox@dunesdiscoverytourism.com']);
+        app(SettingsService::class)->clearCache();
+
+        // Post with NO mail_mode / auto_cleanup overrides so true system defaults run
+        $response = $this->actingAs($this->admin)
+            ->post(route('admin.qa-simulator.run'), [
+                'flows' => ['booking', 'whatsapp', 'contact'],
+                'locale' => 'en',
+                'device_profile' => 'desktop',
+                'tour_id' => $this->tour->id,
+                'include_bot_shield_check' => '1',
+                'include_coupon_check' => '1',
+            ]);
+
+        $run = SyntheticTestRun::with('steps')->latest('id')->firstOrFail();
+        $response->assertRedirect(route('admin.qa-simulator.show', $run->id));
+
+        $this->assertSame('live_smtp', $run->mail_mode);
+        $this->assertFalse($run->auto_cleanup);
+        $this->assertFalse($run->cleanup_completed);
+        $this->assertSame('passed', $run->status, $run->summary ?? '');
+
+        // Exactly 1 identifiable dummy record per flow (+ our 1 pre-existing real booking)
+        $this->assertSame(2, Booking::count()); // pre-existing + 1 dummy (converted draft self-cleaned)
+        $dummyBooking = Booking::where('id', '!=', $realBooking->id)->firstOrFail();
+        $this->assertSame('Dunes Test Traveler', $dummyBooking->name);
+        $this->assertSame('qa-inbox@dunesdiscoverytourism.com', $dummyBooking->email);
+        $this->assertSame('pending', $dummyBooking->status);
+        $this->assertStringContainsString('[QA TEST RUN #'.$run->id.']', (string) $dummyBooking->pickup_location);
+
+        $this->assertSame(1, WhatsappInquiry::count()); // secondary /ajax.php probe self-cleaned
+        $dummyWa = WhatsappInquiry::firstOrFail();
+        $this->assertSame('Dunes Test Lead', $dummyWa->name);
+        $this->assertSame('qa-inbox@dunesdiscoverytourism.com', $dummyWa->email);
+        $this->assertStringContainsString('[AUTOMATED E2E TEST RUN #'.$run->id.']', (string) $dummyWa->message_text);
+
+        $this->assertSame(1, Contact::count());
+        $dummyContact = Contact::firstOrFail();
+        $this->assertSame('Dunes Test Visitor', $dummyContact->name);
+        $this->assertFalse((bool) $dummyContact->is_spam);
+        $this->assertStringContainsString('[AUTOMATED TEST #'.$run->id.']', (string) $dummyContact->subject);
+
+        // Bot shield probe must NOT leave clutter SpamEvent rows behind
+        $this->assertSame(0, SpamEvent::count());
+
+        // Delivered emails via MessageSent must be recorded on all 3 notification steps
+        $checkoutStep = $run->steps->firstWhere('step_key', 'booking_checkout_submit');
+        $this->assertNotEmpty($checkoutStep?->metadata['emails_delivered'] ?? []);
+
+        $waStep = $run->steps->firstWhere('step_key', 'whatsapp_db_and_mail_verify');
+        $this->assertNotEmpty($waStep?->metadata['emails_delivered'] ?? []);
+
+        $contactStep = $run->steps->firstWhere('step_key', 'contact_db_and_mail_verify');
+        $this->assertNotEmpty($contactStep?->metadata['emails_delivered'] ?? []);
+
+        // Waterfall view renders direct links to created dummy records
+        $showRes = $this->actingAs($this->admin)->get(route('admin.qa-simulator.show', $run->id));
+        $showRes->assertStatus(200);
+        $showRes->assertSee($dummyBooking->reference);
+        $showRes->assertSee('Dunes Test Lead');
+        $showRes->assertSee('Dunes Test Visitor');
+
+        // Clean Up All Dummy Records purges test artifacts while keeping pre-existing real booking intact
+        $this->actingAs($this->admin)
+            ->post(route('admin.qa-simulator.cleanup-all'))
+            ->assertRedirect();
+
+        $run->refresh();
+        $this->assertTrue($run->cleanup_completed);
+        $this->assertSame(1, Booking::count());
+        $this->assertSame($realBooking->id, Booking::firstOrFail()->id);
+        $this->assertSame(0, WhatsappInquiry::count());
+        $this->assertSame(0, Contact::count());
+    }
+
     public function test_manual_full_three_flow_simulation_passes_keeps_admin_session_and_auto_cleans(): void
     {
         $baselineBookings = Booking::count();
@@ -343,7 +442,7 @@ class SyntheticJourneySimulatorTest extends TestCase
         ])->assertStatus(403);
 
         // Super admin can export run report as JSON
-        $run = app(SyntheticJourneyRunner::class)->execute(['flows' => ['whatsapp']], 'manual', $this->admin->id);
+        $run = app(SyntheticJourneyRunner::class)->execute(['flows' => ['whatsapp'], 'mail_mode' => 'intercept', 'auto_cleanup' => true], 'manual', $this->admin->id);
         $export = $this->actingAs($this->admin)->get(route('admin.qa-simulator.export', $run->id));
         $export->assertStatus(200);
         $this->assertStringContainsString('application/json', (string) $export->headers->get('Content-Type'));

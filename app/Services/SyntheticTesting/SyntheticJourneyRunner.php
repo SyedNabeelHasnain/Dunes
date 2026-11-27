@@ -19,6 +19,7 @@ use App\Models\SyntheticTestStep;
 use App\Models\Tour;
 use App\Models\VerifiedEmail;
 use App\Models\WhatsappInquiry;
+use App\Services\Mail\SmtpDiagnosticService;
 use App\Services\NotificationManagementService;
 use App\Services\SettingsService;
 use Carbon\Carbon;
@@ -47,7 +48,42 @@ class SyntheticJourneyRunner
         protected SettingsService $settings,
         protected SyntheticVisitorSession $visitorSession,
         protected NotificationManagementService $notifications,
+        protected SmtpDiagnosticService $smtpDiagnostics,
     ) {}
+
+    /**
+     * Resolve the live test customer email address so real SMTP checks never bounce against fake domains.
+     */
+    public function resolveDefaultTestRecipientEmail(?string $configured = null): string
+    {
+        $configured = strtolower(trim((string) $configured));
+        if ($configured !== '' && filter_var($configured, FILTER_VALIDATE_EMAIL)) {
+            return $configured;
+        }
+
+        $siteEmail = strtolower(trim((string) $this->settings->get('site_email', '')));
+        if ($siteEmail !== '' && filter_var($siteEmail, FILTER_VALIDATE_EMAIL)) {
+            return $siteEmail;
+        }
+
+        return strtolower(trim((string) $this->settings->getAdminEmail()));
+    }
+
+    /**
+     * Resolve per-flow dummy visitor email: real deliverable test mailbox in live_smtp mode,
+     * unique throwaway address in safe intercept mode.
+     *
+     * @param  array<string, mixed>  $cfg
+     */
+    protected function resolveTestVisitorEmail(string $flow, string $tokenSlug, array $cfg): string
+    {
+        $mailMode = (string) ($cfg['mail_mode'] ?? 'live_smtp');
+        if ($mailMode === 'live_smtp') {
+            return $this->resolveDefaultTestRecipientEmail($cfg['recipient_email'] ?? null);
+        }
+
+        return "qa.{$flow}.{$tokenSlug}@dunesdiscoverytourism.com";
+    }
 
     /**
      * Load normalized simulator & schedule settings from CMS Settings.
@@ -70,9 +106,9 @@ class SyntheticJourneyRunner
             $frequency = 'daily';
         }
 
-        $mailMode = (string) $this->settings->get('synthetic_test_mail_mode', 'intercept');
+        $mailMode = (string) $this->settings->get('synthetic_test_mail_mode', 'live_smtp');
         if (! in_array($mailMode, ['intercept', 'live_smtp'], true)) {
-            $mailMode = 'intercept';
+            $mailMode = 'live_smtp';
         }
 
         $device = (string) $this->settings->get('synthetic_test_device', 'desktop');
@@ -96,7 +132,7 @@ class SyntheticJourneyRunner
             'recipient_email' => trim((string) $this->settings->get('synthetic_test_recipient_email', '')),
             'include_bot_shield_check' => $this->settings->get('synthetic_test_bot_shield', '1') === '1',
             'include_coupon_check' => $this->settings->get('synthetic_test_coupon_check', '1') === '1',
-            'auto_cleanup' => $this->settings->get('synthetic_test_auto_cleanup', '1') === '1',
+            'auto_cleanup' => $this->settings->get('synthetic_test_auto_cleanup', '0') === '1',
             'alert_on_failure' => $this->settings->get('synthetic_test_alert_on_failure', '1') === '1',
             'alert_recipients' => trim((string) $this->settings->get('synthetic_test_alert_recipients', '')),
             'retention_days' => max(7, min(365, (int) $this->settings->get('synthetic_test_retention_days', '30'))),
@@ -128,7 +164,7 @@ class SyntheticJourneyRunner
             'synthetic_test_locale' => (string) ($data['locale'] ?? 'en'),
             'synthetic_test_device' => (string) ($data['device_profile'] ?? 'desktop'),
             'synthetic_test_tour_id' => ! empty($data['tour_id']) ? (string) ((int) $data['tour_id']) : '',
-            'synthetic_test_mail_mode' => (string) ($data['mail_mode'] ?? 'intercept'),
+            'synthetic_test_mail_mode' => (string) ($data['mail_mode'] ?? 'live_smtp'),
             'synthetic_test_recipient_email' => trim((string) ($data['recipient_email'] ?? '')),
             'synthetic_test_bot_shield' => ! empty($data['include_bot_shield_check']) ? '1' : '0',
             'synthetic_test_coupon_check' => ! empty($data['include_coupon_check']) ? '1' : '0',
@@ -234,10 +270,10 @@ class SyntheticJourneyRunner
         $device = in_array($cfg['device_profile'] ?? 'desktop', ['desktop', 'mobile'], true)
             ? (string) $cfg['device_profile']
             : 'desktop';
-        $mailMode = in_array($cfg['mail_mode'] ?? 'intercept', ['intercept', 'live_smtp'], true)
+        $mailMode = in_array($cfg['mail_mode'] ?? 'live_smtp', ['intercept', 'live_smtp'], true)
             ? (string) $cfg['mail_mode']
-            : 'intercept';
-        $autoCleanup = (bool) ($cfg['auto_cleanup'] ?? true);
+            : 'live_smtp';
+        $autoCleanup = (bool) ($cfg['auto_cleanup'] ?? false);
 
         $run = SyntheticTestRun::create([
             'trigger_type' => in_array($triggerType, ['manual', 'scheduled', 'cli'], true) ? $triggerType : 'manual',
@@ -255,8 +291,10 @@ class SyntheticJourneyRunner
 
         $artifacts = [
             'booking_ids' => [],
+            'booking_refs' => [],
             'draft_ids' => [],
             'whatsapp_inquiry_ids' => [],
+            'whatsapp_refs' => [],
             'contact_ids' => [],
             'spam_event_ids' => [],
             'request_log_ids' => [],
@@ -458,12 +496,10 @@ class SyntheticJourneyRunner
             }
         }
 
-        // 4. Email OTP Send + Verify (Using unique test email or configured live recipient)
+        // 4. Email OTP Send + Verify (Uses configured real customer test email in live_smtp mode)
         $tokenSlug = strtolower(Str::random(8));
-        $mailMode = (string) ($cfg['mail_mode'] ?? 'intercept');
-        $testEmail = ($mailMode === 'live_smtp' && ! empty($cfg['recipient_email']))
-            ? strtolower(trim((string) $cfg['recipient_email']))
-            : "qa.booking.{$tokenSlug}@dunesdiscoverytourism.com";
+        $mailMode = (string) ($cfg['mail_mode'] ?? 'live_smtp');
+        $testEmail = $this->resolveTestVisitorEmail('booking', $tokenSlug, $cfg);
 
         $wasPreVerified = VerifiedEmail::where('email', $testEmail)->exists();
 
@@ -514,6 +550,10 @@ class SyntheticJourneyRunner
         }
 
         // 5. Save Abandoned Checkout Draft
+        $testName = 'Dunes Test Traveler';
+        $testPickup = "[QA TEST RUN #{$run->id}] Dubai Mall Main Entrance (Dummy Test Pickup)";
+        $testRequests = "[AUTOMATED E2E TEST RUN #{$run->id}] Dummy test booking created by Dunes Journey Simulator. Safe to review and delete via QA Simulator cleanup.";
+
         $draftRes = $session->postJson('/booking/draft', [
             'tour_id' => $tour->id,
             'tier_id' => $tierId,
@@ -521,10 +561,10 @@ class SyntheticJourneyRunner
             'adults' => 2,
             'children' => 0,
             'infants' => 0,
-            'name' => 'Tariq Al Hashimi',
+            'name' => $testName,
             'email' => $testEmail,
             'phone' => '+971500000101',
-            'pickup_location' => 'Dubai Mall Main Entrance, Downtown Dubai',
+            'pickup_location' => $testPickup,
             'payment_method' => 'cash',
             'utm_source' => 'synthetic_qa',
         ]);
@@ -544,6 +584,9 @@ class SyntheticJourneyRunner
             $flowOk = false;
         }
 
+        // Clear earlier OTP mail capture so checkout step isolates booking confirmation + voucher emails
+        $session->clearCapturedEmails();
+
         // 6. Submit Full Cash Booking Checkout
         $addonId = DB::table('addons')
             ->join('tour_addons', 'addons.id', '=', 'tour_addons.addon_id')
@@ -558,9 +601,9 @@ class SyntheticJourneyRunner
             'adults' => 2,
             'children' => 0,
             'infants' => 0,
-            'location' => 'Dubai Mall Main Entrance, Downtown Dubai',
-            'requests' => 'Automated QA Simulator E2E verification booking.',
-            'name' => 'Tariq Al Hashimi',
+            'location' => $testPickup,
+            'requests' => $testRequests,
+            'name' => $testName,
             'email' => $testEmail,
             'phone' => '+971500000101',
             'payment_method' => 'cash',
@@ -573,17 +616,19 @@ class SyntheticJourneyRunner
         $booking = $bookingRef !== '' ? Booking::where('reference', $bookingRef)->first() : null;
         if ($booking) {
             $artifacts['booking_ids'][] = $booking->id;
+            $artifacts['booking_refs'][] = $booking->reference;
             if ($booking->request_log_id) {
                 $artifacts['request_log_ids'][] = (int) $booking->request_log_id;
             }
             $artifacts['voucher_pdf_paths'][] = storage_path('app/vouchers/'.$booking->reference.'.pdf');
         }
 
-        $capturedEmails = $session->getCapturedEmails();
-        $bookingEmails = array_values(array_filter(
-            $capturedEmails,
+        $filterBookingMails = fn (array $mails) => array_values(array_filter(
+            $mails,
             fn (array $m) => $bookingRef !== '' && (str_contains($m['subject'] ?? '', $bookingRef) || str_contains($m['html_body'] ?? '', $bookingRef))
         ));
+        $attemptedEmails = $filterBookingMails($session->getCapturedEmails());
+        $deliveredEmails = $filterBookingMails($session->getDeliveredEmails());
 
         $checkoutOk = $checkoutRes['status'] === 200
             && ! empty($checkoutRes['json']['success'])
@@ -594,18 +639,48 @@ class SyntheticJourneyRunner
             ? (Booking::where('id', $draftId)->value('status') === 'converted')
             : true;
 
+        // Remove temporary converted draft so Admin Reservations lists ONLY the 1 clean Dummy Test Booking
+        if ($draftConverted && $draftId > 0) {
+            Booking::withTrashed()->where('id', $draftId)->forceDelete();
+            $artifacts['draft_ids'] = array_values(array_filter(
+                $artifacts['draft_ids'],
+                fn ($id) => (int) $id !== $draftId
+            ));
+        }
+
+        $bookingMailRequired = $mailMode === 'live_smtp' && (
+            $this->settings->get('notification_booking_customer_enabled', '1') === '1'
+            || $this->settings->get('notification_booking_admin_enabled', '1') === '1'
+        );
+        $deliveryOk = ! $bookingMailRequired || count($deliveredEmails) > 0;
+        $smtpDiagnosis = ($bookingMailRequired && ! $deliveryOk)
+            ? $this->formatSmtpFailureSummary()
+            : null;
+
+        $stepPassed = $checkoutOk && $draftConverted && $deliveryOk;
+        $stepErr = null;
+        if (! $checkoutOk || ! $draftConverted) {
+            $stepErr = $checkoutRes['json']['message'] ?? 'Checkout failed or draft was not transitioned to converted.';
+        } elseif (! $deliveryOk) {
+            $stepErr = "Booking #{$bookingRef} was created cleanly, but live SMTP delivery failed (0 delivered). {$smtpDiagnosis}";
+        }
+
         $this->recordStep(
             $run, 'booking', $stepOrder++, 'booking_checkout_submit', 'Complete Authoritative Booking Checkout & Notifications',
-            'POST', '/api/v1/booking/checkout', $checkoutRes['status'], ($checkoutOk && $draftConverted) ? 'passed' : 'failed', $checkoutRes['duration_ms'],
-            ($checkoutOk && $draftConverted) ? "Booking #{$bookingRef} persisted (AED {$booking->total}), draft converted, and ".count($bookingEmails).' booking email(s) rendered.' : null,
-            ($checkoutOk && $draftConverted) ? null : ($checkoutRes['json']['message'] ?? 'Checkout failed or draft was not transitioned to converted.'),
+            'POST', '/api/v1/booking/checkout', $checkoutRes['status'], $stepPassed ? 'passed' : 'failed', $checkoutRes['duration_ms'],
+            $stepPassed ? "Booking #{$bookingRef} persisted ({$testName}, AED {$booking->total}), draft converted, ".count($deliveredEmails).' delivered / '.count($attemptedEmails).' rendered email(s).' : null,
+            $stepErr,
             [
+                'booking_id' => $booking?->id,
                 'reference' => $bookingRef,
                 'total' => $booking ? (float) $booking->total : null,
-                'emails_rendered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject'], 'attachments' => $e['attachments']], $bookingEmails),
+                'mail_mode' => $mailMode,
+                'emails_rendered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject'], 'attachments' => $e['attachments']], $attemptedEmails),
+                'emails_delivered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject'], 'attachments' => $e['attachments']], $deliveredEmails),
+                'smtp_diagnosis' => $smtpDiagnosis,
             ]
         );
-        if (! $checkoutOk || ! $draftConverted || ! $booking) {
+        if (! $stepPassed || ! $booking) {
             return false;
         }
 
@@ -677,14 +752,17 @@ class SyntheticJourneyRunner
             return false;
         }
 
-        // 2. Submit WhatsApp Lead via /api/v1/whatsapp/log
+        // 2. Submit WhatsApp Lead via /api/v1/whatsapp/log (Clearly Identifiable Dummy Test Lead)
+        $mailMode = (string) ($cfg['mail_mode'] ?? 'live_smtp');
+        $waEmail = $this->resolveTestVisitorEmail('whatsapp', strtolower(Str::random(6)), $cfg);
+        $waName = 'Dunes Test Lead';
         $waRes = $session->postJson('/api/v1/whatsapp/log', [
-            'name' => 'Layla Hassan',
+            'name' => $waName,
             'phone' => '+971500000123',
-            'email' => 'qa.whatsapp.'.strtolower(Str::random(6)).'@dunesdiscoverytourism.com',
+            'email' => $waEmail,
             'tour_name' => 'Evening Desert Safari Dubai',
             'page_url' => $homePath,
-            'message_text' => 'Hello Dunes Discovery, QA synthetic simulator checking VIP table availability for 2 guests.',
+            'message_text' => "[AUTOMATED E2E TEST RUN #{$run->id}] Dummy WhatsApp lead test — inquiring about Evening Desert Safari availability for 2 guests.",
             'utm_source' => 'synthetic_qa',
             'traffic_channel' => 'Direct',
             'journey_timeline' => [
@@ -697,6 +775,7 @@ class SyntheticJourneyRunner
         $redirectUrl = (string) ($waRes['json']['redirect_url'] ?? '');
         if ($waId > 0) {
             $artifacts['whatsapp_inquiry_ids'][] = $waId;
+            $artifacts['whatsapp_refs'][] = $refCode;
         }
 
         $apiOk = $waRes['status'] === 200
@@ -709,7 +788,7 @@ class SyntheticJourneyRunner
         $this->recordStep(
             $run, 'whatsapp', $stepOrder++, 'whatsapp_api_submit', 'Log WhatsApp Inquiry & Build Tagged Redirect URL',
             'POST', '/api/v1/whatsapp/log', $waRes['status'], $apiOk ? 'passed' : 'failed', $waRes['duration_ms'],
-            $apiOk ? "Lead #{$waId} logged with correlation ref #{$refCode} and valid wa.me redirect URL." : null,
+            $apiOk ? "Lead #{$waId} ({$waName}) logged with correlation ref #{$refCode} and valid wa.me redirect URL." : null,
             $apiOk ? null : ($waRes['json']['message'] ?? 'WhatsApp API failed to log lead or generate tagged redirect_url.')
         );
         if (! $apiOk) {
@@ -722,43 +801,72 @@ class SyntheticJourneyRunner
         if ($inquiry && $inquiry->request_log_id) {
             $artifacts['request_log_ids'][] = (int) $inquiry->request_log_id;
         }
-        $waEmails = array_values(array_filter(
-            $session->getCapturedEmails(),
+        $filterWaMails = fn (array $mails) => array_values(array_filter(
+            $mails,
             fn (array $m) => str_contains(($m['subject'] ?? '').($m['html_body'] ?? ''), $refCode)
         ));
+        $attemptedWaEmails = $filterWaMails($session->getCapturedEmails());
+        $deliveredWaEmails = $filterWaMails($session->getDeliveredEmails());
+
         $dbOk = $inquiry !== null
             && $inquiry->ref_code === $refCode
             && is_array($inquiry->journey_timeline)
             && ! empty($inquiry->journey_timeline)
             && $inquiry->request_log_id !== null;
+
+        $waMailRequired = $mailMode === 'live_smtp'
+            && $this->settings->get('notification_whatsapp_admin_enabled', '1') === '1';
+        $waDeliveryOk = ! $waMailRequired || count($deliveredWaEmails) > 0;
+        $waSmtpDiagnosis = ($waMailRequired && ! $waDeliveryOk)
+            ? $this->formatSmtpFailureSummary()
+            : null;
+        $waStepOk = $dbOk && $waDeliveryOk;
         $dbDuration = max(1, (int) round((microtime(true) - $started) * 1000));
+
+        $waStepErr = null;
+        if (! $dbOk) {
+            $waStepErr = 'WhatsappInquiry DB verification failed (missing ref_code, journey_timeline, or request_log_id).';
+        } elseif (! $waDeliveryOk) {
+            $waStepErr = "WhatsApp Lead #{$waId} saved cleanly, but live SMTP admin alert failed (0 delivered). {$waSmtpDiagnosis}";
+        }
 
         $this->recordStep(
             $run, 'whatsapp', $stepOrder++, 'whatsapp_db_and_mail_verify', 'Verify WhatsApp DB Record, Timeline & Email Alert',
-            null, 'whatsapp_inquiries', null, $dbOk ? 'passed' : 'failed', $dbDuration,
-            $dbOk ? "DB record #{$waId} verified with ref_code={$refCode}, journey timeline, request_log #{$inquiry->request_log_id}, and ".count($waEmails).' alert email(s).' : null,
-            $dbOk ? null : 'WhatsappInquiry DB verification failed (missing ref_code, journey_timeline, or request_log_id).',
-            ['emails_rendered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject']], $waEmails)]
+            null, 'whatsapp_inquiries', null, $waStepOk ? 'passed' : 'failed', $dbDuration,
+            $waStepOk ? "DB record #{$waId} ({$waName}) verified with ref_code={$refCode}, journey timeline, request_log #{$inquiry->request_log_id}, ".count($deliveredWaEmails).' delivered / '.count($attemptedWaEmails).' rendered alert email(s).' : null,
+            $waStepErr,
+            [
+                'whatsapp_id' => $waId,
+                'ref_code' => $refCode,
+                'mail_mode' => $mailMode,
+                'emails_rendered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject']], $attemptedWaEmails),
+                'emails_delivered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject']], $deliveredWaEmails),
+                'smtp_diagnosis' => $waSmtpDiagnosis,
+            ]
         );
-        if (! $dbOk) {
+        if (! $waStepOk) {
             $flowOk = false;
         }
 
-        // 4. Legacy /ajax.php POST Parity + GET 405 Method Guard
-        $ajaxPost = $session->post('/ajax.php', [
-            'action' => 'log_whatsapp',
-            'name' => 'Layla Hassan',
-            'phone' => '+971500000124',
-            'tour_name' => 'Morning Desert Safari Dubai',
-            'page_url' => $homePath,
-            'message_text' => 'QA legacy ajax gateway check.',
-        ], ['X-Requested-With' => 'XMLHttpRequest']);
+        // 4. Legacy /ajax.php POST Parity + GET 405 Method Guard (suppressed & self-cleaned so only 1 clean lead remains)
+        $ajaxPost = $session->withExternalSideEffectsSuppressed(function (SyntheticVisitorSession $s) use ($homePath, $run) {
+            return $s->post('/ajax.php', [
+                'action' => 'log_whatsapp',
+                'name' => 'Dunes Test Parity Probe',
+                'phone' => '+971500000124',
+                'tour_name' => 'Morning Desert Safari Dubai',
+                'page_url' => $homePath,
+                'message_text' => "[QA GATEWAY PROBE RUN #{$run->id}] Parity probe row — auto-removed immediately.",
+            ], ['X-Requested-With' => 'XMLHttpRequest']);
+        });
+
         $ajaxId = (int) ($ajaxPost['json']['inquiry_id'] ?? 0);
         if ($ajaxId > 0) {
-            $artifacts['whatsapp_inquiry_ids'][] = $ajaxId;
             $ajaxRow = WhatsappInquiry::find($ajaxId);
-            if ($ajaxRow && $ajaxRow->request_log_id) {
-                $artifacts['request_log_ids'][] = (int) $ajaxRow->request_log_id;
+            $ajaxReqLogId = $ajaxRow?->request_log_id ? (int) $ajaxRow->request_log_id : null;
+            WhatsappInquiry::where('id', $ajaxId)->delete();
+            if ($ajaxReqLogId) {
+                RequestLog::where('id', $ajaxReqLogId)->delete();
             }
         }
         $ajaxGet = $session->get('/ajax.php?action=log_whatsapp');
@@ -769,7 +877,7 @@ class SyntheticJourneyRunner
         $this->recordStep(
             $run, 'whatsapp', $stepOrder++, 'whatsapp_ajax_parity_and_guard', 'Verify /ajax.php POST Parity & GET 405 Guard',
             'POST/GET', '/ajax.php', $ajaxPost['status'], $parityOk ? 'passed' : 'failed', $ajaxPost['duration_ms'] + $ajaxGet['duration_ms'],
-            $parityOk ? 'POST /ajax.php succeeded (200) and GET /ajax.php?action=log_whatsapp properly rejected (405).' : null,
+            $parityOk ? 'POST /ajax.php succeeded (200, secondary probe cleaned up) and GET /ajax.php?action=log_whatsapp properly rejected (405).' : null,
             $parityOk ? null : "Expected POST=200 & GET=405, got POST={$ajaxPost['status']} & GET={$ajaxGet['status']}."
         );
         if (! $parityOk) {
@@ -845,10 +953,8 @@ class SyntheticJourneyRunner
 
         // 3. Email OTP Verification on Contact Flow
         $tokenSlug = strtolower(Str::random(8));
-        $mailMode = (string) ($cfg['mail_mode'] ?? 'intercept');
-        $contactEmail = ($mailMode === 'live_smtp' && ! empty($cfg['recipient_email']))
-            ? strtolower(trim((string) $cfg['recipient_email']))
-            : "qa.contact.{$tokenSlug}@dunesdiscoverytourism.com";
+        $mailMode = (string) ($cfg['mail_mode'] ?? 'live_smtp');
+        $contactEmail = $this->resolveTestVisitorEmail('contact', $tokenSlug, $cfg);
 
         $wasPreVerified = VerifiedEmail::where('email', $contactEmail)->exists();
         $otpSend = $session->postJson('/api/v1/email/otp/send', ['email' => $contactEmail]);
@@ -912,15 +1018,18 @@ class SyntheticJourneyRunner
 
             $botBlockedCleanly = Contact::where('email', $botEmail)->count() === 0;
             $spamEvent = SpamEvent::where('email', $botEmail)->latest('id')->first();
-            if ($spamEvent) {
-                $artifacts['spam_event_ids'][] = $spamEvent->id;
-            }
             $shieldOk = $botBlockedCleanly && $spamEvent !== null;
+            $spamEventId = $spamEvent?->id;
+            $spamScore = $spamEvent?->spam_score;
+            if ($spamEvent) {
+                // Immediately clean synthetic probe SpamEvent so Security logs stay free of simulator probes
+                $spamEvent->delete();
+            }
 
             $this->recordStep(
                 $run, 'contact', $stepOrder++, 'contact_bot_shield_probe', 'Probe 6-Layer Anti-Spam Bot Shield Defense',
                 'POST', '/api/v1/contact/submit', $botRes['status'], $shieldOk ? 'passed' : 'failed', $botRes['duration_ms'],
-                $shieldOk ? "Bot payload stealth-blocked cleanly; SpamEvent #{$spamEvent->id} logged with score {$spamEvent->spam_score} and zero Contact DB pollution." : null,
+                $shieldOk ? "Bot payload stealth-blocked cleanly (SpamEvent #{$spamEventId} score {$spamScore}, probe cleaned) with zero Contact DB pollution." : null,
                 $shieldOk ? null : 'Anti-spam bot probe was not intercepted or failed to log SpamEvent.'
             );
             if (! $shieldOk) {
@@ -928,14 +1037,18 @@ class SyntheticJourneyRunner
             }
         }
 
-        // 5. Legitimate Human Visitor Contact Inquiry Submission
-        $contactSubject = 'Desert Safari Family Inquiry '.$tokenSlug;
+        // Clear earlier OTP mail capture so contact step isolates Contact Admin + Customer Ack emails
+        $session->clearCapturedEmails();
+
+        // 5. Legitimate Human Visitor Contact Inquiry Submission (Clearly Identifiable Dummy Test Inquiry)
+        $contactName = 'Dunes Test Visitor';
+        $contactSubject = "[AUTOMATED TEST #{$run->id}] Desert Safari Family Inquiry";
         $submitRes = $session->postJson('/api/v1/contact/submit', [
-            'name' => 'Nadia Al Mansoori',
+            'name' => $contactName,
             'email' => $contactEmail,
             'phone' => '+971500000456',
             'subject' => $contactSubject,
-            'message' => 'Hello Dunes team, our family of four will be visiting Dubai next month and would like details on hotel pickup timing and vegetarian BBQ options.',
+            'message' => "Automated E2E Test Inquiry (Run #{$run->id}): Our family of four will be visiting Dubai next month and we are testing live contact inquiry submission, database storage, and email notifications.",
             '_dunes_token' => $challengeToken,
             '_dunes_pow' => $powNonce,
             '_dunes_telemetry' => json_encode(['keystrokes' => 54, 'pointer' => 18, 'focus' => 5]),
@@ -974,27 +1087,47 @@ class SyntheticJourneyRunner
             }
         }
 
-        $contactEmails = array_values(array_filter(
-            $session->getCapturedEmails(),
-            fn (array $m) => str_contains(($m['subject'] ?? '').($m['html_body'] ?? ''), $contactSubject)
-                || in_array($contactEmail, (array) ($m['to'] ?? []), true)
-        ));
+        $attemptedContactEmails = $session->getCapturedEmails();
+        $deliveredContactEmails = $session->getDeliveredEmails();
 
         $dbOk = $contact !== null
             && ! $contact->is_spam
             && $contact->status === 'new'
             && $contact->is_verified
             && $contact->request_log_id !== null;
+
+        $contactMailRequired = $mailMode === 'live_smtp' && (
+            $this->settings->get('notification_contact_admin_enabled', '1') === '1'
+            || $this->settings->get('notification_contact_customer_enabled', '1') === '1'
+        );
+        $contactDeliveryOk = ! $contactMailRequired || count($deliveredContactEmails) > 0;
+        $contactSmtpDiagnosis = ($contactMailRequired && ! $contactDeliveryOk)
+            ? $this->formatSmtpFailureSummary()
+            : null;
+        $stepOk = $dbOk && $contactDeliveryOk;
         $dbMs = max(1, (int) round((microtime(true) - $started) * 1000));
+
+        $contactErr = null;
+        if (! $dbOk) {
+            $contactErr = 'Contact record missing, unexpectedly quarantined, or unlinked from RequestLog.';
+        } elseif (! $contactDeliveryOk) {
+            $contactErr = "Contact #{$contact->id} saved cleanly, but live SMTP email delivery failed (0 delivered). {$contactSmtpDiagnosis}";
+        }
 
         $this->recordStep(
             $run, 'contact', $stepOrder++, 'contact_db_and_mail_verify', 'Verify Clean Contact Persistence & Acknowledgement Emails',
-            null, 'contacts', null, $dbOk ? 'passed' : 'failed', $dbMs,
-            $dbOk ? "Contact #{$contact->id} stored cleanly (is_spam=false, is_verified=true, request_log #{$contact->request_log_id}) and ".count($contactEmails).' email(s) rendered.' : null,
-            $dbOk ? null : 'Contact record missing, unexpectedly quarantined, or unlinked from RequestLog.',
-            ['emails_rendered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject']], $contactEmails)]
+            null, 'contacts', null, $stepOk ? 'passed' : 'failed', $dbMs,
+            $stepOk ? "Contact #{$contact->id} ({$contactName}) stored cleanly (is_spam=false, is_verified=true, request_log #{$contact->request_log_id}), ".count($deliveredContactEmails).' delivered / '.count($attemptedContactEmails).' rendered email(s).' : null,
+            $contactErr,
+            [
+                'contact_id' => $contact?->id,
+                'mail_mode' => $mailMode,
+                'emails_rendered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject']], $attemptedContactEmails),
+                'emails_delivered' => array_map(fn ($e) => ['to' => $e['to'], 'subject' => $e['subject']], $deliveredContactEmails),
+                'smtp_diagnosis' => $contactSmtpDiagnosis,
+            ]
         );
-        if (! $dbOk) {
+        if (! $stepOk) {
             $flowOk = false;
         }
 
@@ -1102,6 +1235,47 @@ class SyntheticJourneyRunner
         $run->save();
 
         return $deleted;
+    }
+
+    /**
+     * Clean up all uncleaned runs in one batch.
+     *
+     * @return array{runs_cleaned: int, total_artifacts_removed: int}
+     */
+    public function cleanupAllUncleanedRuns(): array
+    {
+        $runsCleaned = 0;
+        $totalRemoved = 0;
+
+        SyntheticTestRun::where('cleanup_completed', false)
+            ->chunkById(50, function ($runs) use (&$runsCleaned, &$totalRemoved): void {
+                foreach ($runs as $run) {
+                    if ($run->hasUncleanedArtifacts()) {
+                        $counts = $this->cleanupRun($run);
+                        $totalRemoved += array_sum($counts);
+                        $runsCleaned++;
+                    }
+                }
+            });
+
+        return [
+            'runs_cleaned' => $runsCleaned,
+            'total_artifacts_removed' => $totalRemoved,
+        ];
+    }
+
+    protected function formatSmtpFailureSummary(): string
+    {
+        $health = $this->smtpDiagnostics->getHealthStatus();
+        $diag = is_array($health['diagnosis'] ?? null) ? $health['diagnosis'] : null;
+        if ($diag) {
+            $title = (string) ($diag['title'] ?? 'SMTP Transport Failure');
+            $raw = (string) ($diag['raw_error'] ?? '');
+
+            return $raw !== '' ? "{$title} — {$raw}" : $title;
+        }
+
+        return 'Check Admin -> Settings -> Mail / SMTP or Failover SMTP configuration.';
     }
 
     public function pruneOldRuns(?int $days = null): int

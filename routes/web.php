@@ -435,6 +435,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/qa-simulator/run', [AdminSyntheticTestController::class, 'run'])->name('qa-simulator.run');
     Route::get('/qa-simulator/runs/{id}', [AdminSyntheticTestController::class, 'show'])->name('qa-simulator.show');
     Route::post('/qa-simulator/settings', [AdminSyntheticTestController::class, 'updateSettings'])->name('qa-simulator.settings.update');
+    Route::post('/qa-simulator/cleanup-all', [AdminSyntheticTestController::class, 'cleanupAll'])->name('qa-simulator.cleanup-all');
     Route::post('/qa-simulator/runs/{id}/cleanup', [AdminSyntheticTestController::class, 'cleanup'])->name('qa-simulator.cleanup');
     Route::get('/qa-simulator/runs/{id}/export', [AdminSyntheticTestController::class, 'export'])->name('qa-simulator.export');
     Route::delete('/qa-simulator/runs/{id}', [AdminSyntheticTestController::class, 'destroy'])->name('qa-simulator.destroy');

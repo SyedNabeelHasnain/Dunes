@@ -170,6 +170,8 @@ class NotificationManagementService
     {
         $this->prepareMailEnvironment();
         $sender = $this->getSenderIdentity();
+        $diagnostics = app(\App\Services\Mail\SmtpDiagnosticService::class);
+        $suppressDiagnostics = SyntheticVisitorSession::shouldSuppressExternalSideEffects();
         $result = [
             'customer_sent' => false,
             'admin_sent' => false,
@@ -203,9 +205,15 @@ class NotificationManagementService
                 }
 
                 Mail::to($booking->email)->send($customerMail);
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordSuccess('booking_customer_confirmation');
+                }
                 $result['customer_sent'] = true;
             } catch (\Throwable $e) {
                 Log::error("Failed sending customer booking email for {$booking->reference}: " . $e->getMessage());
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordFailure('booking_customer_confirmation', $e, $booking->email);
+                }
             }
         }
 
@@ -235,9 +243,15 @@ class NotificationManagementService
                 }
 
                 Mail::to($primaryRecipient)->send($adminMail);
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordSuccess('booking_admin_alert');
+                }
                 $result['admin_sent'] = true;
             } catch (\Throwable $e) {
                 Log::error("Failed sending admin booking alert for {$booking->reference}: " . $e->getMessage());
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordFailure('booking_admin_alert', $e, $primaryRecipient ?? null);
+                }
             }
         }
 
@@ -270,6 +284,8 @@ class NotificationManagementService
 
         $this->prepareMailEnvironment();
         $sender = $this->getSenderIdentity();
+        $diagnostics = app(\App\Services\Mail\SmtpDiagnosticService::class);
+        $suppressDiagnostics = SyntheticVisitorSession::shouldSuppressExternalSideEffects();
 
         try {
             $recipients = $this->resolveEventRecipients('notification_whatsapp_recipients', $this->settings->get('site_email'));
@@ -303,6 +319,9 @@ class NotificationManagementService
             }
 
             Mail::to($primaryRecipient)->send($mail);
+            if (! $suppressDiagnostics) {
+                $diagnostics->recordSuccess('whatsapp_admin_alert');
+            }
 
             // Outgoing Webhook Trigger
             $this->dispatchWebhook('whatsapp.lead', [
@@ -319,6 +338,9 @@ class NotificationManagementService
             return true;
         } catch (\Throwable $e) {
             Log::error("Failed to send WhatsApp lead email for lead #{$inquiry->id}: " . $e->getMessage());
+            if (! $suppressDiagnostics) {
+                $diagnostics->recordFailure('whatsapp_admin_alert', $e, $primaryRecipient ?? null);
+            }
 
             return false;
         }
@@ -344,6 +366,7 @@ class NotificationManagementService
         $this->prepareMailEnvironment();
         $sender = $this->getSenderIdentity();
         $diagnostics = app(\App\Services\Mail\SmtpDiagnosticService::class);
+        $suppressDiagnostics = SyntheticVisitorSession::shouldSuppressExternalSideEffects();
 
         // 1. Admin Alert
         $adminEnabled = $this->settings->get('notification_contact_admin_enabled', '1') === '1';
@@ -373,11 +396,15 @@ class NotificationManagementService
                 }
 
                 Mail::to($primaryRecipient)->send($adminMail);
-                $diagnostics->recordSuccess('contact_admin_notification');
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordSuccess('contact_admin_notification');
+                }
                 $result['admin_sent'] = true;
             } catch (\Throwable $e) {
                 Log::error("Failed sending admin contact notification for inquiry #{$contact->id}: " . $e->getMessage());
-                $diagnostics->recordFailure('contact_admin_notification', $e, $primaryRecipient ?? null);
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordFailure('contact_admin_notification', $e, $primaryRecipient ?? null);
+                }
             }
         }
 
@@ -398,11 +425,15 @@ class NotificationManagementService
                     ->replyTo($sender['reply_to'], $sender['name']);
 
                 Mail::to($contact->email)->send($ackMail);
-                $diagnostics->recordSuccess('contact_customer_ack');
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordSuccess('contact_customer_ack');
+                }
                 $result['customer_sent'] = true;
             } catch (\Throwable $e) {
                 Log::error("Failed sending customer contact acknowledgement to {$contact->email}: " . $e->getMessage());
-                $diagnostics->recordFailure('contact_customer_ack', $e, $contact->email);
+                if (! $suppressDiagnostics) {
+                    $diagnostics->recordFailure('contact_customer_ack', $e, $contact->email);
+                }
             }
         }
 

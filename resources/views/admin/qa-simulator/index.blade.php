@@ -38,7 +38,7 @@
                     </span>
                 </div>
                 <p class="text-xs text-slate-500 mt-1">
-                    Isolated end-to-end visitor emulation across Booking Checkout, WhatsApp Lead Logging, and Contact Us Anti-Spam &amp; OTP flows — zero session mutation and automatic cleanup.
+                    Executes 100% real visitor operations across Booking Checkout, WhatsApp Leads, and Contact Inquiries using clearly identifiable dummy test identities (<code class="font-mono">Dunes Test Traveler</code>, <code class="font-mono">Dunes Test Lead</code>, <code class="font-mono">Dunes Test Visitor</code>) and fires real live notifications.
                 </p>
             </div>
         </div>
@@ -50,16 +50,32 @@
                 <input type="hidden" name="flows[]" value="contact">
                 <input type="hidden" name="locale" value="{{ $settings['locale'] }}">
                 <input type="hidden" name="device_profile" value="{{ $settings['device_profile'] }}">
-                <input type="hidden" name="mail_mode" value="intercept">
+                <input type="hidden" name="mail_mode" value="live_smtp">
+                <input type="hidden" name="recipient_email" value="{{ $defaultTestEmail }}">
                 <input type="hidden" name="include_bot_shield_check" value="1">
                 <input type="hidden" name="include_coupon_check" value="1">
-                <input type="hidden" name="auto_cleanup" value="1">
+                <input type="hidden" name="auto_cleanup" value="0">
                 <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold transition shadow-sm cursor-pointer">
-                    <i class="bi bi-play-circle-fill"></i> Run All 3 Flows Now
+                    <i class="bi bi-play-circle-fill"></i> Run All 3 Flows Live (Real Records &amp; Alerts)
                 </button>
             </form>
         </div>
     </div>
+
+    @if(($smtpHealth['status'] ?? '') === 'unhealthy' && !empty($smtpHealth['diagnosis']))
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-3.5 text-xs text-rose-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+                <div class="font-extrabold flex items-center gap-1.5">
+                    <i class="bi bi-exclamation-triangle-fill text-rose-600"></i>
+                    Live SMTP Health Warning: {{ $smtpHealth['diagnosis']['title'] ?? 'Outbound Mail Failure Detected' }}
+                </div>
+                <div class="text-[11px] text-rose-800 mt-0.5">{{ $smtpHealth['diagnosis']['raw_error'] ?? '' }}</div>
+            </div>
+            <a href="{{ route('admin.settings.mail') }}" class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-bold text-[11px]">
+                Fix Mail / Failover SMTP &rarr;
+            </a>
+        </div>
+    @endif
 
     <!-- KPI & Per-Flow Health Strip -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -170,16 +186,16 @@
                 </div>
 
                 <div>
-                    <label for="sim_mail_mode" class="block font-bold text-slate-700 mb-1">Email &amp; Webhook Handling</label>
+                    <label for="sim_mail_mode" class="block font-bold text-slate-700 mb-1">Execution &amp; Notification Mode</label>
                     <select id="sim_mail_mode" name="mail_mode" x-model="runMailMode" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
-                        <option value="intercept">Safe Intercept (Verify rendered Mailables without SMTP send)</option>
-                        <option value="live_smtp">Live SMTP Dispatch (Actually transmit via live mail server)</option>
+                        <option value="live_smtp">Real Live Mode — Creates Real Records &amp; Triggers Live SMTP + Webhooks (Default)</option>
+                        <option value="intercept">Safe Dry-Run / Intercept — No Real SMTP or Webhooks Sent</option>
                     </select>
                 </div>
 
                 <div x-show="runMailMode === 'live_smtp'" x-cloak>
-                    <label for="sim_recipient" class="block font-bold text-slate-700 mb-1">Live Test Recipient Email</label>
-                    <input id="sim_recipient" type="email" name="recipient_email" value="{{ $settings['recipient_email'] }}" placeholder="qa@dunesdiscoverytourism.com" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    <label for="sim_recipient" class="block font-bold text-slate-700 mb-1">Dummy Customer Test Email (Receives Customer OTP, Booking Voucher &amp; Ack)</label>
+                    <input id="sim_recipient" type="email" name="recipient_email" value="{{ $settings['recipient_email'] ?: $defaultTestEmail }}" placeholder="{{ $defaultTestEmail }}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
                 </div>
 
                 <div class="space-y-2 rounded-xl bg-slate-50 border border-slate-200 p-3">
@@ -192,8 +208,8 @@
                         <span class="font-semibold text-slate-700">Verify Promo Coupon API Validation Endpoint</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="auto_cleanup" value="1" checked class="rounded border-slate-300 text-primary">
-                        <span class="font-semibold text-slate-700">Auto-cleanup synthetic DB &amp; PDF artifacts immediately after run</span>
+                        <input type="checkbox" name="auto_cleanup" value="1" {{ $settings['auto_cleanup'] ? 'checked' : '' }} class="rounded border-slate-300 text-primary">
+                        <span class="font-semibold text-slate-700">Auto-delete dummy records right after run (leave unchecked to inspect Booking, WhatsApp Lead &amp; Contact Inquiry in CMS)</span>
                     </label>
                 </div>
 
@@ -290,10 +306,10 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label for="sched_mail_mode" class="block font-bold text-slate-700 mb-1">Scheduled Mail Mode</label>
+                        <label for="sched_mail_mode" class="block font-bold text-slate-700 mb-1">Scheduled Execution Mode</label>
                         <select id="sched_mail_mode" name="mail_mode" x-model="mailMode" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
-                            <option value="intercept">Safe Intercept (Recommended)</option>
-                            <option value="live_smtp">Live SMTP Dispatch</option>
+                            <option value="live_smtp">Real Live Mode — Real Records &amp; Live SMTP + Webhooks</option>
+                            <option value="intercept">Safe Dry-Run / Intercept</option>
                         </select>
                     </div>
                     <div>
@@ -310,8 +326,8 @@
                 </div>
 
                 <div x-show="mailMode === 'live_smtp'" x-cloak>
-                    <label for="sched_recipient" class="block font-bold text-slate-700 mb-1">Live Test Recipient Email</label>
-                    <input id="sched_recipient" type="email" name="recipient_email" value="{{ old('recipient_email', $settings['recipient_email']) }}" placeholder="qa@dunesdiscoverytourism.com" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                    <label for="sched_recipient" class="block font-bold text-slate-700 mb-1">Dummy Customer Test Email (Receives Customer OTP, Booking Voucher &amp; Ack)</label>
+                    <input id="sched_recipient" type="email" name="recipient_email" value="{{ old('recipient_email', $settings['recipient_email'] ?: $defaultTestEmail) }}" placeholder="{{ $defaultTestEmail }}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
                 </div>
 
                 <div>
@@ -354,21 +370,31 @@
                 <h2 class="text-sm font-extrabold text-slate-900">Synthetic E2E Test Run History</h2>
                 <p class="text-xs text-slate-500">Full audit trail of manual, CLI, and scheduled visitor simulations.</p>
             </div>
-            <form method="GET" action="{{ route('admin.qa-simulator.index') }}" class="flex flex-wrap items-center gap-2 text-xs">
-                <select name="status" class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs">
-                    <option value="">All Statuses</option>
-                    @foreach(['passed', 'partial', 'failed'] as $st)
-                        <option value="{{ $st }}" {{ request('status') === $st ? 'selected' : '' }}>{{ ucfirst($st) }}</option>
-                    @endforeach
-                </select>
-                <select name="trigger_type" class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs">
-                    <option value="">All Triggers</option>
-                    @foreach(['manual', 'scheduled', 'cli'] as $tr)
-                        <option value="{{ $tr }}" {{ request('trigger_type') === $tr ? 'selected' : '' }}>{{ ucfirst($tr) }}</option>
-                    @endforeach
-                </select>
-                <button type="submit" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold">Filter</button>
-            </form>
+            <div class="flex flex-wrap items-center gap-2">
+                @if($uncleanedRunsCount > 0)
+                    <form action="{{ route('admin.qa-simulator.cleanup-all') }}" method="POST" class="inline" onsubmit="return confirm('Delete all kept dummy test records across {{ $uncleanedRunsCount }} run(s)? Real customer data will never be touched.')">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold cursor-pointer">
+                            <i class="bi bi-stars"></i> Clean Up All Dummy Records ({{ $uncleanedRunsCount }})
+                        </button>
+                    </form>
+                @endif
+                <form method="GET" action="{{ route('admin.qa-simulator.index') }}" class="flex flex-wrap items-center gap-2 text-xs">
+                    <select name="status" class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs">
+                        <option value="">All Statuses</option>
+                        @foreach(['passed', 'partial', 'failed'] as $st)
+                            <option value="{{ $st }}" {{ request('status') === $st ? 'selected' : '' }}>{{ ucfirst($st) }}</option>
+                        @endforeach
+                    </select>
+                    <select name="trigger_type" class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs">
+                        <option value="">All Triggers</option>
+                        @foreach(['manual', 'scheduled', 'cli'] as $tr)
+                            <option value="{{ $tr }}" {{ request('trigger_type') === $tr ? 'selected' : '' }}>{{ ucfirst($tr) }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold">Filter</button>
+                </form>
+            </div>
         </div>
 
         <div class="overflow-x-auto">

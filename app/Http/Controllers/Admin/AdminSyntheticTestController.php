@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
+use App\Models\Contact;
 use App\Models\Language;
 use App\Models\SyntheticTestRun;
 use App\Models\SyntheticTestStep;
 use App\Models\Tour;
+use App\Models\WhatsappInquiry;
 use App\Services\Governance\ConfigAuditService;
+use App\Services\Mail\SmtpDiagnosticService;
 use App\Services\SyntheticTesting\SyntheticJourneyRunner;
 use Cron\CronExpression;
 use Illuminate\Http\JsonResponse;
@@ -82,6 +86,13 @@ class AdminSyntheticTestController extends Controller
             ? Language::getActive()
             : collect([(object) ['code' => 'en', 'name' => 'English']]);
 
+        $defaultTestEmail = $this->runner->resolveDefaultTestRecipientEmail($settings['recipient_email'] ?? '');
+        $uncleanedRunsCount = SyntheticTestRun::where('cleanup_completed', false)
+            ->get()
+            ->filter(fn (SyntheticTestRun $r) => $r->hasUncleanedArtifacts())
+            ->count();
+        $smtpHealth = app(SmtpDiagnosticService::class)->getHealthStatus();
+
         return view('admin.qa-simulator.index', compact(
             'settings',
             'nextScheduledAt',
@@ -95,6 +106,9 @@ class AdminSyntheticTestController extends Controller
             'flowStatuses',
             'tours',
             'languages',
+            'defaultTestEmail',
+            'uncleanedRunsCount',
+            'smtpHealth',
         ));
     }
 
@@ -118,11 +132,11 @@ class AdminSyntheticTestController extends Controller
             'locale' => $validated['locale'] ?? 'en',
             'device_profile' => $validated['device_profile'] ?? 'desktop',
             'tour_id' => ! empty($validated['tour_id']) ? (int) $validated['tour_id'] : null,
-            'mail_mode' => $validated['mail_mode'] ?? 'intercept',
+            'mail_mode' => $validated['mail_mode'] ?? 'live_smtp',
             'recipient_email' => $validated['recipient_email'] ?? '',
             'include_bot_shield_check' => $request->boolean('include_bot_shield_check', true),
             'include_coupon_check' => $request->boolean('include_coupon_check', true),
-            'auto_cleanup' => $request->boolean('auto_cleanup', true),
+            'auto_cleanup' => $request->boolean('auto_cleanup', false),
         ];
 
         $run = $this->runner->execute($overrides, 'manual', auth()->id());
@@ -165,8 +179,25 @@ class AdminSyntheticTestController extends Controller
     {
         $run = SyntheticTestRun::with(['steps', 'triggeredByUser'])->findOrFail($id);
         $stepsByFlow = $run->steps->groupBy('flow');
+        $artifacts = is_array($run->artifacts) ? $run->artifacts : [];
 
-        return view('admin.qa-simulator.show', compact('run', 'stepsByFlow'));
+        $createdBookings = ! empty($artifacts['booking_ids'])
+            ? Booking::whereIn('id', array_map('intval', (array) $artifacts['booking_ids']))->get()
+            : collect();
+        $createdWhatsapps = ! empty($artifacts['whatsapp_inquiry_ids'])
+            ? WhatsappInquiry::whereIn('id', array_map('intval', (array) $artifacts['whatsapp_inquiry_ids']))->get()
+            : collect();
+        $createdContacts = ! empty($artifacts['contact_ids'])
+            ? Contact::whereIn('id', array_map('intval', (array) $artifacts['contact_ids']))->get()
+            : collect();
+
+        return view('admin.qa-simulator.show', compact(
+            'run',
+            'stepsByFlow',
+            'createdBookings',
+            'createdWhatsapps',
+            'createdContacts',
+        ));
     }
 
     public function updateSettings(Request $request): RedirectResponse
@@ -250,6 +281,16 @@ class AdminSyntheticTestController extends Controller
         $totalRemoved = array_sum($counts);
 
         return back()->with('success', "Cleaned up {$totalRemoved} synthetic test artifact(s) for Run #{$run->id}.");
+    }
+
+    public function cleanupAll(): RedirectResponse
+    {
+        $result = $this->runner->cleanupAllUncleanedRuns();
+
+        return back()->with(
+            'success',
+            "Cleaned up {$result['total_artifacts_removed']} dummy test artifact(s) across {$result['runs_cleaned']} uncleaned run(s)."
+        );
     }
 
     public function export(int $id): Response

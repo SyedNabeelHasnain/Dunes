@@ -65,9 +65,21 @@ class SyntheticTestRun extends Model
             return false;
         }
 
+        $artifactKeys = [
+            'booking_ids',
+            'draft_ids',
+            'whatsapp_inquiry_ids',
+            'contact_ids',
+            'spam_event_ids',
+            'request_log_ids',
+            'verified_emails',
+            'email_otp_emails',
+            'voucher_pdf_paths',
+        ];
+
         $artifacts = is_array($this->artifacts) ? $this->artifacts : [];
-        foreach ($artifacts as $items) {
-            if (is_array($items) && ! empty($items)) {
+        foreach ($artifactKeys as $key) {
+            if (! empty($artifacts[$key]) && is_array($artifacts[$key])) {
                 return true;
             }
         }

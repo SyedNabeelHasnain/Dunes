@@ -8,6 +8,7 @@ use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\SessionManager;
@@ -39,6 +40,11 @@ class SyntheticVisitorSession
      * @var array<int, array<string, mixed>>|null
      */
     private static ?array $capturedEmails = null;
+
+    /**
+     * @var array<int, array<string, mixed>>|null
+     */
+    private static ?array $deliveredEmails = null;
 
     private ?HttpKernel $kernel = null;
 
@@ -122,7 +128,7 @@ class SyntheticVisitorSession
 
         $this->locale = (string) ($options['locale'] ?? 'en');
         $device = (string) ($options['device_profile'] ?? 'desktop');
-        $mailMode = (string) ($options['mail_mode'] ?? 'intercept');
+        $mailMode = (string) ($options['mail_mode'] ?? 'live_smtp');
         $this->clientIp = (string) ($options['client_ip'] ?? '127.0.0.1');
         $this->baseUrl = rtrim((string) ($options['base_url'] ?? ($originalRequest
             ? $originalRequest->getSchemeAndHttpHost()
@@ -142,11 +148,13 @@ class SyntheticVisitorSession
         $wasSuppressing = self::$suppressExternalSideEffects;
         $wasProbe = self::$botShieldProbe;
         $previousCollector = self::$capturedEmails;
+        $previousDelivered = self::$deliveredEmails;
 
         self::$simulating = true;
         self::$suppressExternalSideEffects = ($mailMode !== 'live_smtp');
         self::$botShieldProbe = false;
         self::$capturedEmails = [];
+        self::$deliveredEmails = [];
 
         try {
             // Reset session & auth to an ephemeral array-backed driver for the simulated visitor
@@ -171,6 +179,7 @@ class SyntheticVisitorSession
             self::$suppressExternalSideEffects = $wasSuppressing;
             self::$botShieldProbe = $wasProbe;
             self::$capturedEmails = $previousCollector;
+            self::$deliveredEmails = $previousDelivered;
             $this->kernel = null;
             $this->sessionManager = null;
 
@@ -379,6 +388,35 @@ class SyntheticVisitorSession
     }
 
     /**
+     * Execute a step with external SMTP and webhooks temporarily suppressed
+     * (useful for secondary gateway parity probes so only 1 real alert fires).
+     */
+    public function withExternalSideEffectsSuppressed(callable $fn): mixed
+    {
+        $prevSuppress = self::$suppressExternalSideEffects;
+        $prevMailer = config('mail.default');
+        self::$suppressExternalSideEffects = true;
+        config(['mail.default' => 'array']);
+        try {
+            app('mail.manager')->purge();
+        } catch (\Throwable) {
+        }
+
+        try {
+            return $fn($this);
+        } finally {
+            self::$suppressExternalSideEffects = $prevSuppress;
+            if ($prevMailer !== null) {
+                config(['mail.default' => $prevMailer]);
+            }
+            try {
+                app('mail.manager')->purge();
+            } catch (\Throwable) {
+            }
+        }
+    }
+
+    /**
      * @return array<int, array<string, mixed>>
      */
     public function getCapturedEmails(): array
@@ -386,9 +424,18 @@ class SyntheticVisitorSession
         return self::$capturedEmails ?? [];
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getDeliveredEmails(): array
+    {
+        return self::$deliveredEmails ?? [];
+    }
+
     public function clearCapturedEmails(): void
     {
         self::$capturedEmails = [];
+        self::$deliveredEmails = [];
     }
 
     public function findLatestOtpCodeForEmail(string $email): ?string
@@ -439,6 +486,34 @@ class SyntheticVisitorSession
                 }
 
                 self::$capturedEmails[] = [
+                    'to' => $to,
+                    'subject' => (string) $msg->getSubject(),
+                    'text_body' => (string) ($msg->getTextBody() ?? ''),
+                    'html_body' => (string) ($msg->getHtmlBody() ?? ''),
+                    'attachments' => $attachmentNames,
+                ];
+            } catch (\Throwable) {
+            }
+        });
+
+        Event::listen(MessageSent::class, function (MessageSent $event): void {
+            if (! self::$simulating || self::$deliveredEmails === null) {
+                return;
+            }
+
+            try {
+                $msg = $event->message;
+                $to = [];
+                foreach ($msg->getTo() as $addr) {
+                    $to[] = $addr->getAddress();
+                }
+
+                $attachmentNames = [];
+                foreach ($msg->getAttachments() as $part) {
+                    $attachmentNames[] = method_exists($part, 'getFilename') ? ($part->getFilename() ?: 'attachment') : 'attachment';
+                }
+
+                self::$deliveredEmails[] = [
                     'to' => $to,
                     'subject' => (string) $msg->getSubject(),
                     'text_body' => (string) ($msg->getTextBody() ?? ''),
