@@ -3,306 +3,7 @@
 @section('page_title', 'Customer Video Reviews & Video SEO')
 
 @section('content')
-<div class="space-y-6" x-data="{
-    editModalOpen: false,
-    addModalOpen: false,
-    previewModalOpen: false,
-    previewVideoUrl: '',
-    previewVideoTitle: '',
-    editingItem: null,
-
-    // AI Analysis States
-    isAnalyzingAdd: false,
-    analysisStageAdd: '',
-    analysisSuccessAdd: false,
-    analysisErrorAdd: '',
-
-    isAnalyzingEdit: false,
-    analysisStageEdit: '',
-    analysisSuccessEdit: false,
-    analysisErrorEdit: '',
-
-    addForm: {
-        title: '',
-        reviewer_name: '',
-        reviewer_country: '',
-        reviewer_country_code: '',
-        category: 'red_dunes',
-        tour_slug: '',
-        rating: '5.0',
-        duration: 30,
-        transcript: '',
-        caption: '',
-        location: 'Lahbab Red Dunes, Dubai, UAE',
-        description: '',
-        keywords: '',
-        existing_filename: '',
-        existing_poster: '',
-        poster_preview_url: '',
-        placement_home: true,
-        placement_gallery: true,
-        placement_tour: true,
-        is_active: true
-    },
-
-    resetAddForm() {
-        this.addForm = {
-            title: '',
-            reviewer_name: '',
-            reviewer_country: '',
-            reviewer_country_code: '',
-            category: 'red_dunes',
-            tour_slug: '',
-            rating: '5.0',
-            duration: 30,
-            transcript: '',
-            caption: '',
-            location: 'Lahbab Red Dunes, Dubai, UAE',
-            description: '',
-            keywords: '',
-            existing_filename: '',
-            existing_poster: '',
-            poster_preview_url: '',
-            placement_home: true,
-            placement_gallery: true,
-            placement_tour: true,
-            is_active: true
-        };
-        this.isAnalyzingAdd = false;
-        this.analysisStageAdd = '';
-        this.analysisSuccessAdd = false;
-        this.analysisErrorAdd = '';
-        const addFileInput = document.getElementById('add_video_file');
-        if (addFileInput) addFileInput.value = '';
-    },
-
-    openEdit(item) {
-        this.editingItem = JSON.parse(JSON.stringify(item));
-        this.isAnalyzingEdit = false;
-        this.analysisStageEdit = '';
-        this.analysisSuccessEdit = false;
-        this.analysisErrorEdit = '';
-        this.editModalOpen = true;
-    },
-
-    openPreview(url, title) {
-        this.previewVideoUrl = url;
-        this.previewVideoTitle = title;
-        this.previewModalOpen = true;
-    },
-
-    closePreview() {
-        this.previewModalOpen = false;
-        this.previewVideoUrl = '';
-    },
-
-    async analyzeVideo(context = 'add') {
-        const isAdd = context === 'add';
-        const formEl = isAdd 
-            ? document.getElementById('addVideoReviewForm') 
-            : document.getElementById('editVideoReviewForm');
-        
-        if (!formEl) return;
-
-        const formData = new FormData(formEl);
-        
-        // Ensure existing_filename is populated from state if hidden input was not updated
-        const stateFilename = isAdd ? this.addForm.existing_filename : (this.editingItem?.filename || '');
-        if (!formData.get('existing_filename') && stateFilename) {
-            formData.set('existing_filename', stateFilename);
-        }
-
-        const videoFile = formData.get('video_file');
-        const hasFile = videoFile instanceof File && videoFile.size > 0;
-        const hasExisting = Boolean(formData.get('existing_filename'));
-
-        if (!hasFile && !hasExisting) {
-            const msg = 'Please choose a video from the library or select a direct video file first.';
-            if (isAdd) {
-                this.analysisErrorAdd = msg;
-            } else {
-                this.analysisErrorEdit = msg;
-            }
-            return;
-        }
-
-        if (isAdd) {
-            this.isAnalyzingAdd = true;
-            this.analysisSuccessAdd = false;
-            this.analysisErrorAdd = '';
-            this.analysisStageAdd = 'Inspecting video stream & duration...';
-        } else {
-            this.isAnalyzingEdit = true;
-            this.analysisSuccessEdit = false;
-            this.analysisErrorEdit = '';
-            this.analysisStageEdit = 'Inspecting video stream & duration...';
-        }
-
-        const stages = [
-            'Inspecting video stream & duration...',
-            'Extracting HD WebP & JPG poster frames...',
-            'Extracting audio & transcribing speech verbatim...',
-            'Translating speech & inferring traveler details...',
-            'Matching active tour & generating Video SEO tags...'
-        ];
-        let stageStep = 0;
-        const stageTimer = setInterval(() => {
-            stageStep++;
-            if (stageStep < stages.length) {
-                if (isAdd) {
-                    this.analysisStageAdd = stages[stageStep];
-                } else {
-                    this.analysisStageEdit = stages[stageStep];
-                }
-            }
-        }, 1400);
-
-        try {
-            formData.set('_token', '{{ csrf_token() }}');
-
-            const response = await fetch('{{ route('admin.video-reviews.analyze') }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
-            clearInterval(stageTimer);
-            const res = await response.json();
-
-            if (res.success && res.data) {
-                const d = res.data;
-                if (isAdd) {
-                    this.addForm.title = d.title || '';
-                    this.addForm.reviewer_name = d.reviewer_name || '';
-                    this.addForm.reviewer_country = d.reviewer_country || '';
-                    this.addForm.reviewer_country_code = d.reviewer_country_code || '';
-                    this.addForm.category = d.category || 'red_dunes';
-                    this.addForm.tour_slug = d.tour_slug || '';
-                    this.addForm.rating = d.rating || 5.0;
-                    this.addForm.duration = d.duration || 30;
-                    this.addForm.transcript = d.transcript || '';
-                    this.addForm.caption = d.caption || '';
-                    this.addForm.location = d.location || 'Lahbab Red Dunes, Dubai, UAE';
-                    this.addForm.description = d.description || '';
-                    this.addForm.keywords = d.keywords || '';
-                    this.addForm.existing_filename = d.video_filename || '';
-                    this.addForm.existing_poster = d.poster_filename || '';
-                    this.addForm.poster_preview_url = d.poster_url || '';
-                    this.analysisSuccessAdd = true;
-                    this.analysisStageAdd = '✨ Video analyzed! All 14 fields auto-filled.';
-
-                    // Also sync DOM inputs directly
-                    ['title', 'reviewer_name', 'reviewer_country', 'reviewer_country_code', 'category', 'tour_slug', 'rating', 'duration', 'transcript', 'caption', 'location', 'description', 'keywords'].forEach(field => {
-                        const el = formEl.querySelector(`[name="${field}"]`);
-                        if (el && d[field] !== undefined) {
-                            el.value = d[field];
-                            el.dispatchEvent(new Event('input', { bubbles: true }));
-                            el.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                    });
-                    const posterEl = formEl.querySelector('[name="existing_poster"]');
-                    if (posterEl && d.poster_filename) {
-                        posterEl.value = d.poster_filename;
-                        posterEl.dispatchEvent(new Event('input', { bubbles: true }));
-                        posterEl.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                } else {
-                    this.editingItem.title = d.title || this.editingItem.title;
-                    this.editingItem.reviewer_name = d.reviewer_name || this.editingItem.reviewer_name;
-                    this.editingItem.reviewer_country = d.reviewer_country || this.editingItem.reviewer_country;
-                    this.editingItem.reviewer_country_code = d.reviewer_country_code || this.editingItem.reviewer_country_code;
-                    this.editingItem.category = d.category || this.editingItem.category;
-                    this.editingItem.tour_slug = d.tour_slug || this.editingItem.tour_slug;
-                    this.editingItem.rating = d.rating || this.editingItem.rating;
-                    this.editingItem.duration = d.duration || this.editingItem.duration;
-                    this.editingItem.transcript = d.transcript || this.editingItem.transcript;
-                    this.editingItem.caption = d.caption || this.editingItem.caption;
-                    this.editingItem.location = d.location || this.editingItem.location;
-                    this.editingItem.description = d.description || this.editingItem.description;
-                    this.editingItem.keywords = d.keywords ? d.keywords.split(',').map(s => s.trim()) : this.editingItem.keywords;
-                    if (d.poster_filename) {
-                        this.editingItem.poster_filename = d.poster_filename;
-                    }
-                    this.analysisSuccessEdit = true;
-                    this.analysisStageEdit = '✨ Video analyzed! Fields refreshed from AI.';
-                }
-            } else {
-                const err = res.message || 'Video analysis failed. Please verify the file.';
-                if (isAdd) {
-                    this.analysisErrorAdd = err;
-                } else {
-                    this.analysisErrorEdit = err;
-                }
-            }
-        } catch (e) {
-            clearInterval(stageTimer);
-            const err = 'Failed to analyze video: ' + (e.message || 'Network error');
-            if (isAdd) {
-                this.analysisErrorAdd = err;
-            } else {
-                this.analysisErrorEdit = err;
-            }
-        } finally {
-            if (isAdd) {
-                this.isAnalyzingAdd = false;
-            } else {
-                this.isAnalyzingEdit = false;
-            }
-        }
-    },
-
-    async togglePlacement(id, placement, event) {
-        const btn = event.currentTarget;
-        const currentActive = btn.dataset.active === '1';
-        btn.disabled = true;
-        try {
-            const res = await fetch(`/admin/video-reviews/${id}/toggle-placement`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ placement: placement })
-            });
-            const data = await res.json();
-            if (data.success) {
-                btn.dataset.active = data.value ? '1' : '0';
-                if (data.value) {
-                    btn.className = 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary text-white transition-all shadow-2xs';
-                } else {
-                    btn.className = 'px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all';
-                }
-            }
-        } catch (e) {
-            alert('Failed to update placement.');
-        } finally {
-            btn.disabled = false;
-        }
-    },
-
-    async toggleStatus(id, event) {
-        const btn = event.currentTarget;
-        btn.disabled = true;
-        try {
-            const res = await fetch(`/admin/video-reviews/${id}/toggle-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-            const data = await res.json();
-            if (data.success) {
-                location.reload();
-            }
-        } catch (e) {
-            alert('Failed to toggle status.');
-            btn.disabled = false;
-        }
-    }
-}">
+<div class="space-y-6" x-data="videoReviewsHub()">
 
     <!-- Top Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1123,3 +824,322 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+window.videoReviewsHub = function videoReviewsHub() {
+    const analyzeUrl = @json(route('admin.video-reviews.analyze'));
+    const csrfToken = @json(csrf_token());
+
+    return {
+        editModalOpen: false,
+        addModalOpen: false,
+        previewModalOpen: false,
+        previewVideoUrl: '',
+        previewVideoTitle: '',
+        editingItem: null,
+
+        // AI Analysis States
+        isAnalyzingAdd: false,
+        analysisStageAdd: '',
+        analysisSuccessAdd: false,
+        analysisErrorAdd: '',
+
+        isAnalyzingEdit: false,
+        analysisStageEdit: '',
+        analysisSuccessEdit: false,
+        analysisErrorEdit: '',
+
+        addForm: {
+            title: '',
+            reviewer_name: '',
+            reviewer_country: '',
+            reviewer_country_code: '',
+            category: 'red_dunes',
+            tour_slug: '',
+            rating: '5.0',
+            duration: 30,
+            transcript: '',
+            caption: '',
+            location: 'Lahbab Red Dunes, Dubai, UAE',
+            description: '',
+            keywords: '',
+            existing_filename: '',
+            existing_poster: '',
+            poster_preview_url: '',
+            placement_home: true,
+            placement_gallery: true,
+            placement_tour: true,
+            is_active: true
+        },
+
+        resetAddForm() {
+            this.addForm = {
+                title: '',
+                reviewer_name: '',
+                reviewer_country: '',
+                reviewer_country_code: '',
+                category: 'red_dunes',
+                tour_slug: '',
+                rating: '5.0',
+                duration: 30,
+                transcript: '',
+                caption: '',
+                location: 'Lahbab Red Dunes, Dubai, UAE',
+                description: '',
+                keywords: '',
+                existing_filename: '',
+                existing_poster: '',
+                poster_preview_url: '',
+                placement_home: true,
+                placement_gallery: true,
+                placement_tour: true,
+                is_active: true
+            };
+            this.isAnalyzingAdd = false;
+            this.analysisStageAdd = '';
+            this.analysisSuccessAdd = false;
+            this.analysisErrorAdd = '';
+            const addFileInput = document.getElementById('add_video_file');
+            if (addFileInput) addFileInput.value = '';
+        },
+
+        openEdit(item) {
+            this.editingItem = JSON.parse(JSON.stringify(item));
+            this.isAnalyzingEdit = false;
+            this.analysisStageEdit = '';
+            this.analysisSuccessEdit = false;
+            this.analysisErrorEdit = '';
+            this.editModalOpen = true;
+        },
+
+        openPreview(url, title) {
+            this.previewVideoUrl = url;
+            this.previewVideoTitle = title;
+            this.previewModalOpen = true;
+        },
+
+        closePreview() {
+            this.previewModalOpen = false;
+            this.previewVideoUrl = '';
+        },
+
+        async analyzeVideo(context = 'add') {
+            const isAdd = context === 'add';
+            const formEl = isAdd
+                ? document.getElementById('addVideoReviewForm')
+                : document.getElementById('editVideoReviewForm');
+
+            if (!formEl) return;
+
+            const formData = new FormData(formEl);
+
+            // Ensure existing_filename is populated from state if hidden input was not updated
+            const stateFilename = isAdd ? this.addForm.existing_filename : (this.editingItem?.filename || '');
+            if (!formData.get('existing_filename') && stateFilename) {
+                formData.set('existing_filename', stateFilename);
+            }
+
+            const videoFile = formData.get('video_file');
+            const hasFile = videoFile instanceof File && videoFile.size > 0;
+            const hasExisting = Boolean(formData.get('existing_filename'));
+
+            if (!hasFile && !hasExisting) {
+                const msg = 'Please choose a video from the library or select a direct video file first.';
+                if (isAdd) {
+                    this.analysisErrorAdd = msg;
+                } else {
+                    this.analysisErrorEdit = msg;
+                }
+                return;
+            }
+
+            if (isAdd) {
+                this.isAnalyzingAdd = true;
+                this.analysisSuccessAdd = false;
+                this.analysisErrorAdd = '';
+                this.analysisStageAdd = 'Inspecting video stream & duration...';
+            } else {
+                this.isAnalyzingEdit = true;
+                this.analysisSuccessEdit = false;
+                this.analysisErrorEdit = '';
+                this.analysisStageEdit = 'Inspecting video stream & duration...';
+            }
+
+            const stages = [
+                'Inspecting video stream & duration...',
+                'Extracting HD WebP & JPG poster frames...',
+                'Extracting audio & transcribing speech verbatim...',
+                'Translating speech & inferring traveler details...',
+                'Matching active tour & generating Video SEO tags...'
+            ];
+            let stageStep = 0;
+            const stageTimer = setInterval(() => {
+                stageStep++;
+                if (stageStep < stages.length) {
+                    if (isAdd) {
+                        this.analysisStageAdd = stages[stageStep];
+                    } else {
+                        this.analysisStageEdit = stages[stageStep];
+                    }
+                }
+            }, 1400);
+
+            try {
+                formData.set('_token', csrfToken);
+
+                const response = await fetch(analyzeUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                clearInterval(stageTimer);
+                const res = await response.json();
+
+                if (response.ok && res.success && res.data) {
+                    const d = res.data;
+                    if (isAdd) {
+                        this.addForm.title = d.title || '';
+                        this.addForm.reviewer_name = d.reviewer_name || '';
+                        this.addForm.reviewer_country = d.reviewer_country || '';
+                        this.addForm.reviewer_country_code = d.reviewer_country_code || '';
+                        this.addForm.category = d.category || 'red_dunes';
+                        this.addForm.tour_slug = d.tour_slug || '';
+                        this.addForm.rating = d.rating || 5.0;
+                        this.addForm.duration = d.duration || 30;
+                        this.addForm.transcript = d.transcript || '';
+                        this.addForm.caption = d.caption || '';
+                        this.addForm.location = d.location || 'Lahbab Red Dunes, Dubai, UAE';
+                        this.addForm.description = d.description || '';
+                        this.addForm.keywords = d.keywords || '';
+                        this.addForm.existing_filename = d.video_filename || '';
+                        this.addForm.existing_poster = d.poster_filename || '';
+                        this.addForm.poster_preview_url = d.poster_url || '';
+                        this.analysisSuccessAdd = true;
+                        this.analysisStageAdd = '✨ Video analyzed! All 14 fields auto-filled.';
+
+                        // Also sync DOM inputs directly
+                        ['title', 'reviewer_name', 'reviewer_country', 'reviewer_country_code', 'category', 'tour_slug', 'rating', 'duration', 'transcript', 'caption', 'location', 'description', 'keywords'].forEach(field => {
+                            const el = formEl.querySelector(`[name="${field}"]`);
+                            if (el && d[field] !== undefined) {
+                                el.value = d[field];
+                                el.dispatchEvent(new Event('input', { bubbles: true }));
+                                el.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        });
+                        const posterEl = formEl.querySelector('[name="existing_poster"]');
+                        if (posterEl && d.poster_filename) {
+                            posterEl.value = d.poster_filename;
+                            posterEl.dispatchEvent(new Event('input', { bubbles: true }));
+                            posterEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    } else {
+                        this.editingItem.title = d.title || this.editingItem.title;
+                        this.editingItem.reviewer_name = d.reviewer_name || this.editingItem.reviewer_name;
+                        this.editingItem.reviewer_country = d.reviewer_country || this.editingItem.reviewer_country;
+                        this.editingItem.reviewer_country_code = d.reviewer_country_code || this.editingItem.reviewer_country_code;
+                        this.editingItem.category = d.category || this.editingItem.category;
+                        this.editingItem.tour_slug = d.tour_slug || this.editingItem.tour_slug;
+                        this.editingItem.rating = d.rating || this.editingItem.rating;
+                        this.editingItem.duration = d.duration || this.editingItem.duration;
+                        this.editingItem.transcript = d.transcript || this.editingItem.transcript;
+                        this.editingItem.caption = d.caption || this.editingItem.caption;
+                        this.editingItem.location = d.location || this.editingItem.location;
+                        this.editingItem.description = d.description || this.editingItem.description;
+                        this.editingItem.keywords = d.keywords
+                            ? (Array.isArray(d.keywords) ? d.keywords : String(d.keywords).split(',').map(s => s.trim()).filter(Boolean))
+                            : this.editingItem.keywords;
+                        if (d.poster_filename) {
+                            this.editingItem.poster_filename = d.poster_filename;
+                        }
+                        this.analysisSuccessEdit = true;
+                        this.analysisStageEdit = '✨ Video analyzed! Fields refreshed from AI.';
+                    }
+                } else {
+                    const err = res.message || 'Video analysis failed. Please verify the file.';
+                    if (isAdd) {
+                        this.analysisErrorAdd = err;
+                    } else {
+                        this.analysisErrorEdit = err;
+                    }
+                }
+            } catch (e) {
+                clearInterval(stageTimer);
+                const err = 'Failed to analyze video: ' + (e.message || 'Network error');
+                if (isAdd) {
+                    this.analysisErrorAdd = err;
+                } else {
+                    this.analysisErrorEdit = err;
+                }
+            } finally {
+                if (isAdd) {
+                    this.isAnalyzingAdd = false;
+                } else {
+                    this.isAnalyzingEdit = false;
+                }
+            }
+        },
+
+        async togglePlacement(id, placement, event) {
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            try {
+                const res = await fetch(`/admin/video-reviews/${id}/toggle-placement`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ placement: placement })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    btn.dataset.active = data.value ? '1' : '0';
+                    if (data.value) {
+                        btn.className = 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary text-white transition-all shadow-2xs';
+                    } else {
+                        btn.className = 'px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all';
+                    }
+                } else {
+                    alert(data.message || 'Failed to update placement.');
+                }
+            } catch (e) {
+                alert('Failed to update placement.');
+            } finally {
+                btn.disabled = false;
+            }
+        },
+
+        async toggleStatus(id, event) {
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            try {
+                const res = await fetch(`/admin/video-reviews/${id}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Failed to toggle status.');
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                alert('Failed to toggle status.');
+                btn.disabled = false;
+            }
+        }
+    };
+};
+</script>
+@endpush

@@ -185,6 +185,26 @@ class AdminPortalTest extends TestCase
             '/admin/settings/meta',
             '/admin/settings/currency',
             '/admin/profile',
+            '/admin/video-reviews',
+            '/admin/media',
+            '/admin/pages',
+            '/admin/menus',
+            '/admin/wiki',
+            '/admin/wiki/pillars',
+            '/admin/wiki/glossary',
+            '/admin/qa-simulator',
+            '/admin/health',
+            '/admin/audit',
+            '/admin/backlinks',
+            '/admin/settings/redirects',
+            '/admin/settings/notifications',
+            '/admin/settings/languages',
+            '/admin/settings/translations',
+            '/admin/security/ip-rules',
+            '/admin/drivers',
+            '/admin/vehicles',
+            '/admin/reports',
+            '/admin/bookings/drafts',
         ];
 
         foreach ($routes as $route) {
@@ -193,6 +213,22 @@ class AdminPortalTest extends TestCase
                 in_array($response->status(), [200, 301, 302]),
                 "Admin route [{$route}] failed with status {$response->status()}"
             );
+
+            if ($response->status() === 200) {
+                $html = (string) $response->getContent();
+                $strippedHtml = (string) preg_replace('/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/i', '', $html);
+                $visibleText = strip_tags($strippedHtml);
+
+                $this->assertStringNotContainsString('}">', $visibleText, "Route [{$route}] leaked raw Alpine/JS attribute close artifact into visible page text.");
+                $this->assertStringNotContainsString('async togglePlacement(', $strippedHtml, "Route [{$route}] leaked JS method text outside <script>.");
+                $this->assertStringNotContainsString('formEl.querySelector(', $strippedHtml, "Route [{$route}] leaked JS DOM selector text outside <script>.");
+                $this->assertStringNotContainsString('const btn = event.currentTarget', $strippedHtml, "Route [{$route}] leaked JS variable declaration outside <script>.");
+
+                if ($route === '/admin/video-reviews') {
+                    $this->assertStringContainsString('x-data="videoReviewsHub()"', $strippedHtml);
+                    $this->assertStringNotContainsString('s.trim()) : this.editingItem.keywords', $strippedHtml);
+                }
+            }
         }
     }
 
